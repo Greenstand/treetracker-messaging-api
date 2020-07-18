@@ -1,0 +1,273 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Treetracker Messaging API",
+    "version": "1.0.0",
+    "description": "API for Treetracker Messaging service for triggering messages to be sent out to Planters via Treetracker App.",
+    "x-logo": {
+      "url": ""
+    }
+  },
+  "servers": [
+    {
+      "url": "https://treetracker-messaging-api.swagger.io/v1"
+    },
+    {
+      "url": "http://treetracker-messaging-api.swagger.io/v1"
+    }
+  ],
+  "paths": {
+    "/messages": {
+      "summary": "A message is a information sent to the Planter via Treetracker App",
+      "description": "A message is a type of object that contains information as text sent to the planters with generic as well specific business events. For example, a business event like `PaymentSent` as well as a generic message informing effective ways to plant can be sent as a message.",
+      "get": {
+        "parameters": [
+          {
+            "name": "planterIdentifier",
+            "description": "A unique identifier of the planter",
+            "in": "query",
+            "example": "",
+            "required": true,
+            "deprecated": false,
+            "allowEmptyValue": false,
+            "x-last-modified": 1595029316077
+          },
+          {
+            "name": "seqGreaterThan",
+            "description": "A integer whose value is given as a filtering criteria for retrieving messages with ids greater than this specified value",
+            "in": "query",
+            "example": "",
+            "required": true,
+            "deprecated": false,
+            "x-last-modified": 1595029335718
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                   "description": "An object with array field named planterMessages containing message objects.",
+                   "type": "object",
+                  "properties": {
+                    "planterMessages": {
+                      "type": "array"
+                    }
+                  },
+                  "example": "{\r\n    planterMessages: [\r\n        {\r\n            \"id\": 324,\r\n            \"planterIdentifier\": \"planter@greenearth.org\",\r\n            \"subject\": \"Payment Sent\",\r\n            \"body\": \"A payment for the amount 20.00 USD is made via mobile money. To date, 333 trees are uploaded by you out of which 210 are validated/accepted. The total payment sent to you so far is 2100 USD\",\r\n            \"createdAt\": \"2020-04-23T18:25:43.511Z\"\r\n        },\r\n        {\r\n            \"id\": 390,\r\n            \"planterIdentifier\": \"planter@greenearth.org\",\r\n            \"subject\": \"Tips for growing native trees\",\r\n            \"body\": \"Identify the plants that currently grow in your yard and neighborhood. Take photos and use online gardening sites, garden plant apps, or gardening books, or bring your photos to your local nursery for identification help. You’ll be surprised to find that many of the plants used in landscapes are not native.\"\r\n        }\r\n    ]\r\n}"
+                }
+              }
+            },
+            "description": "An array of messages send for a specific planter",
+            "x-last-modified": 1595026579001
+          }
+        },
+        "operationId": "getMessages",
+        "summary": "Retrieve messages for a specific planter",
+        "description": "Get messages retrieves messages meant for a specific planter using two parameters\n`planterIdentifier` - unique identifier for the planter\n`seqGreaterThan`- retrieve messages with id values greater than the specified value\n"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
+              },
+              "example": ""
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": "{\r\n  \"planterIdentifier\": \"planter@greenearth.org\",\r\n  \"subject\": \"Payment Sent\",\r\n  \"body\": \"A payment for the amount 20.00 USD is made via mobile money. To date, 333 trees are uploaded by you out of which 210 are validated/accepted. The total payment sent to you so far is 2100 USD\"\r\n}"
+              }
+            },
+            "description": "",
+            "x-last-modified": 1595026361449
+          }
+        },
+        "operationId": "sendMessage",
+        "summary": "Sends a message to a specific planter",
+        "description": "Used to send a generic message to a planter that is not associated with any specific business event."
+      },
+      "x-last-modified": 1595025803706
+    },
+    "/events": {
+      "summary": "Events associated with treetracker activities  that generate messages for the planter",
+      "description": "The end point is meant like a webhook that consumes the business events associated with treetracker activities that result in messages for planters informing them of their payment status and tree approval counts etc.",
+      "post": {
+        "requestBody": {
+          "description": "A event associated with a planter's tree tracking activities. It comes with payload that varies according to the type of event determined by its name. This event when consumed by the API translates it into a message for the planter informing their payment, tree approval or other related status associated with their activity.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Event"
+              },
+              "example": {
+                "name": "PaymentSent",
+                "planterIdentifier": "<email or phonenumber of the planter>",
+                "payload": {
+                  "paymentAmount": 200,
+                  "paymentCurrency": "USD",
+                  "paymentForTreeCount": 20,
+                  "totalValidatedTreeCount": 210,
+                  "totalUploadedTreeCount": 333,
+                  "totalPaymentSent": 2100
+                },
+                "status": "Processed",
+                "createdAt": "2020-04-23T18:25:43.511Z"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": "{\r\n  \"id\": 324,\r\n  \"planterIdentifier\": \"planter@greenearth.org\",\r\n  \"subject\": \"Payment Sent\",\r\n  \"body\": \"A payment for the amount 20.00 USD is made via mobile money. To date, 333 trees are uploaded by you out of which 210 are validated/accepted. The total payment sent to you so far is 2100 USD\",\r\n  \"createdAt\": \"2020-04-23T18:25:43.511Z\"\r\n}"
+              }
+            },
+            "description": "The consumed event is translated into a message for the planter to retrieve. This response indicates a synchronous process resulting in a message.",
+            "x-last-modified": 1595027620502
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                },
+                "example": ""
+              }
+            },
+            "description": "In case of async processing, event is recorded by the server but hasn't translated that into the message.\nThis might come handy to queue and batch  processing of events into messages. If an admin wants to cancel or reprocess certain events, it can be done by marking the status to \"Pending\".",
+            "x-last-modified": 1595027456330
+          }
+        },
+        "operationId": "postEvent",
+        "summary": "Webhook for consuming events that translates to messages",
+        "description": "Webhook for consuming events that translates to messages for planters."
+      },
+      "x-last-modified": 1595026774627
+    }
+  },
+  "components": {
+    "schemas": {
+      "Message": {
+        "description": "A message object is a notification that is delievered to the treetracker app targeting a specific planter. It contains textual information derived from various events associated with treetracker activities that occur on the greenstand platform. ",
+        "required": [
+          "planterIdentifier",
+          "subject",
+          "body"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Tips for planting trees"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2020-04-23T18:25:43.511Z"
+          }
+        },
+        "example": {
+          "id": 324,
+          "planterIdentifier": "planter@greenearth.org",
+          "subject": "Payment Sent",
+          "body": "A payment for the amount 20.00 USD is made via mobile money. To date, 333 trees are uploaded by you out of which 210 are validated/accepted. The total payment sent to you so far is 2100 USD",
+          "createdAt": "2020-04-23T18:25:43.511Z"
+        },
+        "x-last-modified": 1595023538738
+      },
+      "Event": {
+        "description": "Event represents a process that has happened in the Greenstand servers that are of interest to treetracker messaging platform that converts these events into messages for the Planters via Treetracker Applications.",
+        "required": [
+          "planterIdentifier",
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "description": "A discriminator to differentiate events from each other.",
+            "type": "string",
+            "example": "PaymentSent. More event types to be defined."
+          },
+          "planterIdentifier": {
+            "description": "Represents unique planter",
+            "type": "string",
+            "example": "+255621067201 or treeplanter@greenearth.org"
+          },
+          "payload": {
+            "description": "Represents an json object with properties that vary depending on the event name",
+            "type": "object"
+          },
+          "status": {
+            "description": "The status whether the event is processed or not. Possible values are 'Processed' or 'Pending'",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "A serialized representation of the date and time with time zone information.",
+            "type": "string",
+            "example": "2020-04-23T18:25:43.511Z"
+          }
+        },
+        "example": {
+          "name": "PaymentSent",
+          "planterIdentifier": "<email or phonenumber of the planter>",
+          "payload": {
+            "paymentAmount": 200,
+            "paymentCurrency": "USD",
+            "paymentForTreeCount": 20,
+            "totalValidatedTreeCount": 210,
+            "totalUploadedTreeCount": 333,
+            "totalPaymentSent": 2100
+          },
+          "status": "Processed",
+          "createdAt": "2020-04-23T18:25:43.511Z"
+        },
+        "x-last-modified": 1595023557109
+      }
+    },
+    "securitySchemes": {
+      "JWTAuth": {
+        "type": "apiKey",
+        "description": "Example: \n> Authorization: Bearer <token>",
+        "name": "token",
+        "in": "header",
+        "x-last-modified": 1595023918720
+      }
+    },
+    "responses": {}
+  },
+  "security": [
+    {
+      "JWTAuth": []
+    }
+  ],
+  "tags": []
+}
