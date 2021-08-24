@@ -122,12 +122,12 @@ paths:
                   - messages
                   - links
     post:
-      summary: ''
+      summary: Create a message resource
       operationId: post-messages
       responses:
         '200':
           description: OK
-      description: ''
+      description: Create a message resource
       parameters: []
       requestBody:
         content:
@@ -174,7 +174,7 @@ paths:
                 - composed_at
   /message/send:
     post:
-      summary: ''
+      summary: Author a new message or group message.
       operationId: post-message-send
       responses:
         '200':
