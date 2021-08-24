@@ -1,0 +1,246 @@
+openapi: 3.1.0
+info:
+  title: Messages API
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /message:
+    parameters: []
+    get:
+      summary: Get messages for a planter or author
+      tags: []
+      operationId: get-users-userId
+      description: 'Retreive messages for an author or planter since a specified date, with pagination.'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: author_handle
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: offset
+        - schema:
+            type: integer
+            maximum: 100
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: since
+          description: IS0 8601 DateTime
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    messages:
+                      - from: Sender
+                        subject: Subject
+                        body: Body
+                        sent_at: 123123
+                    links:
+                      prev: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=0&limit=100'
+                      next: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=200&limit=100'
+                properties:
+                  messages:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    items:
+                      type: object
+                      properties:
+                        parent_message_id:
+                          type: string
+                          format: uuid
+                        from:
+                          type: string
+                          minLength: 1
+                        to:
+                          type: string
+                        subject:
+                          type: string
+                          minLength: 1
+                        body:
+                          type: string
+                          minLength: 1
+                        composed_at:
+                          type: string
+                          format: ISO 8601
+                        survey:
+                          type:
+                            - object
+                            - 'null'
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            title:
+                              type: string
+                            response:
+                              type: boolean
+                            questions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  prompt:
+                                    type: string
+                                  choices:
+                                    type: array
+                                    items:
+                                      type: string
+                            answers:
+                              type: array
+                              items:
+                                type: string
+                      required:
+                        - from
+                        - subject
+                        - body
+                        - composed_at
+                  links:
+                    type: object
+                    required:
+                      - prev
+                      - next
+                    properties:
+                      prev:
+                        type: string
+                        minLength: 1
+                      next:
+                        type: string
+                        minLength: 1
+                required:
+                  - messages
+                  - links
+    post:
+      summary: ''
+      operationId: post-messages
+      responses:
+        '200':
+          description: OK
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  planter_identifier: string
+                  organization_id: integer
+                  region: string
+                  from: string
+                  subject: string
+                  body: string
+              properties:
+                parent_message_id:
+                  type:
+                    - integer
+                    - 'null'
+                author_handle:
+                  type: string
+                  minLength: 1
+                receipient_handle:
+                  type: string
+                subject:
+                  type: string
+                  minLength: 1
+                body:
+                  type: string
+                  minLength: 1
+                composed_at:
+                  type: string
+                  format: ISO 8601
+                survey_id:
+                  type: string
+                  format: uuid
+                survey_response:
+                  type: string
+              required:
+                - author_handle
+                - subject
+                - body
+                - composed_at
+  /message/send:
+    post:
+      summary: ''
+      operationId: post-message-send
+      responses:
+        '200':
+          description: OK
+      description: 'Create a new message or group message.  Only one of planter_identifier, organization_id, or region can be specified to direct a message to users.   This is a special API path to be used by the admin panel tool to queue messages for delivery'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  planter_identifier: string
+                  organization_id: integer
+                  region: string
+                  from: string
+                  subject: string
+                  body: string
+              properties:
+                parent_message_id:
+                  type:
+                    - integer
+                    - 'null'
+                planter_identifier:
+                  type: string
+                  minLength: 1
+                region:
+                  type: string
+                  minLength: 1
+                organization_id:
+                  type: integer
+                from:
+                  type: string
+                  minLength: 1
+                subject:
+                  type: string
+                  minLength: 1
+                body:
+                  type: string
+                  minLength: 1
+                survey:
+                  type: object
+                  properties:
+                    questions:
+                      type: array
+                      maxItems: 3
+                      description: A list of questions and multiple choice responses
+                      items:
+                        type: object
+                        properties:
+                          question:
+                            type: string
+                          choices:
+                            type: array
+                            items:
+                              type: string
+                '':
+                  type: string
+              required:
+                - planter_identifier
+                - region
+                - organization_id
+                - from
+                - subject
+                - body
+components:
+  schemas: {}
