@@ -10,7 +10,7 @@ paths:
       summary: Get messages for a planter or author
       tags: []
       operationId: get-users-userId
-      description: 'Retreive messages for an author or planter since a specified date, with pagination.'
+      description: 'Retreive messages for a handle since a specified date, with pagination.  Includes both messages too and from the handle.'
       parameters:
         - schema:
             type: string
@@ -24,6 +24,7 @@ paths:
         - schema:
             type: integer
             maximum: 100
+            default: 100
           in: query
           name: limit
         - schema:
@@ -74,6 +75,8 @@ paths:
                         composed_at:
                           type: string
                           format: ISO 8601
+                        video_link:
+                          type: string
                         survey:
                           type:
                             - object
@@ -103,6 +106,7 @@ paths:
                                 type: string
                       required:
                         - from
+                        - to
                         - subject
                         - body
                         - composed_at
@@ -115,9 +119,11 @@ paths:
                       prev:
                         type: string
                         minLength: 1
+                        description: Complete link with query string to the next page of messages
                       next:
                         type: string
                         minLength: 1
+                        description: Complete link with query string to the previous page of messages
                 required:
                   - messages
                   - links
@@ -167,6 +173,8 @@ paths:
                   format: uuid
                 survey_response:
                   type: string
+                video_link:
+                  type: string
               required:
                 - author_handle
                 - subject
@@ -199,15 +207,14 @@ paths:
                   type:
                     - integer
                     - 'null'
-                planter_identifier:
+                recipient_handle:
                   type: string
                   minLength: 1
-                region:
-                  type: string
-                  minLength: 1
+                region_id:
+                  type: integer
                 organization_id:
                   type: integer
-                from:
+                author_handle:
                   type: string
                   minLength: 1
                 subject:
@@ -232,14 +239,122 @@ paths:
                             type: array
                             items:
                               type: string
-                '':
-                  type: string
               required:
-                - planter_identifier
-                - region
+                - recipient_handle
+                - region_id
                 - organization_id
-                - from
+                - author_handle
                 - subject
                 - body
+            examples:
+              simple-message-example:
+                value:
+                  parent_message_id: 0
+                  recipient_handle: '+13132324232'
+                  author_handle: string
+                  subject: string
+                  body: string
+              org-wide-message-with-survey:
+                value:
+                  parent_message_id: 0
+                  organization_id: 12
+                  author_handle: string
+                  subject: string
+                  body: string
+                  survey:
+                    questions:
+                      - question: Do you have appriopriate protective gear?
+                        choices:
+                          - 'yes'
+                          - 'no'
+                          - sometimes
+  /region:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        created_at:
+                          type: string
+                          format: IS0 8601 DateTime
+      operationId: get-regions
+      description: Get list of all region descriptions
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-region
+      responses:
+        '200':
+          description: OK
+      description: Create a new region
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                shape:
+                  type: string
+                  format: GeoJSON
+                creator_user_id:
+                  type: integer
+                creator_organization_id:
+                  type: integer
+              required:
+                - name
+                - description
+  '/region/{region_id}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: region_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-region-region_id
+      description: Get all details (including GeoJSON) of a region
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                shape:
+                  type: string
+                  format: GeoJSON
+                  description: GeoJSON that describes the shape of the region as stored in postGIS
+                created_at:
+                  type: string
+                  format: ISO 8601 DateTime
 components:
   schemas: {}
