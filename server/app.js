@@ -1,24 +1,26 @@
 const express = require('express');
 const Sentry = require('@sentry/node');
-const bodyParser = require('body-parser');
 const asyncHandler = require('express-async-handler');
 const { check, validationResult } = require('express-validator');
 const { body } = require('express-validator');
-const HttpError = require('./utils/HttpError');
 //const walletRouter = require("./routes/entityRouter"); // create your router
-const { errorHandler } = require('./routes/utils');
+
+const { sentryDSN } = require('../config/config');
+const HttpError = require('./utils/HttpError');
+const { errorHandler } = require('./utils/utils');
 const log = require('loglevel');
-const helper = require('./routes/utils');
+const { handlerWrapper } = require('./utils/utils');
+const router = require('./routes.js');
 
 const app = express();
 
-// Sentry.init({ dsn: config.sentry_dsn });
+Sentry.init({ dsn: sentryDSN });
 
 /*
  * Check request
  */
 app.use(
-  helper.handlerWrapper(async (req, _res, next) => {
+  handlerWrapper(async (req, _res, next) => {
     if (
       req.method === 'POST' ||
       req.method === 'PATCH' ||
@@ -45,6 +47,9 @@ app.use(express.json()); // parse application/json
 //app.get('/entity', asyncHandler(async (req, res, next) => {
 //
 //}));
+
+//routers
+app.use('/', router);
 
 // Global error handler
 app.use(errorHandler);
