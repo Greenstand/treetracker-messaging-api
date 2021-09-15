@@ -1,5 +1,7 @@
 const { v4: uuid } = require('uuid');
 
+const { getAuthorId } = require('../handlers/helpers');
+
 const Message = ({
   parent_message_id,
   author_handle,
@@ -45,7 +47,7 @@ const MessageObject = ({
   body,
   composed_at = new Date().toISOString(),
   survey_id = null,
-  survey = null,
+  survey,
   survey_response = null,
   video_link = null,
   author_id,
@@ -58,7 +60,7 @@ const MessageObject = ({
     body,
     composed_at,
     survey_id,
-    survey_response: survey ? { survey_response: survey } : { survey_response },
+    survey_response: survey_response ? { survey_response } : null,
     video_link,
     author_id,
     active,
@@ -82,20 +84,20 @@ const MessageRequestObject = ({
     recipient_organization_id: organization_id,
   });
 
-const createMessageResourse = async (messageRepo, requestBody) => {
-  const messageObject = MessageObject(requestBody);
-  const message = await messageRepo.create(messageObject);
-
-  const messageRequestObject = MessageRequestObject({
-    ...requestBody,
-    message_id: message.id,
+const MessageDeliveryObject = ({
+  parent_message_delivery_id = null,
+  message_id,
+  recipient_id,
+}) =>
+  Object.freeze({
+    id: uuid(),
+    created_at: new Date().toISOString(),
+    parent_message_id: parent_message_delivery_id,
+    recipient_id,
+    message_id,
   });
-  const messageRequest = await messageRepo.createMessageRequest(
-    messageRequestObject,
-  );
-};
 
-const authorNewMessage = async (messageRepo, requestBody) => {
+const createMessageResourse = async (messageRepo, requestBody) => {
   const messageObject = MessageObject({ ...requestBody });
   const message = await messageRepo.create(messageObject);
 
@@ -103,14 +105,28 @@ const authorNewMessage = async (messageRepo, requestBody) => {
     ...requestBody,
     message_id: message.id,
   });
-  const messageRequest = await messageRepo.createMessageRequest(
-    messageRequestObject,
-  );
+  await messageRepo.createMessageRequest(messageRequestObject);
+
+  let parent_message_delivery_id = null;
+  // if parent_message_id exists get the message_delivery_id for the parent message
+  if (requestBody.parent_message_id) {
+    parent_message_delivery_id = await messageRepo.getParentMessageDeliveryId(
+      requestBody.parent_message_id,
+    );
+  }
+
+  const messageDeliveryObject = MessageDeliveryObject({
+    ...requestBody,
+    message_id: message.id,
+    parent_message_delivery_id,
+  });
+  await messageRepo.createMessageDelivery(messageDeliveryObject);
 };
 
-const FilterCriteria = ({ author_handle, since }) => {
+const FilterCriteria = ({ author_handle, since, author_id }) => {
   return {
     author_handle,
+    author_id,
     since: since ? new Date(since).toISOString() : since,
   };
 };
@@ -129,7 +145,11 @@ const getMessages =
   async (filterCriteria = undefined, url) => {
     let filter = {};
     let options = { limit: 100, offset: 0 };
-    filter = FilterCriteria({ ...filterCriteria });
+    const author_id = await getAuthorId(filterCriteria.author_handle);
+    filter = FilterCriteria({
+      ...filterCriteria,
+      author_id,
+    });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
     let urlWithLimitAndOffset = `${url}&limit=${options.limit}&offset=`;
@@ -155,5 +175,4 @@ const getMessages =
 module.exports = {
   createMessageResourse,
   getMessages,
-  authorNewMessage,
 };

@@ -29,10 +29,24 @@ class MessageRepository extends BaseRepository {
     return result[0];
   }
 
+  async createMessageDelivery(object) {
+    const result = await this._session
+      .getDB()('message_delivery')
+      .insert(object)
+      .returning('*');
+    expect(result).match([
+      {
+        id: expect.anything(),
+      },
+    ]);
+    return result[0];
+  }
+
   async getMessages(filter, { limit, offset }) {
     const whereBuilder = function (object, builder) {
       let result = builder;
       result.where('message_request.author_handle', filter.author_handle);
+      result.orWhere('message_delivery.recipient_id', filter.author_id);
       if (object.since) {
         result = result.andWhere('created_at', '>=', object.since);
       }
@@ -45,6 +59,12 @@ class MessageRepository extends BaseRepository {
         '=',
         'message_request.message_id',
       )
+      .leftJoin(
+        'message_delivery',
+        'message.id',
+        '=',
+        'message_delivery.message_id',
+      )
       .leftJoin('survey', 'survey.id', '=', 'message.survey_id')
       .leftJoin(
         'survey_question',
@@ -55,6 +75,16 @@ class MessageRepository extends BaseRepository {
       .limit(limit)
       .offset(offset)
       .where((builder) => whereBuilder(filter, builder));
+  }
+
+  async getParentMessageDeliveryId(parent_message_id) {
+    const result = await this._session
+      .getDB()
+      .select('id')
+      .from('message_delivery')
+      .where('message_id', parent_message_id);
+
+    return result[0].id;
   }
 }
 

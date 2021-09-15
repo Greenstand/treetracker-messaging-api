@@ -2,12 +2,9 @@ const Joi = require('joi');
 
 const HttpError = require('../utils/HttpError');
 const Session = require('../models/Session');
-const {
-  createMessageResourse,
-  authorNewMessage,
-  getMessages,
-} = require('../models/Message');
+const { createMessageResourse, getMessages } = require('../models/Message');
 const MessageRepository = require('../repositories/MessageRepository');
+const { getAuthorId } = require('./helpers');
 
 const messageSendPostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
@@ -40,16 +37,20 @@ const messagePostSchema = Joi.object({
   composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
   survey_response: Joi.string(),
-  video_link: Joi.string(),
+  video_link: Joi.string().uri(),
+}).unknown(false);
+
+const messageGetQuerySchema = Joi.object({
+  author_handle: Joi.string().required(),
+  limit: Joi.number().integer().greater(0).less(101),
+  offset: Joi.number().integer().greater(-1),
+  since: Joi.date().iso(),
 }).unknown(false);
 
 const messageGet = async (req, res, next) => {
+  await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
   const session = new Session();
   const messageRepo = new MessageRepository(session);
-
-  if (!req.query.author_handle) {
-    throw new HttpError(400, 'author_handle is required as a query parameter');
-  }
 
   let url = `${req.protocol}://${req.get('host')}/message?author_handle=${
     req.query.author_handle
@@ -65,22 +66,24 @@ const messageGet = async (req, res, next) => {
 const messagePost = async (req, res, next) => {
   await messagePostSchema.validateAsync(req.body, { abortEarly: false });
   const session = new Session();
-
-  //   Get author id using author handle
   const messageRepo = new MessageRepository(session);
-  const authorIdResponse = await messageRepo.getAuthorId(
-    req.body.author_handle,
-  );
-  if (authorIdResponse.length < 1)
-    throw new HttpError(404, 'Author handle not found');
 
-  //   if (authorIdResponse.length > 1)
-  //     throw new HttpError(404, 'Multiple author handles found');
+  // Get author id using author handle
+  const author_id = await getAuthorId(req.body.author_handle);
+
+  let recipient_id = null;
+
+  // Get recipient id using recipient handle
+  if (req.body.recipient_handle) {
+    recipient_id = await getAuthorId(req.body.recipient_handle);
+  }
+
   try {
     await session.beginTransaction();
     await createMessageResourse(messageRepo, {
       ...req.body,
-      author_id: authorIdResponse[0].id,
+      author_id,
+      recipient_id,
     });
     await session.commitTransaction();
     res.status(200).send();
@@ -99,21 +102,22 @@ const messageSendPost = async (req, res, next) => {
   await messageSendPostSchema.validateAsync(req.body, { abortEarly: false });
   const session = new Session();
 
-  //   Get author id using author handle
+  // Get author id using author handle
   const messageRepo = new MessageRepository(session);
-  const authorIdResponse = await messageRepo.getAuthorId(
-    req.body.author_handle,
-  );
-  if (authorIdResponse.length < 1)
-    throw new HttpError(404, 'Author handle not found');
+  const author_id = await getAuthorId(req.body.author_handle);
 
-  //   if (authorIdResponse.length > 1)
-  //     throw new HttpError(404, 'Multiple author handles found');
+  let recipient_id = null;
+
+  // Get recipient id using recipient handle
+  if (req.body.recipient_handle) {
+    recipient_id = await getAuthorId(req.body.recipient_handle);
+  }
   try {
     await session.beginTransaction();
-    await authorNewMessage(messageRepo, {
+    await createMessageResourse(messageRepo, {
       ...req.body,
-      author_id: authorIdResponse[0].id,
+      author_id,
+      recipient_id,
     });
     await session.commitTransaction();
     res.status(200).send();
