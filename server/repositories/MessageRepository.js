@@ -16,22 +16,9 @@ class MessageRepository extends BaseRepository {
       .where('handle', handle);
   }
 
-  async createMessageRequest(object) {
+  async createForOtherTables(object, tablename) {
     const result = await this._session
-      .getDB()('message_request')
-      .insert(object)
-      .returning('*');
-    expect(result).match([
-      {
-        id: expect.anything(),
-      },
-    ]);
-    return result[0];
-  }
-
-  async createMessageDelivery(object) {
-    const result = await this._session
-      .getDB()('message_delivery')
+      .getDB()(tablename)
       .insert(object)
       .returning('*');
     expect(result).match([

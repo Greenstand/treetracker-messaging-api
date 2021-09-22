@@ -105,7 +105,10 @@ const createMessageResourse = async (messageRepo, requestBody) => {
     ...requestBody,
     message_id: message.id,
   });
-  await messageRepo.createMessageRequest(messageRequestObject);
+  await messageRepo.createForOtherTables(
+    messageRequestObject,
+    'message_request',
+  );
 
   let parent_message_delivery_id = null;
   // if parent_message_id exists get the message_delivery_id for the parent message
@@ -120,7 +123,10 @@ const createMessageResourse = async (messageRepo, requestBody) => {
     message_id: message.id,
     parent_message_delivery_id,
   });
-  await messageRepo.createMessageDelivery(messageDeliveryObject);
+  await messageRepo.createForOtherTables(
+    messageDeliveryObject,
+    'message_delivery',
+  );
 };
 
 const FilterCriteria = ({ author_handle, since, author_id }) => {
