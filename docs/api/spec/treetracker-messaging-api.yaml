@@ -233,12 +233,14 @@ paths:
                       items:
                         type: object
                         properties:
-                          question:
+                          prompt:
                             type: string
                           choices:
                             type: array
                             items:
                               type: string
+                    title:
+                      type: string
               required:
                 - recipient_handle
                 - region_id
