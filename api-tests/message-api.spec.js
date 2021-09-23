@@ -8,6 +8,7 @@ const {
   MessageSendPostObject,
   message_delivery_id,
   author_one_handle,
+  survey_title,
 } = require('./seed-data-creation');
 
 describe('Message API tests.', () => {
@@ -349,14 +350,66 @@ describe('Message API tests.', () => {
         });
     });
 
+    it(`Should raise validation error with error code 422 -- survey should be an object with questions as a property `, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.change_property('survey', {
+        title: { ...messageSendPostObject._object.survey.title },
+      });
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err, res) {
+          if (err) return done(err);
+          return done();
+        });
+    });
+
+    it(`Should raise validation error with error code 422 -- survey should be an object with title as a property `, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.change_property('survey', {
+        questions: { ...messageSendPostObject._object.survey.questions },
+      });
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err, res) {
+          if (err) return done(err);
+          return done();
+        });
+    });
+
     it(`Should raise validation error with error code 422 -- survey.questions should not be greater than 3 `, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.change_property('survey', {
+        questions: [
+          { prompt: 'question1', choices: ['a1'] },
+          { prompt: 'question2', choices: ['a2'] },
+          { prompt: 'question3', choices: ['a3'] },
+          { prompt: 'question4', choices: ['a4'] },
+        ],
+      });
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err, res) {
+          if (err) return done(err);
+          return done();
+        });
+    });
+
+    it(`Should raise validation error with error code 422 -- survey.questions is an array of objects with prompt and choices `, function (done) {
       const messageSendPostObject = new MessageSendPostObject();
       messageSendPostObject.change_property('survey', {
         questions: [
           { question: 'question1', choices: ['a1'] },
           { question: 'question2', choices: ['a2'] },
           { question: 'question3', choices: ['a3'] },
-          { question: 'question4', choices: ['a4'] },
         ],
       });
       request(server)
@@ -393,7 +446,13 @@ describe('Message API tests.', () => {
         .where('subject', messageSendPostObject._object.subject)
         .where('body', messageSendPostObject._object.body);
 
+      const survey = await knex
+        .select('id')
+        .table('survey')
+        .where('title', messageSendPostObject._object.survey.title);
+
       expect(message).have.lengthOf(1);
+      expect(survey).have.lengthOf(1);
       expect(message_delivery).have.lengthOf(2);
       expect(message_request).have.lengthOf(1);
     });
@@ -527,6 +586,25 @@ describe('Message API tests.', () => {
           if (err) return done(err);
           expect(res.body).to.have.keys(['messages', 'links']);
           expect(res.body.links).to.have.keys(['prev', 'next']);
+
+          // test if surveys were added successfully
+          const messageSendPostObject = new MessageSendPostObject();
+
+          let survey_one_exists = false;
+          let survey_two_exists = false;
+          for (message of res.body.messages) {
+            let survey = message.survey;
+            if (survey.title === messageSendPostObject._object.survey.title) {
+              survey_one_exists = true;
+              expect(survey.questions).eql(
+                messageSendPostObject._object.survey.questions,
+              );
+            }
+            if (survey.title === survey_title) survey_two_exists = true;
+          }
+
+          expect(survey_one_exists).to.be.true;
+          expect(survey_two_exists).to.be.true;
 
           return done();
         });

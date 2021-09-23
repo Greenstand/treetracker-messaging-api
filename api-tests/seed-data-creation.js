@@ -24,6 +24,9 @@ const existing_region_object = Object.freeze({
   description: 'Timbuktu Timbuktu Timbuktu',
 });
 
+const survey_id = uuid();
+const survey_title = 'Just just another another random title';
+
 const author_one_id = uuid();
 const author_two_id = uuid();
 
@@ -60,6 +63,7 @@ class MessagePostObject extends GenericObject {
       author_handle: author_one_handle,
       subject: 'Subject',
       body: 'Bodyyy',
+      survey_id,
       composed_at: new Date().toISOString(),
       survey_response: 'string',
       video_link: 'https://www.string.com',
@@ -78,10 +82,11 @@ class MessageSendPostObject extends GenericObject {
       survey: {
         questions: [
           {
-            question: 'Wha is the capital of atlantis?',
+            prompt: 'What is the capital of atlantis?',
             choices: ['konoha', "Bermuda's triangle"],
           },
         ],
+        title: 'Just a Random Survey',
       },
     });
   }
@@ -110,12 +115,22 @@ before(async () => {
     INSERT INTO public.message_delivery(
       id, parent_message_id, message_id, recipient_id, created_at)
       VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_one_id}', now());
+
+    INSERT INTO public.survey(
+      id, title, active, created_at)
+      VALUES ('${survey_id}', '${survey_title}', true, now());
   `);
 });
 
 after(async () => {
   const messageSendPostObject = new MessageSendPostObject();
   const messagePostObject = new MessagePostObject();
+
+  const created_survey = await knex
+    .select('id')
+    .table('survey')
+    .where('title', messageSendPostObject._object.survey.title);
+
   await knex.raw(`
 
     DELETE FROM public.message_delivery
@@ -129,6 +144,12 @@ after(async () => {
 
     DELETE FROM public.message
     WHERE id = '${existing_message.id}' or (body = '${messageSendPostObject._object.body}' and subject = '${messageSendPostObject._object.subject}') or (body = '${messagePostObject._object.body}' and subject = '${messagePostObject._object.subject}');
+
+    DELETE FROM public.survey_question
+    WHERE survey_id = '${created_survey[0].id}';
+
+    DELETE FROM public.survey
+    WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';
     
     DELETE FROM public.author
 	  WHERE id = '${author_one_id}' or id = '${author_two_id}';
@@ -143,6 +164,7 @@ module.exports = {
   existing_message,
   message_delivery_id,
   author_one_handle,
+  survey_title,
   RegionObject,
   MessagePostObject,
   MessageSendPostObject,
