@@ -593,6 +593,23 @@ describe('Message API tests.', () => {
           let survey_one_exists = false;
           let survey_two_exists = false;
           for (message of res.body.messages) {
+            expect(message).to.have.keys([
+              'parent_message_id',
+              'from',
+              'to',
+              'subject',
+              'body',
+              'composed_at',
+              'video_link',
+              'survey',
+            ]);
+            expect(message.survey).to.have.keys([
+              'id',
+              'title',
+              'questions',
+              'response',
+              'answers',
+            ]);
             let survey = message.survey;
             if (survey.title === messageSendPostObject._object.survey.title) {
               survey_one_exists = true;
