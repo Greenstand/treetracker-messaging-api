@@ -19,10 +19,12 @@ const messageSendPostSchema = Joi.object({
       .max(3)
       .items(
         Joi.object({
-          question: Joi.string(),
-          choices: Joi.array().items(Joi.string()),
+          prompt: Joi.string().required(),
+          choices: Joi.array().items(Joi.string()).required(),
         }),
-      ),
+      )
+      .required(),
+    title: Joi.string().required(),
   }),
 })
   .unknown(false)

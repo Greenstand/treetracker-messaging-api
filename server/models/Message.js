@@ -15,8 +15,7 @@ const Message = ({
   survey_response,
   survey_id,
   title,
-  prompt,
-  choices,
+  questions,
 }) =>
   Object.freeze({
     parent_message_id,
@@ -34,10 +33,7 @@ const Message = ({
       id: survey_id,
       title,
       response: survey_response ? true : false,
-      questions: {
-        prompt,
-        choices,
-      },
+      questions,
       answers: [''],
     },
   });
@@ -97,8 +93,54 @@ const MessageDeliveryObject = ({
     message_id,
   });
 
+const SurveyObject = ({ survey }) =>
+  Object.freeze({
+    id: uuid(),
+    title: survey.title,
+    created_at: new Date().toISOString(),
+    active: true,
+  });
+
+const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
+  Object.freeze({
+    id: uuid(),
+    survey_id,
+    rank,
+    prompt,
+    choices,
+    created_at: new Date().toISOString(),
+  });
+
 const createMessageResourse = async (messageRepo, requestBody) => {
-  const messageObject = MessageObject({ ...requestBody });
+  let survey_id = requestBody.survey_id;
+  // IF this has a survey object, a message/send POST request
+  if (requestBody.survey) {
+    const surveyObject = SurveyObject({ ...requestBody });
+    const survey = await messageRepo.createForOtherTables(
+      surveyObject,
+      'survey',
+    );
+
+    survey_id = survey.id;
+
+    let rank = 1;
+
+    for (const { prompt, choices } of requestBody.survey.questions) {
+      const surveyQuestionObject = SurveyQuestionObject({
+        survey_id,
+        prompt,
+        choices,
+        rank,
+      });
+      rank++;
+      await messageRepo.createForOtherTables(
+        surveyQuestionObject,
+        'survey_question',
+      );
+    }
+  }
+
+  const messageObject = MessageObject({ ...requestBody, survey_id });
   const message = await messageRepo.create(messageObject);
 
   const messageRequestObject = MessageRequestObject({
@@ -111,6 +153,7 @@ const createMessageResourse = async (messageRepo, requestBody) => {
   );
 
   let parent_message_delivery_id = null;
+
   // if parent_message_id exists get the message_delivery_id for the parent message
   if (requestBody.parent_message_id) {
     parent_message_delivery_id = await messageRepo.getParentMessageDeliveryId(

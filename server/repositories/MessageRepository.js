@@ -35,7 +35,7 @@ class MessageRepository extends BaseRepository {
       result.where('message_request.author_handle', filter.author_handle);
       result.orWhere('message_delivery.recipient_id', filter.author_id);
       if (object.since) {
-        result = result.andWhere('created_at', '>=', object.since);
+        result = result.andWhere('message.created_at', '>=', object.since);
       }
     };
     return await this._session
@@ -59,7 +59,42 @@ class MessageRepository extends BaseRepository {
         '=',
         'survey_question.survey_id',
       )
+      .select(
+        'message_request.parent_message_id',
+        'message_request.author_handle',
+        'message_request.recipient_handle',
+        'message_request.recipient_organization_id',
+        'message_request.recipient_region_id',
+        'message.subject',
+        'message.body',
+        'message.video_link',
+        'message.composed_at',
+        'message.survey_response',
+        'message.survey_id',
+        'survey.title',
+        this._session
+          .getDB()
+          .raw(
+            `json_agg(json_build_object('prompt', survey_question.prompt, 'choices', survey_question.choices)) as questions`,
+          ),
+      )
       .limit(limit)
+      .groupBy(
+        'message_request.recipient_handle',
+        'message.id',
+        'message.survey_id',
+        'message_request.parent_message_id',
+        'message_request.author_handle',
+        'message_request.recipient_organization_id',
+        'message_request.recipient_region_id',
+        'message.subject',
+        'message.body',
+        'message.video_link',
+        'message.composed_at',
+        'message.survey_response',
+        'message.survey_id',
+        'survey.title',
+      )
       .offset(offset)
       .where((builder) => whereBuilder(filter, builder));
   }
