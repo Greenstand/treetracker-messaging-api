@@ -34,7 +34,7 @@ const Message = ({
       title,
       response: survey_response ? true : false,
       questions,
-      answers: [''],
+      answers: [survey_response],
     },
   });
 
