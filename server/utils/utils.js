@@ -2,10 +2,10 @@
  * Some utils for router/express
  */
 const log = require('loglevel');
+const { ValidationError } = require('joi');
 const HttpError = require('./HttpError');
 // const ApiKeyService = require("../services/ApiKeyService");
 // const JWTService = require('../services/JWTService.js');
-const { ValidationError } = require('joi');
 // const Session = require('../models/Session');
 
 /*
@@ -52,17 +52,17 @@ exports.errorHandler = (err, req, res, next) => {
   }
 };
 
-exports.apiKeyHandler = exports.handlerWrapper(async (req, res, next) => {
-  const session = new Session();
-  const apiKey = new ApiKeyService(session);
-  await apiKey.check(req.headers['treetracker-api-key']);
-  log.debug('Valid Access');
-  next();
-});
+// exports.apiKeyHandler = exports.handlerWrapper(async (req, res, next) => {
+//   const session = new Session();
+//   const apiKey = new ApiKeyService(session);
+//   await apiKey.check(req.headers['treetracker-api-key']);
+//   log.debug('Valid Access');
+//   next();
+// });
 
-exports.verifyJWTHandler = exports.handlerWrapper(async (req, res, next) => {
-  const jwtService = new JWTService();
-  const decode = jwtService.verify(req.headers.authorization);
-  res.locals.wallet_id = decode.id;
-  next();
-});
+// exports.verifyJWTHandler = exports.handlerWrapper(async (req, res, next) => {
+//   const jwtService = new JWTService();
+//   const decode = jwtService.verify(req.headers.authorization);
+//   res.locals.wallet_id = decode.id;
+//   next();
+// });

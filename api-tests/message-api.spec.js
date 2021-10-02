@@ -1,15 +1,12 @@
 require('dotenv').config();
 const request = require('supertest');
+const { expect } = require('chai');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
-const { expect } = require('chai');
-const {
-  MessagePostObject,
-  MessageSendPostObject,
-  message_delivery_id,
-  author_one_handle,
-  survey_title,
-} = require('./seed-data-creation');
+const { message_delivery_id, survey_title } = require('./seed-data-creation');
+const { author_one_handle } = require('./generic-class');
+const MessagePostObject = require('./message-post-class');
+const MessageSendPostObject = require('./message-send-post-class');
 
 describe('Message API tests.', () => {
   describe('Message POST', () => {
@@ -21,7 +18,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -35,7 +32,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(404)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -52,7 +49,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(404)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -66,7 +63,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -80,7 +77,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -94,7 +91,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -108,7 +105,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -122,7 +119,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -139,7 +136,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -153,7 +150,7 @@ describe('Message API tests.', () => {
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -202,7 +199,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -219,7 +216,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(404)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -236,7 +233,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(404)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -254,7 +251,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -268,7 +265,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -282,7 +279,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -299,7 +296,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -314,7 +311,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -328,7 +325,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -344,7 +341,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -360,7 +357,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -376,7 +373,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -397,7 +394,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -417,7 +414,7 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -464,7 +461,7 @@ describe('Message API tests.', () => {
         .get(`/message`)
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -478,7 +475,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(404)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -493,7 +490,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -508,7 +505,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -523,7 +520,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -538,7 +535,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -553,7 +550,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -568,7 +565,7 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(422)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });
@@ -592,7 +589,7 @@ describe('Message API tests.', () => {
 
           let survey_one_exists = false;
           let survey_two_exists = false;
-          for (message of res.body.messages) {
+          for (const message of res.body.messages) {
             expect(message).to.have.keys([
               'parent_message_id',
               'from',
@@ -610,7 +607,7 @@ describe('Message API tests.', () => {
               'response',
               'answers',
             ]);
-            let survey = message.survey;
+            const { survey } = message;
             if (survey.title === messageSendPostObject._object.survey.title) {
               survey_one_exists = true;
               expect(survey.questions).eql(

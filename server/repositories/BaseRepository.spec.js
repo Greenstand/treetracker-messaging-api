@@ -2,6 +2,7 @@ const BaseRepository = require("./BaseRepository");
 const {expect} = require("chai");
 const knex = require("../database/knex");
 const mockKnex = require("mock-knex");
+
 const tracker = mockKnex.getTracker();
 const jestExpect = require("expect");
 const Session = require("../models/Session");
@@ -32,7 +33,7 @@ describe("BaseRepository", () => {
     expect(entity).property("id").eq(1);
   });
 
-  //TODO
+  // TODO
   it.skip("getById can not find result, should throw 404", () => {
   });
 
@@ -235,7 +236,7 @@ describe("BaseRepository", () => {
       expect(result).eq(1);
     });
 
-    //TODO
+    // TODO
     describe.skip("count support and and or", () => {
     });
   });

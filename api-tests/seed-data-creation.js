@@ -1,22 +1,14 @@
 const { v4: uuid } = require('uuid');
 const knex = require('../server/database/knex');
-
-class GenericObject {
-  constructor(payload) {
-    this._object = payload;
-  }
-
-  delete_property(property) {
-    delete this._object[property];
-  }
-
-  change_property(property, value) {
-    this._object[property] = value;
-  }
-}
-const existing_message = Object.freeze({
-  id: uuid(),
-});
+const {
+  existing_message,
+  author_one_handle,
+  author_two_handle,
+  survey_id,
+} = require('./generic-class');
+const RegionObject = require('./region-class');
+const MessagePostObject = require('./message-post-class');
+const MessageSendPostObject = require('./message-send-post-class');
 
 const existing_region_object = Object.freeze({
   id: uuid(),
@@ -24,73 +16,10 @@ const existing_region_object = Object.freeze({
   description: 'Timbuktu Timbuktu Timbuktu',
 });
 
-const survey_id = uuid();
 const survey_title = 'Just just another another random title';
 
 const author_one_id = uuid();
 const author_two_id = uuid();
-
-const author_one_handle = 'handle1';
-const author_two_handle = 'handle2';
-
-class RegionObject extends GenericObject {
-  constructor() {
-    super({
-      name: 'Konoha',
-      description: 'The hidden leaf village',
-      shape: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [1, 2],
-            [2, 3],
-            [0, 3],
-            [2, 8],
-          ],
-        ],
-      },
-      creator_user_id: 1,
-      creator_organization_id: 7,
-    });
-  }
-}
-
-class MessagePostObject extends GenericObject {
-  constructor() {
-    super({
-      parent_message_id: existing_message.id,
-      recipient_handle: author_two_handle,
-      author_handle: author_one_handle,
-      subject: 'Subject',
-      body: 'Bodyyy',
-      survey_id,
-      composed_at: new Date().toISOString(),
-      survey_response: 'string',
-      video_link: 'https://www.string.com',
-    });
-  }
-}
-
-class MessageSendPostObject extends GenericObject {
-  constructor() {
-    super({
-      parent_message_id: existing_message.id,
-      recipient_handle: author_one_handle,
-      author_handle: author_two_handle,
-      subject: 'Subject of the message',
-      body: 'Body of the message',
-      survey: {
-        questions: [
-          {
-            prompt: 'What is the capital of atlantis?',
-            choices: ['konoha', "Bermuda's triangle"],
-          },
-        ],
-        title: 'Just a Random Survey',
-      },
-    });
-  }
-}
 
 const message_delivery_id = uuid();
 
@@ -164,8 +93,6 @@ module.exports = {
   existing_message,
   message_delivery_id,
   author_one_handle,
+  author_two_handle,
   survey_title,
-  RegionObject,
-  MessagePostObject,
-  MessageSendPostObject,
 };

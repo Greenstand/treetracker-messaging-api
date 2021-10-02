@@ -3,14 +3,14 @@ const Sentry = require('@sentry/node');
 const asyncHandler = require('express-async-handler');
 const { check, validationResult } = require('express-validator');
 const { body } = require('express-validator');
-//const walletRouter = require("./routes/entityRouter"); // create your router
+// const walletRouter = require("./routes/entityRouter"); // create your router
 
+const log = require('loglevel');
 const { sentryDSN } = require('../config/config');
 const HttpError = require('./utils/HttpError');
 const { errorHandler } = require('./utils/utils');
-const log = require('loglevel');
 const { handlerWrapper } = require('./utils/utils');
-const router = require('./routes.js');
+const router = require('./routes');
 
 const app = express();
 
@@ -40,21 +40,22 @@ app.use(
 app.use(express.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
 app.use(express.json()); // parse application/json
 
-//routers
-//app.use('/entity', entityRouter);
+// routers
+// app.use('/entity', entityRouter);
 
-//paths
-//app.get('/entity', asyncHandler(async (req, res, next) => {
+// paths
+// app.get('/entity', asyncHandler(async (req, res, next) => {
 //
-//}));
+// }));
 
-//routers
+// routers
 app.use('/', router);
 
 // Global error handler
 app.use(errorHandler);
 
-const version = require('../package.json').version;
+const { version } = require('../package.json');
+
 app.get('*', function (req, res) {
   res.status(200).send(version);
 });

@@ -1,6 +1,6 @@
 const Session = require('../models/Session');
 const MessageRepository = require('../repositories/MessageRepository');
-const HttpError = require('../utils/HttpError.js');
+const HttpError = require('../utils/HttpError');
 
 const getAuthorId = async (author_handle) => {
   const session = new Session();

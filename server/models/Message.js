@@ -20,11 +20,7 @@ const Message = ({
   Object.freeze({
     parent_message_id,
     from: author_handle,
-    to: recipient_handle
-      ? recipient_handle
-      : recipient_organization_id
-      ? recipient_organization_id
-      : recipient_region_id,
+    to: recipient_handle || (recipient_organization_id || recipient_region_id),
     subject,
     body,
     composed_at,
@@ -32,7 +28,7 @@ const Message = ({
     survey: {
       id: survey_id,
       title,
-      response: survey_response ? true : false,
+      response: !!survey_response,
       questions,
       answers: [survey_response],
     },
@@ -112,7 +108,7 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
   });
 
 const createMessageResourse = async (messageRepo, requestBody) => {
-  let survey_id = requestBody.survey_id;
+  let {survey_id} = requestBody;
   // IF this has a survey object, a message/send POST request
   if (requestBody.survey) {
     const surveyObject = SurveyObject({ ...requestBody });
@@ -201,9 +197,9 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    let urlWithLimitAndOffset = `${url}&limit=${options.limit}&offset=`;
+    const urlWithLimitAndOffset = `${url}&limit=${options.limit}&offset=`;
 
-    let next = `${urlWithLimitAndOffset}${+options.offset + 1}`;
+    const next = `${urlWithLimitAndOffset}${+options.offset + 1}`;
     let prev = null;
     if (options.offset - 1 >= 0) {
       prev = `${urlWithLimitAndOffset}${+options.offset - 1}`;

@@ -16,13 +16,12 @@ class Session {
   getDB() {
     if (this.thx) {
       return this.thx;
-    } else {
-      return knex;
     }
+    return knex;
   }
 
   isTransactionInProgress() {
-    return this.thx != undefined;
+    return this.thx !== undefined;
   }
 
   async beginTransaction() {
