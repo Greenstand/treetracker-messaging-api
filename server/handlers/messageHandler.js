@@ -54,7 +54,7 @@ const messageGet = async (req, res, next) => {
   const session = new Session();
   const messageRepo = new MessageRepository(session);
 
-  let url = `${req.protocol}://${req.get('host')}/message?author_handle=${
+  const url = `${req.protocol}://${req.get('host')}/message?author_handle=${
     req.query.author_handle
   }`;
 

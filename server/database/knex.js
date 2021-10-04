@@ -2,11 +2,12 @@ const expect = require('expect-runtime');
 const log = require('loglevel');
 
 const connection = require('../../config/config').connectionString;
+
 expect(connection).to.match(/^postgresql:\//);
 
-let knexConfig = {
+const knexConfig = {
   client: 'pg',
-  debug: process.env.NODE_LOG_LEVEL === 'debug' ? true : false,
+  debug: process.env.NODE_LOG_LEVEL === 'debug',
   connection,
   pool: { min: 0, max: 100 },
 };

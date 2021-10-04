@@ -1,11 +1,9 @@
 require('dotenv').config();
 const request = require('supertest');
-const server = require('../server/app');
 const { expect } = require('chai');
-const {
-  existing_region_object,
-  RegionObject,
-} = require('./seed-data-creation');
+const server = require('../server/app');
+const { existing_region_object } = require('./seed-data-creation');
+const RegionObject = require('./region-class');
 
 describe('Region API tests.', () => {
   it(`Should raise validation error with error code 422 -- name is required `, function (done) {
@@ -16,7 +14,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -30,7 +28,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -44,7 +42,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -61,7 +59,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -75,7 +73,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -92,7 +90,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -112,7 +110,7 @@ describe('Region API tests.', () => {
       .send(regionObject._object)
       .set('Accept', 'application/json')
       .expect(422)
-      .end(function (err, res) {
+      .end(function (err) {
         if (err) return done(err);
         return done();
       });
@@ -126,7 +124,7 @@ describe('Region API tests.', () => {
         .send(regionObject._object)
         .set('Accept', 'application/json')
         .expect(200)
-        .end(function (err, res) {
+        .end(function (err) {
           if (err) return done(err);
           return done();
         });

@@ -1,15 +1,16 @@
 const express = require('express');
+
 const router = express.Router();
 const {
   regionPost,
   regionGet,
   regionIdGet,
-} = require('./handlers/regionHandler.js');
+} = require('./handlers/regionHandler');
 const {
   messagePost,
   messageGet,
   messageSendPost,
-} = require('./handlers/messageHandler.js');
+} = require('./handlers/messageHandler');
 const { handlerWrapper } = require('./utils/utils');
 
 router.post('/region', handlerWrapper(regionPost));
