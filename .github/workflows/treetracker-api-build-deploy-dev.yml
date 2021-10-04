@@ -12,6 +12,23 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     if: |
       !contains(github.event.head_commit.message, 'skip-ci')
     steps:
@@ -23,12 +40,28 @@ jobs:
       - name: npm clean install
         run: npm ci
         working-directory: ${{ env.project-directory }}
+
       - name: run ESLint
         run: npm run lint
         working-directory: ${{ env.project-directory }}
+
       - name: run api tests
-        run: npm run test
+        run: npm run test-unit-ci
         working-directory: ${{ env.project-directory }}
+
+      - name: run integration tests
+        run: npm run test-integration-ci
+        working-directory: ${{ env.project-directory }}
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
+          CI: true
+
+      - name: run repository tests
+        run: npm run test-repository
+        working-directory: ${{ env.project-directory }}
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
+          CI: true
 
 
   release:
