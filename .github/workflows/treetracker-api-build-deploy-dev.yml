@@ -12,6 +12,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
 
     # Service containers to run with `container-job`
     services:
@@ -45,9 +46,17 @@ jobs:
         run: npm run lint
         working-directory: ${{ env.project-directory }}
 
-      - name: run api tests
+      - name: run db-migrate
+        run: npm run db-migrate-ci
+        working-directory: ${{ env.project-directory }}
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
+
+      - name: run unit tests
         run: npm run test-unit-ci
         working-directory: ${{ env.project-directory }}
+        env:
+          CI: true
 
       - name: run integration tests
         run: npm run test-integration-ci
