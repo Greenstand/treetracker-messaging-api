@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.1...v1.0.2) (2021-10-05)
+
+
+### Bug Fixes
+
+* add node affinity ([521a38e](https://github.com/Greenstand/treetracker-messaging-api/commit/521a38efbf7e129ff804858c2b8a31e89cce80b3))
+
 ## [1.0.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.0...v1.0.1) (2021-10-05)
 
 
