@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.2...v1.0.3) (2021-10-05)
+
+
+### Bug Fixes
+
+* put affinity into pod template ([6455ab1](https://github.com/Greenstand/treetracker-messaging-api/commit/6455ab1b3639012a56add73ec4e75aa3487b79e7))
+
 ## [1.0.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.1...v1.0.2) (2021-10-05)
 
 
