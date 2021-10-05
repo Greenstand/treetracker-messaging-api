@@ -9,20 +9,20 @@ spec:
   selector:
     matchLabels:
       app: treetracker-messaging-api
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: doks.digitalocean.com/node-pool
-            operator: In
-            values:
-            - default-node-pool
   template:
     metadata:
       labels:
         app: treetracker-messaging-api
     spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+           - key: doks.digitalocean.com/node-pool
+             operator: In
+             values:
+             - default-node-pool    
       containers:
       - name: treetracker-messaging-api
         image: greenstand/treetracker-messaging-api:TAG
