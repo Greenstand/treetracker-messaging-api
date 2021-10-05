@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.0...v1.0.1) (2021-10-05)
+
+
+### Bug Fixes
+
+* correct reference to database connection secret ([00e6966](https://github.com/Greenstand/treetracker-messaging-api/commit/00e69660dc016023a030086ca499cba39bb4a4d7))
+
 # 1.0.0 (2021-10-05)
 
 
