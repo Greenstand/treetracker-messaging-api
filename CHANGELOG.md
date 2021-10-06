@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.3...v1.0.4) (2021-10-06)
+
+
+### Bug Fixes
+
+* correct indent on affinity spec ([08732da](https://github.com/Greenstand/treetracker-messaging-api/commit/08732da284c4d7615f30ea757e2547bfa3214aa6))
+
 ## [1.0.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.2...v1.0.3) (2021-10-05)
 
 
