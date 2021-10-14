@@ -20,9 +20,9 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: doks.digitalocean.com/node-pool
-              operator: In
-              values:
-              - default-node-pool
+                operator: In
+                values:
+                - default-node-pool
       containers:
       - name: treetracker-messaging-api
         image: greenstand/treetracker-messaging-api:TAG
