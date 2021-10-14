@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.5...v1.0.6) (2021-10-14)
+
+
+### Bug Fixes
+
+* use microservices-node-pool ([401c7b5](https://github.com/Greenstand/treetracker-messaging-api/commit/401c7b59a1c2a4350be4d4f2e2f7d62698577536))
+
 ## [1.0.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.4...v1.0.5) (2021-10-14)
 
 
