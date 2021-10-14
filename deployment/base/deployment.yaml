@@ -22,7 +22,7 @@ spec:
               - key: doks.digitalocean.com/node-pool
                 operator: In
                 values:
-                - default-node-pool
+                - microservices-node-pool
       containers:
       - name: treetracker-messaging-api
         image: greenstand/treetracker-messaging-api:TAG
