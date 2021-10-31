@@ -111,7 +111,8 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
   });
 
 const createMessageResourse = async (messageRepo, requestBody, session) => {
-  let { survey_id, organization_id, region_id } = requestBody;
+  let { survey_id } = requestBody;
+  const { organization_id, region_id } = requestBody;
 
   let organizationInfo = {};
   let regionInfo = {};
