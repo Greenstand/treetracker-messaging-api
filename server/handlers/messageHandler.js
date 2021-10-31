@@ -4,6 +4,7 @@ const Session = require('../models/Session');
 const { createMessageResourse, getMessages } = require('../models/Message');
 const MessageRepository = require('../repositories/MessageRepository');
 const { getAuthorId } = require('./helpers');
+const HttpError = require('../utils/HttpError');
 
 const messageSendPostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
@@ -27,7 +28,8 @@ const messageSendPostSchema = Joi.object({
   }),
 })
   .unknown(false)
-  .xor('region_id', 'recipient_handle', 'organization_id');
+  .oxor('recipient_handle', 'region_id')
+  .oxor('recipient_handle', 'organization_id');
 
 const messagePostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
@@ -94,13 +96,20 @@ const messagePost = async (req, res, next) => {
     if (session.isTransactionInProgress()) {
       await session.rollbackTransaction();
     }
-    res.status(422).json({ ...e });
+    next(e);
   }
 };
 
 // Author a new message or group message
 const messageSendPost = async (req, res, next) => {
   await messageSendPostSchema.validateAsync(req.body, { abortEarly: false });
+  const { recipient_handle, region_id, organization_id } = req.body;
+  if (!recipient_handle && !region_id && !organization_id) {
+    throw new HttpError(
+      422,
+      'At least one of recipient_handle, organization_id and region_id must be provided',
+    );
+  }
   const session = new Session();
 
   // Get author id using author handle
@@ -115,11 +124,15 @@ const messageSendPost = async (req, res, next) => {
   }
   try {
     await session.beginTransaction();
-    await createMessageResourse(messageRepo, {
-      ...req.body,
-      author_id,
-      recipient_id,
-    });
+    await createMessageResourse(
+      messageRepo,
+      {
+        ...req.body,
+        author_id,
+        recipient_id,
+      },
+      session,
+    );
     await session.commitTransaction();
     res.status(200).send();
     res.end();
@@ -128,7 +141,7 @@ const messageSendPost = async (req, res, next) => {
     if (session.isTransactionInProgress()) {
       await session.rollbackTransaction();
     }
-    res.status(422).json({ ...e });
+    next(e);
   }
 };
 
