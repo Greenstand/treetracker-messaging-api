@@ -124,7 +124,8 @@ describe('Region API tests.', () => {
         .send(regionObject._object)
         .set('Accept', 'application/json')
         .expect(200)
-        .end(function (err) {
+        .end(function (err, res) {
+          console.log(res.body);
           if (err) return done(err);
           return done();
         });

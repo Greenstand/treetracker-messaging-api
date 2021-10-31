@@ -28,6 +28,24 @@ class RegionRepository extends BaseRepository {
     }
     return object;
   }
+
+  async createRegion(regionObject) {
+    await this._session.getDB().raw(
+      `INSERT INTO region(
+        id, name, description, created_at, creator_user_id, creator_organization_id, active, shape)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ST_SETSRID(ST_GeomFromGeoJSON(?), 4326));`,
+      [
+        regionObject.id,
+        regionObject.name,
+        regionObject.description,
+        regionObject.created_at,
+        regionObject.creator_user_id,
+        regionObject.creator_organization_id,
+        regionObject.active,
+        regionObject.shape,
+      ],
+    );
+  }
 }
 
 module.exports = RegionRepository;

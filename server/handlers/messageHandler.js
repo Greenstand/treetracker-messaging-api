@@ -21,11 +21,11 @@ const messageSendPostSchema = Joi.object({
         Joi.object({
           prompt: Joi.string().required(),
           choices: Joi.array().items(Joi.string()).required(),
-        }),
+        }).unknown(false),
       )
       .required(),
     title: Joi.string().required(),
-  }),
+  }).unknown(false),
 })
   .unknown(false)
   .oxor('recipient_handle', 'region_id')
