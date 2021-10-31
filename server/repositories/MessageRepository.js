@@ -9,7 +9,7 @@ class MessageRepository extends BaseRepository {
   }
 
   async getAuthorId(handle) {
-    return await this._session
+    return this._session
       .getDB()
       .select('id')
       .from('author')
@@ -38,7 +38,7 @@ class MessageRepository extends BaseRepository {
         result = result.andWhere('message.created_at', '>=', object.since);
       }
     };
-    return await this._session
+    return this._session
       .getDB()(this._tableName)
       .innerJoin(
         'message_request',

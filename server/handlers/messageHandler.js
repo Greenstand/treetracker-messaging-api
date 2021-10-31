@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-const HttpError = require('../utils/HttpError');
 const Session = require('../models/Session');
 const { createMessageResourse, getMessages } = require('../models/Message');
 const MessageRepository = require('../repositories/MessageRepository');

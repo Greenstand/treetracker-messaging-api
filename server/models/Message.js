@@ -20,7 +20,7 @@ const Message = ({
   Object.freeze({
     parent_message_id,
     from: author_handle,
-    to: recipient_handle || (recipient_organization_id || recipient_region_id),
+    to: recipient_handle || recipient_organization_id || recipient_region_id,
     subject,
     body,
     composed_at,
@@ -108,7 +108,16 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
   });
 
 const createMessageResourse = async (messageRepo, requestBody) => {
-  let {survey_id} = requestBody;
+  let { survey_id } = requestBody;
+
+  if (requestBody.organization_id) {
+    // check if organization_id is in the stakeholder API
+  }
+
+  if (requestBody.region_id) {
+    // check if the region_id is in the region table
+  }
+
   // IF this has a survey object, a message/send POST request
   if (requestBody.survey) {
     const surveyObject = SurveyObject({ ...requestBody });
@@ -197,7 +206,9 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    const urlWithLimitAndOffset = `${url}&limit=${options.limit}&offset=`;
+    const urlWithLimitAndOffset = `${url}&${
+      filter.since ? `since=${filter.since}` : ''
+    }&limit=${options.limit}&offset=`;
 
     const next = `${urlWithLimitAndOffset}${+options.offset + 1}`;
     let prev = null;

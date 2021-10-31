@@ -9,7 +9,7 @@ class RegionRepository extends BaseRepository {
   }
 
   async getRegions() {
-    return await this._session
+    return this._session
       .getDB()
       .select('id', 'name', 'description', 'created_at')
       .from(this._tableName)
