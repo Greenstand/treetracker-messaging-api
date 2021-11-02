@@ -2,9 +2,8 @@
 apiVersion: getambassador.io/v2
 kind: Mapping
 metadata:
-  name: treetracker-earnings-api
+  name: treetracker-messaging-api
 spec:
   cors:
-    cors:
-    origins: 
+    origins:
     - '*'
