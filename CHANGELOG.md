@@ -1,3 +1,12 @@
+## [1.0.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.6...v1.0.7) (2021-11-02)
+
+
+### Bug Fixes
+
+* open up CORS for development ([a36b6d6](https://github.com/Greenstand/treetracker-messaging-api/commit/a36b6d62025185059a58e05b4b3964e68b722743))
+* open up CORS for development ([ad3dc42](https://github.com/Greenstand/treetracker-messaging-api/commit/ad3dc42e8be52ee87766e1bfd120e5c63ccf984d))
+* open up CORS for development ([2730c7a](https://github.com/Greenstand/treetracker-messaging-api/commit/2730c7af5054a02b7abb1b335fea9d8378f2c31a))
+
 ## [1.0.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.5...v1.0.6) (2021-10-14)
 
 
