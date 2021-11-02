@@ -1,3 +1,10 @@
+## [1.0.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.7...v1.0.8) (2021-11-02)
+
+
+### Bug Fixes
+
+* updated database secret with ssl setting no-verify ([709df96](https://github.com/Greenstand/treetracker-messaging-api/commit/709df965a556757f4c3888784012d31dff8dca33))
+
 ## [1.0.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.6...v1.0.7) (2021-11-02)
 
 
