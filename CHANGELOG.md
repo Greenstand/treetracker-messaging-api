@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.8...v1.0.9) (2021-11-03)
+
+
+### Bug Fixes
+
+* add headers to CORS ([c32bf34](https://github.com/Greenstand/treetracker-messaging-api/commit/c32bf3487705b8b0ec5fb42cbe9f8b451eed812a))
+
 ## [1.0.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.7...v1.0.8) (2021-11-02)
 
 
