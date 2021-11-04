@@ -1,3 +1,18 @@
+# [1.1.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.9...v1.1.0) (2021-11-04)
+
+
+### Bug Fixes
+
+* add extension postgis if not exists ([d0093e3](https://github.com/Greenstand/treetracker-messaging-api/commit/d0093e3c8cb229dbee9e5366a288a355ad039070))
+* linting ([43acefc](https://github.com/Greenstand/treetracker-messaging-api/commit/43acefc253e18e110822c9bb97b2fd56cde3f863))
+* modify region shape column ([df96910](https://github.com/Greenstand/treetracker-messaging-api/commit/df96910914f73fa772a1c97f5ba0e73c32950023))
+* support for multipolygon ([113ecca](https://github.com/Greenstand/treetracker-messaging-api/commit/113eccafa2101bb0869f37ee3a3e9c85968e60b6))
+
+
+### Features
+
+* make provision for organization_id/region_id ([a577406](https://github.com/Greenstand/treetracker-messaging-api/commit/a5774064df56e021ff890650eb60959f9cce6fb7))
+
 ## [1.0.9](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.0.8...v1.0.9) (2021-11-03)
 
 
