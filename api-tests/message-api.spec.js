@@ -1,6 +1,7 @@
 require('dotenv').config();
 const request = require('supertest');
 const { expect } = require('chai');
+const { v4: uuid } = require('uuid');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
 const { message_delivery_id, survey_title } = require('./seed-data-creation');
@@ -317,9 +318,37 @@ describe('Message API tests.', () => {
         });
     });
 
-    it(`Should raise validation error with error code 422 -- only one of region_id, recipient_handle or organization_id should be allowed`, function (done) {
+    it(`Should raise validation error with error code 422 -- only one of recipient_handle or organization_id should be allowed`, function (done) {
       const messageSendPostObject = new MessageSendPostObject();
       messageSendPostObject.change_property('organization_id', 41258);
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err) {
+          if (err) return done(err);
+          return done();
+        });
+    });
+
+    it(`Should raise validation error with error code 422 -- only one of recipient_handle or region_id should be allowed`, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.change_property('region_id', uuid());
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err) {
+          if (err) return done(err);
+          return done();
+        });
+    });
+
+    it(`Should raise validation error with error code 422 -- at least one of organization_id, recipient_handle or region_id should be present`, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.delete_property('recipient_handle');
       request(server)
         .post(`/message/send`)
         .send(messageSendPostObject._object)

@@ -1,6 +1,9 @@
 const { v4: uuid } = require('uuid');
+const axios = require('axios').default;
 
+const HttpError = require('../utils/HttpError');
 const { getAuthorId } = require('../handlers/helpers');
+const RegionRepository = require('../repositories/RegionRepository');
 
 const Message = ({
   parent_message_id,
@@ -20,7 +23,7 @@ const Message = ({
   Object.freeze({
     parent_message_id,
     from: author_handle,
-    to: recipient_handle || (recipient_organization_id || recipient_region_id),
+    to: recipient_handle || recipient_organization_id || recipient_region_id,
     subject,
     body,
     composed_at,
@@ -107,8 +110,29 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
     created_at: new Date().toISOString(),
   });
 
-const createMessageResourse = async (messageRepo, requestBody) => {
-  let {survey_id} = requestBody;
+const createMessageResourse = async (messageRepo, requestBody, session) => {
+  let { survey_id } = requestBody;
+  const { organization_id, region_id } = requestBody;
+
+  let organizationInfo = {};
+  let regionInfo = {};
+
+  if (organization_id) {
+    // check if organization_id is in the stakeholder API
+    const response = await axios.get(
+      `${process.env.ENTITY_API}/${organization_id}`,
+    );
+    organizationInfo = response.data;
+    if (!organizationInfo) {
+      throw new HttpError(422, 'Invalid organization_id received');
+    }
+  }
+
+  if (requestBody.region_id) {
+    const regionRepo = new RegionRepository(session);
+    regionInfo = await regionRepo.getById(region_id);
+  }
+
   // IF this has a survey object, a message/send POST request
   if (requestBody.survey) {
     const surveyObject = SurveyObject({ ...requestBody });
@@ -157,6 +181,18 @@ const createMessageResourse = async (messageRepo, requestBody) => {
     );
   }
 
+  if (organization_id) {
+    // Get all recipients by organization_id
+    // create message_delivery for each of them
+  }
+
+  if (region_id) {
+    // Get all recipients by region_id
+    // create message_delivery for each of them
+    // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
+    return;
+  }
+
   const messageDeliveryObject = MessageDeliveryObject({
     ...requestBody,
     message_id: message.id,
@@ -197,7 +233,9 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    const urlWithLimitAndOffset = `${url}&limit=${options.limit}&offset=`;
+    const urlWithLimitAndOffset = `${url}&${
+      filter.since ? `since=${filter.since}` : ''
+    }&limit=${options.limit}&offset=`;
 
     const next = `${urlWithLimitAndOffset}${+options.offset + 1}`;
     let prev = null;

@@ -9,7 +9,7 @@ class RegionRepository extends BaseRepository {
   }
 
   async getRegions() {
-    return await this._session
+    return this._session
       .getDB()
       .select('id', 'name', 'description', 'created_at')
       .from(this._tableName)
@@ -27,6 +27,24 @@ class RegionRepository extends BaseRepository {
       throw new HttpError(404, `Can not found ${this._tableName} by id:${id}`);
     }
     return object;
+  }
+
+  async createRegion(regionObject) {
+    await this._session.getDB().raw(
+      `INSERT INTO region(
+        id, name, description, created_at, creator_user_id, creator_organization_id, active, shape)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ST_SETSRID(ST_GeomFromGeoJSON(?), 4326));`,
+      [
+        regionObject.id,
+        regionObject.name,
+        regionObject.description,
+        regionObject.created_at,
+        regionObject.creator_user_id,
+        regionObject.creator_organization_id,
+        regionObject.active,
+        regionObject.shape,
+      ],
+    );
   }
 }
 

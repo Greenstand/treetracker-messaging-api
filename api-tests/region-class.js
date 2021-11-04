@@ -6,13 +6,15 @@ class RegionObject extends GenericObject {
       name: 'Konoha',
       description: 'The hidden leaf village',
       shape: {
-        type: 'Polygon',
+        type: 'MultiPolygon',
         coordinates: [
           [
-            [1, 2],
-            [2, 3],
-            [0, 3],
-            [2, 8],
+            [
+              [1, 2],
+              [2, 3],
+              [0, 3],
+              [2, 8],
+            ],
           ],
         ],
       },

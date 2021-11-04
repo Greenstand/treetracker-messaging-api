@@ -3,7 +3,7 @@
   "version": "1.0.9",
   "private": true,
   "engines": {
-    "node": ">=14.0.0 < 15",
+    "node": ">=16.0.0 < 17",
     "npm": ">=6.0.0"
   },
   "main": "server/server.js",
@@ -18,7 +18,7 @@
     "server-test": "DEBUG=express:* NODE_LOG_LEVEL=debug nodemon server/serverTest.js",
     "server": "nodemon server/server.js",
     "test-seedDB": "NODE_ENV=test mocha -r dotenv/config dotenv_config_path=.env.test --timeout 10000 --require co-mocha './**/*.spec.js'",
-    "test-integration-ci": "cross-env NODE_ENV=test mocha -r dotenv/config --dotenv_config_path=.env.test --exit --timeout 30000 --require co-mocha './api-tests'",
+    "test-integration-ci": "NODE_ENV=test mocha -r dotenv/config --dotenv_config_path=.env.test --exit --timeout 30000 --require co-mocha './api-tests'",
     "test-watch": "NODE_ENV=test NODE_LOG_LEVEL=info mocha -r dotenv/config dotenv_config_path=.env.test --timeout 10000 --require co-mocha -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed.spec.js' './__tests__/supertest.js'",
     "test-watch-debug": "NODE_ENV=test NODE_LOG_LEVEL=debug mocha -r dotenv/config dotenv_config_path=.env.test --timeout 10000 --require co-mocha -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed.spec.js' './__tests__/supertest.js'",
     "prettier-fix": "prettier ./ --write",
@@ -31,6 +31,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@sentry/node": "^5.1.0",
+    "axios": "^0.24.0",
     "body-parser": "^1.18.2",
     "db-migrate": "^0.11.12",
     "db-migrate-pg": "^1.2.2",
@@ -40,7 +41,7 @@
     "express-async-handler": "^1.1.4",
     "express-validator": "^6.4.0",
     "joi": "^17.4.2",
-    "knex": "^0.21.5",
+    "knex": "^0.95.12",
     "loglevel": "^1.6.8",
     "pg": "^8.7.1",
     "uuid": "^8.2.0"

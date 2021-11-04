@@ -8,15 +8,9 @@ const regionPostSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
   shape: Joi.object({
-    type: Joi.string().equal('Polygon'),
-    coordinates: Joi.array().items(
-      Joi.array().items(
-        Joi.array()
-          .length(2)
-          .items(Joi.number().required(), Joi.number().required()),
-      ),
-    ),
-  }),
+    type: Joi.string().equal('MultiPolygon'),
+    coordinates: Joi.array(),
+  }).unknown(false),
   creator_user_id: Joi.number().integer(),
   creator_organization_id: Joi.number().integer(),
 }).unknown(false);
@@ -45,7 +39,7 @@ const regionPost = async (req, res, next) => {
   try {
     const regionObject = RegionObject(req.body);
     await session.beginTransaction();
-    await regionRepo.create(regionObject);
+    await regionRepo.createRegion(regionObject);
     await session.commitTransaction();
     res.status(200).send();
     res.end();

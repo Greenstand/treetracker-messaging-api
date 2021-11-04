@@ -13,7 +13,7 @@ const RegionObject = ({
     created_at: new Date().toISOString(),
     name,
     description,
-    shape: shape ? shape.coordinates.join() : null,
+    shape,
     active,
     creator_user_id,
     creator_organization_id,
