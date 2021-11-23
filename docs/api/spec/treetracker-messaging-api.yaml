@@ -104,6 +104,9 @@ paths:
                               type: array
                               items:
                                 type: string
+                        id:
+                          type: string
+                          format: uuid
                       required:
                         - from
                         - to
