@@ -27,25 +27,25 @@ const region_object = new RegionObject();
 
 before(async () => {
   await knex.raw(`
-    INSERT INTO public.author(
+    INSERT INTO author(
 	    id, handle, created_at)
 	  VALUES 
         ('${author_one_id}', '${author_one_handle}', now()),
         ('${author_two_id}', '${author_two_handle}', now());
 
-    INSERT INTO public.region(
+    INSERT INTO region(
         id, name, description, shape, created_at, creator_user_id, creator_organization_id, active)
         VALUES ('${existing_region_object.id}', '${existing_region_object.name}', '${existing_region_object.description}', null, now(), null, null, true);
 
-    INSERT INTO public.message(
+    INSERT INTO message(
       id, author_id, subject, body, video_link, survey_id, survey_response, composed_at, created_at, active)
       VALUES ('${existing_message.id}', '${author_two_id}', 'subject', 'body', null, null, null, now(), now(), true);
     
-    INSERT INTO public.message_delivery(
+    INSERT INTO message_delivery(
       id, parent_message_id, message_id, recipient_id, created_at)
       VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_one_id}', now());
 
-    INSERT INTO public.survey(
+    INSERT INTO survey(
       id, title, active, created_at)
       VALUES ('${survey_id}', '${survey_title}', true, now());
   `);
@@ -62,28 +62,28 @@ after(async () => {
 
   await knex.raw(`
 
-    DELETE FROM public.message_delivery
+    DELETE FROM message_delivery
     WHERE parent_message_id = '${message_delivery_id}';
 
-    DELETE FROM public.message_delivery
+    DELETE FROM message_delivery
     WHERE message_id = '${existing_message.id}';
 
-    DELETE FROM public.message_request
+    DELETE FROM message_request
     WHERE message_id = '${existing_message.id}' or author_handle = '${messageSendPostObject._object.author_handle}' or author_handle = '${messagePostObject._object.author_handle}';
 
-    DELETE FROM public.message
+    DELETE FROM message
     WHERE id = '${existing_message.id}' or (body = '${messageSendPostObject._object.body}' and subject = '${messageSendPostObject._object.subject}') or (body = '${messagePostObject._object.body}' and subject = '${messagePostObject._object.subject}');
 
-    DELETE FROM public.survey_question
+    DELETE FROM survey_question
     WHERE survey_id = '${created_survey[0].id}';
 
-    DELETE FROM public.survey
+    DELETE FROM survey
     WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';
     
-    DELETE FROM public.author
+    DELETE FROM author
 	  WHERE id = '${author_one_id}' or id = '${author_two_id}';
 
-    DELETE FROM public.region
+    DELETE FROM region
     WHERE id = '${existing_region_object.id}' or (name = '${region_object._object.name}' and description = '${region_object._object.description}');
   `);
 });

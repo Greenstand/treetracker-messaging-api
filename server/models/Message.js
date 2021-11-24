@@ -6,6 +6,7 @@ const { getAuthorId } = require('../handlers/helpers');
 const RegionRepository = require('../repositories/RegionRepository');
 
 const Message = ({
+  id,
   parent_message_id,
   author_handle,
   recipient_handle,
@@ -21,6 +22,7 @@ const Message = ({
   questions,
 }) =>
   Object.freeze({
+    id,
     parent_message_id,
     from: author_handle,
     to: recipient_handle || recipient_organization_id || recipient_region_id,
@@ -237,10 +239,10 @@ const getMessages =
       filter.since ? `since=${filter.since}` : ''
     }&limit=${options.limit}&offset=`;
 
-    const next = `${urlWithLimitAndOffset}${+options.offset + 1}`;
+    const next = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
     let prev = null;
-    if (options.offset - 1 >= 0) {
-      prev = `${urlWithLimitAndOffset}${+options.offset - 1}`;
+    if (options.offset - +options.limit >= 0) {
+      prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
     }
 
     const messages = await messageRepo.getMessages(filter, options);
