@@ -620,6 +620,7 @@ describe('Message API tests.', () => {
           let survey_two_exists = false;
           for (const message of res.body.messages) {
             expect(message).to.have.keys([
+              'id',
               'parent_message_id',
               'from',
               'to',

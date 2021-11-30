@@ -67,6 +67,7 @@ class MessageRepository extends BaseRepository {
         'message_request.recipient_region_id',
         'message.subject',
         'message.body',
+        'message.id',
         'message.video_link',
         'message.composed_at',
         'message.survey_response',
