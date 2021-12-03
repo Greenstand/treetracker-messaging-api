@@ -116,21 +116,42 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
 
-  let organizationInfo = {};
-  let regionInfo = {};
-
+  let planterRecipientIds = [];
   if (organization_id) {
-    // check if organization_id is in the stakeholder API
+    const planters_url = `${process.env.TREETRACKER_API_URL}/planters`;
+
+    // get planters in the specified organization from the treetracker-api
     const response = await axios.get(
-      `${process.env.ENTITY_API}/${organization_id}`,
+      `${planters_url}?organization_id=${organization_id}`,
     );
-    organizationInfo = response.data;
-    if (!organizationInfo) {
-      throw new HttpError(422, 'Invalid organization_id received');
+    const planters = response.data.planters;
+    if (planters.length < 1) {
+      throw new HttpError(
+        422,
+        'No planters found in the specified organization',
+      );
     }
+    for (const { email, phone } of planters) {
+      let recipient_id;
+      if (email) {
+        recipient_id = await getAuthorId(email, false);
+      }
+      if (!recipient_id && phone) {
+        recipient_id = await getAuthorId(phone, false);
+      }
+      if (recipient_id) {
+        planterRecipientIds.push(recipient_id);
+      }
+    }
+
+    if (planterRecipientIds.length < 1)
+      throw new HttpError(
+        422,
+        'No author handles found for any of the planters found in the specified organization',
+      );
   }
 
-  if (requestBody.region_id) {
+  if (region_id) {
     const regionRepo = new RegionRepository(session);
     regionInfo = await regionRepo.getById(region_id);
   }
@@ -167,8 +188,11 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
 
   const messageRequestObject = MessageRequestObject({
     ...requestBody,
+    organization_id,
+    region_id,
     message_id: message.id,
   });
+
   await messageRepo.createForOtherTables(
     messageRequestObject,
     'message_request',
@@ -183,27 +207,41 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
     );
   }
 
+  if (requestBody.recipient_id) {
+    const messageDeliveryObject = MessageDeliveryObject({
+      ...requestBody,
+      message_id: message.id,
+      parent_message_delivery_id,
+    });
+    await messageRepo.createForOtherTables(
+      messageDeliveryObject,
+      'message_delivery',
+    );
+    return;
+  }
+
   if (organization_id) {
-    // Get all recipients by organization_id
-    // create message_delivery for each of them
+    // create message_delivery for each of the planters recipientIds
+    for (const recipientId of planterRecipientIds) {
+      const messageDeliveryObject = MessageDeliveryObject({
+        ...requestBody,
+        message_id: message.id,
+        parent_message_delivery_id,
+        recipient_id: recipientId,
+      });
+      await messageRepo.createForOtherTables(
+        messageDeliveryObject,
+        'message_delivery',
+      );
+    }
   }
 
   if (region_id) {
     // Get all recipients by region_id
     // create message_delivery for each of them
     // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
-    return;
   }
-
-  const messageDeliveryObject = MessageDeliveryObject({
-    ...requestBody,
-    message_id: message.id,
-    parent_message_delivery_id,
-  });
-  await messageRepo.createForOtherTables(
-    messageDeliveryObject,
-    'message_delivery',
-  );
+  return;
 };
 
 const FilterCriteria = ({ author_handle, since, author_id }) => {

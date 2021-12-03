@@ -5,7 +5,11 @@ const { v4: uuid } = require('uuid');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
 const { message_delivery_id, survey_title } = require('./seed-data-creation');
-const { author_one_handle } = require('./generic-class');
+const {
+  author_one_handle,
+  organization_id,
+  organization_id_two,
+} = require('./generic-class');
 const MessagePostObject = require('./message-post-class');
 const MessageSendPostObject = require('./message-send-post-class');
 
@@ -240,7 +244,7 @@ describe('Message API tests.', () => {
         });
     });
 
-    it(`Should raise validation error with error code 404 -- organization_id should be an integer `, function (done) {
+    it(`Should raise validation error with error code 404 -- organization_id should be a uuid `, function (done) {
       const messageSendPostObject = new MessageSendPostObject();
       messageSendPostObject.delete_property('recipient_handle');
       messageSendPostObject.change_property(
@@ -449,6 +453,82 @@ describe('Message API tests.', () => {
         });
     });
 
+    it(`Message to an organization should error out -- no planters found for specified organization_id `, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.delete_property('recipient_handle');
+      messageSendPostObject.change_property('organization_id', uuid());
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body.message).to.eql(
+            'No planters found in the specified organization',
+          );
+          return done();
+        });
+    });
+
+    it(`Message to an organization should error out -- planters found for specified organization_id but no author_handles were associated with them `, function (done) {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.delete_property('recipient_handle');
+      messageSendPostObject.change_property(
+        'organization_id',
+        organization_id_two,
+      );
+      request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(422)
+        .end(function (err, res) {
+          console.log(res);
+          if (err) return done(err);
+          expect(res.body.message).to.eql(
+            'No author handles found for any of the planters found in the specified organization',
+          );
+          return done();
+        });
+    });
+
+    it(`Message to an organization should be successful `, async function () {
+      const messageSendPostObject = new MessageSendPostObject();
+      messageSendPostObject.delete_property('recipient_handle');
+      messageSendPostObject.change_property('organization_id', organization_id);
+      await request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject._object)
+        .set('Accept', 'application/json')
+        .expect(200);
+      const message_delivery = await knex
+        .table('message_delivery')
+        .select('id')
+        .where('parent_message_id', message_delivery_id);
+
+      const message_request = await knex
+        .select('id')
+        .table('message_request')
+        .where('recipient_organization_id', organization_id);
+
+      const message = await knex
+        .select('id')
+        .table('message')
+        .where('subject', messageSendPostObject._object.subject)
+        .where('body', messageSendPostObject._object.body);
+
+      const survey = await knex
+        .select('id')
+        .table('survey')
+        .where('title', messageSendPostObject._object.survey.title);
+
+      expect(message).have.lengthOf(1);
+      expect(survey).have.lengthOf(1);
+      expect(message_delivery).have.lengthOf(3);
+      expect(message_request).have.lengthOf(1);
+    });
+
     it(`Should be successful `, async function () {
       const messageSendPostObject = new MessageSendPostObject();
       await request(server)
@@ -477,10 +557,10 @@ describe('Message API tests.', () => {
         .table('survey')
         .where('title', messageSendPostObject._object.survey.title);
 
-      expect(message).have.lengthOf(1);
-      expect(survey).have.lengthOf(1);
-      expect(message_delivery).have.lengthOf(2);
-      expect(message_request).have.lengthOf(1);
+      expect(message).have.lengthOf(2);
+      expect(survey).have.lengthOf(2);
+      expect(message_delivery).have.lengthOf(4);
+      expect(message_request).have.lengthOf(2);
     });
   });
 
