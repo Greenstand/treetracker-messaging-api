@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.1.1...v1.1.2) (2021-12-03)
+
+
+### Bug Fixes
+
+* update node version in dockerfile ([384a0ff](https://github.com/Greenstand/treetracker-messaging-api/commit/384a0ff6b6201094c2d3648f9586efd7958989d7))
+
 ## [1.1.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.1.0...v1.1.1) (2021-11-30)
 
 
