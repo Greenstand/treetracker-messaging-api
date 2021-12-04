@@ -14,6 +14,7 @@ const messageSendPostSchema = Joi.object({
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
   body: Joi.string().required(),
+  video_link: Joi.string().uri(),
   survey: Joi.object({
     questions: Joi.array()
       .max(3)
