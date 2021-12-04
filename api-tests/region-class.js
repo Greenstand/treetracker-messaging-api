@@ -1,5 +1,5 @@
-const { GenericObject } = require('./generic-class');
 const { v4: uuid } = require('uuid');
+const { GenericObject } = require('./generic-class');
 
 class RegionObject extends GenericObject {
   constructor() {

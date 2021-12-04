@@ -116,7 +116,8 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
 
-  let planterRecipientIds = [];
+  const planterRecipientIds = [];
+  let regionInfo;
   if (organization_id) {
     const planters_url = `${process.env.TREETRACKER_API_URL}/planters`;
 
@@ -124,7 +125,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
     const response = await axios.get(
       `${planters_url}?organization_id=${organization_id}`,
     );
-    const planters = response.data.planters;
+    const { planters } = response.data;
     if (planters.length < 1) {
       throw new HttpError(
         422,
@@ -241,7 +242,6 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
     // create message_delivery for each of them
     // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
   }
-  return;
 };
 
 const FilterCriteria = ({ author_handle, since, author_id }) => {
