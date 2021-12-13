@@ -88,7 +88,7 @@ const messagePost = async (req, res, next) => {
       recipient_id,
     });
     await session.commitTransaction();
-    res.status(200).send();
+    res.status(204).send();
     res.end();
   } catch (e) {
     console.log(e);
@@ -133,7 +133,7 @@ const messageSendPost = async (req, res, next) => {
       session,
     );
     await session.commitTransaction();
-    res.status(200).send();
+    res.status(204).send();
     res.end();
   } catch (e) {
     console.log(e);
