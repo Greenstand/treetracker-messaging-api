@@ -453,7 +453,7 @@ describe('Message API tests.', () => {
         });
     });
 
-    it(`Message to an organization should error out -- no planters found for specified organization_id `, function (done) {
+    it(`Message to an organization should error out -- no ground users found for specified organization_id `, function (done) {
       const messageSendPostObject = new MessageSendPostObject();
       messageSendPostObject.delete_property('recipient_handle');
       messageSendPostObject.change_property('organization_id', uuid());
@@ -465,13 +465,13 @@ describe('Message API tests.', () => {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body.message).to.eql(
-            'No planters found in the specified organization',
+            'No ground users found in the specified organization',
           );
           return done();
         });
     });
 
-    it(`Message to an organization should error out -- planters found for specified organization_id but no author_handles were associated with them `, function (done) {
+    it(`Message to an organization should error out -- ground users found for specified organization_id but no author_handles were associated with them `, function (done) {
       const messageSendPostObject = new MessageSendPostObject();
       messageSendPostObject.delete_property('recipient_handle');
       messageSendPostObject.change_property(
@@ -487,7 +487,7 @@ describe('Message API tests.', () => {
           console.log(res);
           if (err) return done(err);
           expect(res.body.message).to.eql(
-            'No author handles found for any of the planters found in the specified organization',
+            'No author handles found for any of the ground users found in the specified organization',
           );
           return done();
         });

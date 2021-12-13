@@ -37,7 +37,7 @@ before(async () => {
     if (organization_id === db_organization_id)
       return {
         data: {
-          planters: [
+          ground_users: [
             { phone: author_two_handle },
             { email: author_two_handle },
           ],
@@ -46,10 +46,10 @@ before(async () => {
     if (organization_id === organization_id_two)
       return {
         data: {
-          planters: [{ phone: 1234567 }, { email: 'email@email.com' }],
+          ground_users: [{ phone: 1234567 }, { email: 'email@email.com' }],
         },
       };
-    return { data: { planters: [] } };
+    return { data: { ground_users: [] } };
   });
 
   await knex.raw(`

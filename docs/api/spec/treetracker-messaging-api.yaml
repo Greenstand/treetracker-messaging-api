@@ -7,7 +7,7 @@ paths:
   /message:
     parameters: []
     get:
-      summary: Get messages for a planter or author
+      summary: Get messages for a ground user or author
       tags: []
       operationId: get-users-userId
       description: 'Retreive messages for a handle since a specified date, with pagination.  Includes both messages too and from the handle.'
@@ -48,8 +48,8 @@ paths:
                         body: Body
                         sent_at: 123123
                     links:
-                      prev: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=0&limit=100'
-                      next: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=200&limit=100'
+                      prev: 'https://messages.treetracker.org?author_handle=998SDF89SDF&since=12312332&offset=0&limit=100'
+                      next: 'https://messages.treetracker.org?author_handle=998SDF89SDF&since=12312332&offset=200&limit=100'
                 properties:
                   messages:
                     type: array

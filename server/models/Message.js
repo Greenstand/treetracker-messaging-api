@@ -116,23 +116,23 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
 
-  const planterRecipientIds = [];
+  const groundUserRecipientIds = [];
   let regionInfo;
   if (organization_id) {
-    const planters_url = `${process.env.TREETRACKER_API_URL}/planters`;
+    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`;
 
-    // get planters in the specified organization from the treetracker-api
+    // get ground_users in the specified organization from the treetracker-api
     const response = await axios.get(
-      `${planters_url}?organization_id=${organization_id}`,
+      `${groundUsersUrl}?organization_id=${organization_id}`,
     );
-    const { planters } = response.data;
-    if (planters.length < 1) {
+    const { ground_users } = response.data;
+    if (ground_users.length < 1) {
       throw new HttpError(
         422,
-        'No planters found in the specified organization',
+        'No ground users found in the specified organization',
       );
     }
-    for (const { email, phone } of planters) {
+    for (const { email, phone } of ground_users) {
       let recipient_id;
       if (email) {
         recipient_id = await getAuthorId(email, false);
@@ -141,14 +141,14 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
         recipient_id = await getAuthorId(phone, false);
       }
       if (recipient_id) {
-        planterRecipientIds.push(recipient_id);
+        groundUserRecipientIds.push(recipient_id);
       }
     }
 
-    if (planterRecipientIds.length < 1)
+    if (groundUserRecipientIds.length < 1)
       throw new HttpError(
         422,
-        'No author handles found for any of the planters found in the specified organization',
+        'No author handles found for any of the ground users found in the specified organization',
       );
   }
 
@@ -222,8 +222,8 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   }
 
   if (organization_id) {
-    // create message_delivery for each of the planters recipientIds
-    for (const recipientId of planterRecipientIds) {
+    // create message_delivery for each of the ground users' recipientIds
+    for (const recipientId of groundUserRecipientIds) {
       const messageDeliveryObject = MessageDeliveryObject({
         ...requestBody,
         message_id: message.id,
