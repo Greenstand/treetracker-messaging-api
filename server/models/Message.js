@@ -21,7 +21,7 @@ const Message = ({
   title,
   questions,
 }) => {
-  let answer = survey_response?.survey_response;
+  const answer = survey_response?.survey_response;
   let survey;
   if (!survey_id) {
     survey = null;
