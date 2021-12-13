@@ -20,8 +20,22 @@ const Message = ({
   survey_id,
   title,
   questions,
-}) =>
-  Object.freeze({
+}) => {
+  let answer = survey_response?.survey_response;
+  let survey;
+  if (!survey_id) {
+    survey = null;
+  } else {
+    survey = {
+      id: survey_id,
+      title,
+      response: !!answer,
+      questions,
+      answers: answer ? [answer] : null,
+    };
+  }
+
+  return Object.freeze({
     id,
     parent_message_id,
     from: author_handle,
@@ -30,21 +44,15 @@ const Message = ({
     body,
     composed_at,
     video_link,
-    survey: {
-      id: survey_id,
-      title,
-      response: !!survey_response,
-      questions,
-      answers: [survey_response],
-    },
+    survey,
   });
+};
 
 const MessageObject = ({
   subject,
   body,
   composed_at = new Date().toISOString(),
   survey_id = null,
-  survey,
   survey_response = null,
   video_link = null,
   author_id,
@@ -273,8 +281,8 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    const urlWithLimitAndOffset = `${url}&${
-      filter.since ? `since=${filter.since}` : ''
+    const urlWithLimitAndOffset = `${url}${
+      filter.since ? `&since=${filter.since}` : ''
     }&limit=${options.limit}&offset=`;
 
     const next = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;

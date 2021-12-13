@@ -167,7 +167,7 @@ describe('Message API tests.', () => {
         .post(`/message`)
         .send(messagePostObject._object)
         .set('Accept', 'application/json')
-        .expect(200);
+        .expect(204);
       const message_delivery = await knex
         .table('message_delivery')
         .select('id')
@@ -501,7 +501,7 @@ describe('Message API tests.', () => {
         .post(`/message/send`)
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
-        .expect(200);
+        .expect(204);
       const message_delivery = await knex
         .table('message_delivery')
         .select('id')
@@ -535,7 +535,7 @@ describe('Message API tests.', () => {
         .post(`/message/send`)
         .send(messageSendPostObject._object)
         .set('Accept', 'application/json')
-        .expect(200);
+        .expect(204);
       const message_delivery = await knex
         .table('message_delivery')
         .select('id')
