@@ -4,8 +4,9 @@ const axios = require('axios').default;
 const HttpError = require('../utils/HttpError');
 const { getAuthorId } = require('../handlers/helpers');
 const RegionRepository = require('../repositories/RegionRepository');
+const Session = require('../models/Session');
 
-const Message = ({
+const Message = async ({
   id,
   parent_message_id,
   author_handle,
@@ -35,11 +36,38 @@ const Message = ({
     };
   }
 
+  let to = [];
+
+  if (recipient_handle) {
+    to.push({ recipient: recipient_handle, type: 'user' });
+  }
+
+  if (recipient_organization_id) {
+    // get organization name
+    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholder`;
+    const organizationResponse = await axios.get(
+      `${stakeholderUrl}?stakeholder_uuid=${recipient_organization_id}`,
+    );
+    to.push({
+      recipient: organizationResponse.data.stakeholders[0]?.name,
+      type: 'organization',
+    });
+  }
+
+  if (recipient_region_id) {
+    // get region name
+    const session = new Session();
+    const regionRepo = new RegionRepository(session);
+    regionInfo = await regionRepo.getById(recipient_region_id);
+
+    to.push({ recipient: regionInfo.name, type: 'region' });
+  }
+
   return Object.freeze({
     id,
     parent_message_id,
     from: author_handle,
-    to: recipient_handle || recipient_organization_id || recipient_region_id,
+    to,
     subject,
     body,
     composed_at,
@@ -293,9 +321,11 @@ const getMessages =
 
     const messages = await messageRepo.getMessages(filter, options);
     return {
-      messages: messages.map((row) => {
-        return Message({ ...row });
-      }),
+      messages: await Promise.all(
+        messages.map(async (row) => {
+          return Message({ ...row });
+        }),
+      ),
       links: {
         prev,
         next,
