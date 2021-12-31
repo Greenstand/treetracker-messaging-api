@@ -4,7 +4,7 @@ const axios = require('axios').default;
 const HttpError = require('../utils/HttpError');
 const { getAuthorId } = require('../handlers/helpers');
 const RegionRepository = require('../repositories/RegionRepository');
-const Session = require('../models/Session');
+const Session = require('./Session');
 
 const Message = async ({
   id,
@@ -36,7 +36,7 @@ const Message = async ({
     };
   }
 
-  let to = [];
+  const to = [];
 
   if (recipient_handle) {
     to.push({ recipient: recipient_handle, type: 'user' });
@@ -58,7 +58,7 @@ const Message = async ({
     // get region name
     const session = new Session();
     const regionRepo = new RegionRepository(session);
-    regionInfo = await regionRepo.getById(recipient_region_id);
+    const regionInfo = await regionRepo.getById(recipient_region_id);
 
     to.push({ recipient: regionInfo.name, type: 'region' });
   }
