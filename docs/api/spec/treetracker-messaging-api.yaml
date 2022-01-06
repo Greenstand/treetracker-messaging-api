@@ -65,7 +65,18 @@ paths:
                           type: string
                           minLength: 1
                         to:
-                          type: string
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              recipient:
+                                type: string
+                              type:
+                                type: string
+                                enum:
+                                  - user
+                                  - organization
+                                  - region
                         subject:
                           type: string
                           minLength: 1
