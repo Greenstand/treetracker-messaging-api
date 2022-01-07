@@ -7,7 +7,7 @@ const Author = ({ id, handle }) =>
 const getAuthors =
   (authorRepo) =>
   async (filterCriteria = undefined) => {
-    let filter = { ...filterCriteria };
+    const filter = { ...filterCriteria };
 
     const authors = await authorRepo.getByFilter(filter);
     return {
