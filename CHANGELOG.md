@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.2.0...v1.3.0) (2022-01-11)
+
+
+### Features
+
+* add get author route ([65ad6f6](https://github.com/Greenstand/treetracker-messaging-api/commit/65ad6f661e9d17fb8d03e988158eafa1edf3c2c7))
+
 # [1.2.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.1.2...v1.2.0) (2022-01-07)
 
 
