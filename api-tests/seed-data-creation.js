@@ -95,4 +95,6 @@ module.exports = {
   author_one_handle,
   author_two_handle,
   survey_title,
+  author_one_id,
+  author_two_id,
 };
