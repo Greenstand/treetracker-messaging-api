@@ -1,3 +1,4 @@
+const { v4: uuid } = require('uuid');
 const { GenericObject } = require('./generic-class');
 
 class RegionObject extends GenericObject {
@@ -18,8 +19,8 @@ class RegionObject extends GenericObject {
           ],
         ],
       },
-      creator_user_id: 1,
-      creator_organization_id: 7,
+      creator_user_id: uuid(),
+      creator_organization_id: uuid(),
     });
   }
 }

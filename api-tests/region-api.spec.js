@@ -34,7 +34,7 @@ describe('Region API tests.', () => {
       });
   });
 
-  it(`Should raise validation error with error code 422 -- creator_user_id is not a number `, function (done) {
+  it(`Should raise validation error with error code 422 -- creator_user_id is not a uuid `, function (done) {
     const regionObject = new RegionObject();
     regionObject.change_property('creator_user_id', 'creator_user_id');
     request(server)
@@ -48,7 +48,7 @@ describe('Region API tests.', () => {
       });
   });
 
-  it(`Should raise validation error with error code 422 -- creator_organization_id is not a number `, function (done) {
+  it(`Should raise validation error with error code 422 -- creator_organization_id is not a uuid `, function (done) {
     const regionObject = new RegionObject();
     regionObject.change_property(
       'creator_organization_id',

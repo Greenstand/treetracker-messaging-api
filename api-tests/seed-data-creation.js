@@ -1,10 +1,14 @@
 const { v4: uuid } = require('uuid');
+const sinon = require('sinon');
+const axios = require('axios').default;
 const knex = require('../server/database/knex');
 const {
   existing_message,
   author_one_handle,
   author_two_handle,
   survey_id,
+  organization_id: db_organization_id,
+  organization_id_two,
 } = require('./generic-class');
 const RegionObject = require('./region-class');
 const MessagePostObject = require('./message-post-class');
@@ -25,7 +29,29 @@ const message_delivery_id = uuid();
 
 const region_object = new RegionObject();
 
+let axiosStub;
+
 before(async () => {
+  axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+    const organization_id = url.split('=')[1];
+    if (organization_id === db_organization_id)
+      return {
+        data: {
+          ground_users: [
+            { phone: author_two_handle },
+            { email: author_two_handle },
+          ],
+        },
+      };
+    if (organization_id === organization_id_two)
+      return {
+        data: {
+          ground_users: [{ phone: 1234567 }, { email: 'email@email.com' }],
+        },
+      };
+    return { data: { ground_users: [] } };
+  });
+
   await knex.raw(`
     INSERT INTO author(
 	    id, handle, created_at)
@@ -52,6 +78,7 @@ before(async () => {
 });
 
 after(async () => {
+  axiosStub.restore();
   const messageSendPostObject = new MessageSendPostObject();
   const messagePostObject = new MessagePostObject();
 
@@ -75,7 +102,7 @@ after(async () => {
     WHERE id = '${existing_message.id}' or (body = '${messageSendPostObject._object.body}' and subject = '${messageSendPostObject._object.subject}') or (body = '${messagePostObject._object.body}' and subject = '${messagePostObject._object.subject}');
 
     DELETE FROM survey_question
-    WHERE survey_id = '${created_survey[0].id}';
+    WHERE survey_id = '${created_survey[0].id}' or survey_id = '${created_survey[1].id}';
 
     DELETE FROM survey
     WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';

@@ -11,8 +11,8 @@ const regionPostSchema = Joi.object({
     type: Joi.string().equal('MultiPolygon'),
     coordinates: Joi.array(),
   }).unknown(false),
-  creator_user_id: Joi.number().integer(),
-  creator_organization_id: Joi.number().integer(),
+  creator_user_id: Joi.string().uuid(),
+  creator_organization_id: Joi.string().uuid(),
 }).unknown(false);
 
 const regionGet = async (req, res, next) => {

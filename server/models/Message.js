@@ -4,8 +4,9 @@ const axios = require('axios').default;
 const HttpError = require('../utils/HttpError');
 const { getAuthorId } = require('../handlers/helpers');
 const RegionRepository = require('../repositories/RegionRepository');
+const Session = require('./Session');
 
-const Message = ({
+const Message = async ({
   id,
   parent_message_id,
   author_handle,
@@ -20,31 +21,66 @@ const Message = ({
   survey_id,
   title,
   questions,
-}) =>
-  Object.freeze({
+}) => {
+  const answer = survey_response?.survey_response;
+  let survey;
+  if (!survey_id) {
+    survey = null;
+  } else {
+    survey = {
+      id: survey_id,
+      title,
+      response: !!answer,
+      questions,
+      answers: answer ? [answer] : null,
+    };
+  }
+
+  const to = [];
+
+  if (recipient_handle) {
+    to.push({ recipient: recipient_handle, type: 'user' });
+  }
+
+  if (recipient_organization_id) {
+    // get organization name
+    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholder`;
+    const organizationResponse = await axios.get(
+      `${stakeholderUrl}?stakeholder_uuid=${recipient_organization_id}`,
+    );
+    to.push({
+      recipient: organizationResponse.data.stakeholders[0]?.name,
+      type: 'organization',
+    });
+  }
+
+  if (recipient_region_id) {
+    // get region name
+    const session = new Session();
+    const regionRepo = new RegionRepository(session);
+    const regionInfo = await regionRepo.getById(recipient_region_id);
+
+    to.push({ recipient: regionInfo.name, type: 'region' });
+  }
+
+  return Object.freeze({
     id,
     parent_message_id,
     from: author_handle,
-    to: recipient_handle || recipient_organization_id || recipient_region_id,
+    to,
     subject,
     body,
     composed_at,
     video_link,
-    survey: {
-      id: survey_id,
-      title,
-      response: !!survey_response,
-      questions,
-      answers: [survey_response],
-    },
+    survey,
   });
+};
 
 const MessageObject = ({
   subject,
   body,
   composed_at = new Date().toISOString(),
   survey_id = null,
-  survey,
   survey_response = null,
   video_link = null,
   author_id,
@@ -116,21 +152,43 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
 
-  let organizationInfo = {};
-  let regionInfo = {};
-
+  const groundUserRecipientIds = [];
+  let regionInfo;
   if (organization_id) {
-    // check if organization_id is in the stakeholder API
+    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`;
+
+    // get ground_users in the specified organization from the treetracker-api
     const response = await axios.get(
-      `${process.env.ENTITY_API}/${organization_id}`,
+      `${groundUsersUrl}?organization_id=${organization_id}`,
     );
-    organizationInfo = response.data;
-    if (!organizationInfo) {
-      throw new HttpError(422, 'Invalid organization_id received');
+    const { ground_users } = response.data;
+    if (ground_users.length < 1) {
+      throw new HttpError(
+        422,
+        'No ground users found in the specified organization',
+      );
     }
+    for (const { email, phone } of ground_users) {
+      let recipient_id;
+      if (email) {
+        recipient_id = await getAuthorId(email, false);
+      }
+      if (!recipient_id && phone) {
+        recipient_id = await getAuthorId(phone, false);
+      }
+      if (recipient_id) {
+        groundUserRecipientIds.push(recipient_id);
+      }
+    }
+
+    if (groundUserRecipientIds.length < 1)
+      throw new HttpError(
+        422,
+        'No author handles found for any of the ground users found in the specified organization',
+      );
   }
 
-  if (requestBody.region_id) {
+  if (region_id) {
     const regionRepo = new RegionRepository(session);
     regionInfo = await regionRepo.getById(region_id);
   }
@@ -167,8 +225,11 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
 
   const messageRequestObject = MessageRequestObject({
     ...requestBody,
+    organization_id,
+    region_id,
     message_id: message.id,
   });
+
   await messageRepo.createForOtherTables(
     messageRequestObject,
     'message_request',
@@ -183,27 +244,40 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
     );
   }
 
+  if (requestBody.recipient_id) {
+    const messageDeliveryObject = MessageDeliveryObject({
+      ...requestBody,
+      message_id: message.id,
+      parent_message_delivery_id,
+    });
+    await messageRepo.createForOtherTables(
+      messageDeliveryObject,
+      'message_delivery',
+    );
+    return;
+  }
+
   if (organization_id) {
-    // Get all recipients by organization_id
-    // create message_delivery for each of them
+    // create message_delivery for each of the ground users' recipientIds
+    for (const recipientId of groundUserRecipientIds) {
+      const messageDeliveryObject = MessageDeliveryObject({
+        ...requestBody,
+        message_id: message.id,
+        parent_message_delivery_id,
+        recipient_id: recipientId,
+      });
+      await messageRepo.createForOtherTables(
+        messageDeliveryObject,
+        'message_delivery',
+      );
+    }
   }
 
   if (region_id) {
     // Get all recipients by region_id
     // create message_delivery for each of them
     // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
-    return;
   }
-
-  const messageDeliveryObject = MessageDeliveryObject({
-    ...requestBody,
-    message_id: message.id,
-    parent_message_delivery_id,
-  });
-  await messageRepo.createForOtherTables(
-    messageDeliveryObject,
-    'message_delivery',
-  );
 };
 
 const FilterCriteria = ({ author_handle, since, author_id }) => {
@@ -235,8 +309,8 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    const urlWithLimitAndOffset = `${url}&${
-      filter.since ? `since=${filter.since}` : ''
+    const urlWithLimitAndOffset = `${url}${
+      filter.since ? `&since=${filter.since}` : ''
     }&limit=${options.limit}&offset=`;
 
     const next = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
@@ -247,9 +321,11 @@ const getMessages =
 
     const messages = await messageRepo.getMessages(filter, options);
     return {
-      messages: messages.map((row) => {
-        return Message({ ...row });
-      }),
+      messages: await Promise.all(
+        messages.map(async (row) => {
+          return Message({ ...row });
+        }),
+      ),
       links: {
         prev,
         next,

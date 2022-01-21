@@ -7,7 +7,7 @@ paths:
   /message:
     parameters: []
     get:
-      summary: Get messages for a planter or author
+      summary: Get messages for a ground user or author
       tags: []
       operationId: get-users-userId
       description: 'Retreive messages for a handle since a specified date, with pagination.  Includes both messages too and from the handle.'
@@ -48,8 +48,8 @@ paths:
                         body: Body
                         sent_at: 123123
                     links:
-                      prev: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=0&limit=100'
-                      next: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=200&limit=100'
+                      prev: 'https://messages.treetracker.org?author_handle=998SDF89SDF&since=12312332&offset=0&limit=100'
+                      next: 'https://messages.treetracker.org?author_handle=998SDF89SDF&since=12312332&offset=200&limit=100'
                 properties:
                   messages:
                     type: array
@@ -65,7 +65,18 @@ paths:
                           type: string
                           minLength: 1
                         to:
-                          type: string
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              recipient:
+                                type: string
+                              type:
+                                type: string
+                                enum:
+                                  - user
+                                  - organization
+                                  - region
                         subject:
                           type: string
                           minLength: 1
@@ -134,7 +145,7 @@ paths:
       summary: Create a message resource
       operationId: post-messages
       responses:
-        '200':
+        '204':
           description: OK
       description: Create a message resource
       parameters: []
@@ -146,17 +157,16 @@ paths:
               type: object
               x-examples:
                 example-1:
-                  planter_identifier: string
-                  organization_id: integer
+                  recipient_handle: string
+                  organization_id: uuid
                   region: string
                   from: string
                   subject: string
                   body: string
               properties:
                 parent_message_id:
-                  type:
-                    - integer
-                    - 'null'
+                  type: string
+                  format: uuid
                 author_handle:
                   type: string
                   minLength: 1
@@ -189,8 +199,8 @@ paths:
       operationId: post-message-send
       responses:
         '204':
-          description: No Content
-      description: 'Create a new message or group message.  Only one of planter_identifier, organization_id, or region can be specified to direct a message to users.   This is a special API path to be used by the admin panel tool to queue messages for delivery'
+          description: OK
+      description: 'Create a new message or group message.  Only one of recipient_handle or (organization_id and/or region_id) can be specified to direct a message to users.   This is a special API path to be used by the admin panel tool to queue messages for delivery'
       requestBody:
         content:
           application/json:
@@ -199,30 +209,33 @@ paths:
               type: object
               x-examples:
                 example-1:
-                  planter_identifier: string
-                  organization_id: integer
+                  recipient_handle: string
+                  organization_id: uuid
                   region: string
                   from: string
                   subject: string
                   body: string
               properties:
                 parent_message_id:
-                  type:
-                    - integer
-                    - 'null'
+                  type: string
+                  format: uuid
                 recipient_handle:
                   type: string
                   minLength: 1
                 region_id:
-                  type: integer
+                  type: string
+                  format: uuid
                 organization_id:
-                  type: integer
+                  type: string
+                  format: uuid
                 author_handle:
                   type: string
                   minLength: 1
                 subject:
                   type: string
                   minLength: 1
+                video_link:
+                  type: string
                 body:
                   type: string
                   minLength: 1
@@ -245,24 +258,22 @@ paths:
                     title:
                       type: string
               required:
-                - recipient_handle
-                - region_id
-                - organization_id
                 - author_handle
                 - subject
                 - body
             examples:
               simple-message-example:
                 value:
-                  parent_message_id: 0
+                  parent_message_id: 8b9fbb2b-ff98-44ef-b754-98c00acaf647
                   recipient_handle: '+13132324232'
                   author_handle: string
                   subject: string
                   body: string
               org-wide-message-with-survey:
                 value:
-                  parent_message_id: 0
-                  organization_id: 12
+                  parent_message_id: 8b9fbb2b-ff98-44ef-b754-98c00acaf647
+                  organization_id: 69de42d7-6400-4dde-97b8-3e2848fd7649
+                  region_id: 8f9b1b2e-7929-4fc8-a4ca-bae44e61d9c7
                   author_handle: string
                   subject: string
                   body: string
@@ -324,9 +335,11 @@ paths:
                   type: string
                   format: GeoJSON
                 creator_user_id:
-                  type: integer
+                  type: string
+                  format: uuid
                 creator_organization_id:
-                  type: integer
+                  type: string
+                  format: uuid
               required:
                 - name
                 - description

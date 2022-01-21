@@ -10,10 +10,11 @@ const messageSendPostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
   recipient_handle: Joi.string(),
   region_id: Joi.string().uuid(),
-  organization_id: Joi.number().integer(),
+  organization_id: Joi.string().uuid(),
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
   body: Joi.string().required(),
+  video_link: Joi.string().uri(),
   survey: Joi.object({
     questions: Joi.array()
       .max(3)
@@ -87,7 +88,7 @@ const messagePost = async (req, res, next) => {
       recipient_id,
     });
     await session.commitTransaction();
-    res.status(200).send();
+    res.status(204).send();
     res.end();
   } catch (e) {
     console.log(e);
@@ -132,7 +133,7 @@ const messageSendPost = async (req, res, next) => {
       session,
     );
     await session.commitTransaction();
-    res.status(200).send();
+    res.status(204).send();
     res.end();
   } catch (e) {
     console.log(e);
