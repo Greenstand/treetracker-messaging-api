@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.3.0...v1.4.0) (2022-01-21)
+
+
+### Bug Fixes
+
+* return survey as null if data doesn't exist ([791ef3c](https://github.com/Greenstand/treetracker-messaging-api/commit/791ef3c6808b2575ba816deda213a778136981fe))
+* update to property in get Message result ([9b6b9d1](https://github.com/Greenstand/treetracker-messaging-api/commit/9b6b9d173e17bc918d7f1f8c58fb115a2f64b1aa))
+
+
+### Features
+
+* able to send messages to recipients in an organization ([6d5b1f1](https://github.com/Greenstand/treetracker-messaging-api/commit/6d5b1f1d3f5b06eb733eba2bf43f261e1bf44497))
+
 # [1.3.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.2.0...v1.3.0) (2022-01-11)
 
 
