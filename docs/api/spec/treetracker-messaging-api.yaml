@@ -374,5 +374,30 @@ paths:
                 created_at:
                   type: string
                   format: ISO 8601 DateTime
+  /author:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  handle:
+                    type: string
+      operationId: get-author
+      description: Returns a list of all authors that an admin panel operator is allowed to message
+      parameters:
+        - schema:
+            type: number
+          in: query
+          name: organization_id
+          description: 'Organization id to filter list by, temporary until we have JWT to provide this'
 components:
   schemas: {}

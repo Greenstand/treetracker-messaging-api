@@ -11,7 +11,10 @@ const {
   messageGet,
   messageSendPost,
 } = require('./handlers/messageHandler');
+const { authorGet } = require('./handlers/authorHandler');
 const { handlerWrapper } = require('./utils/utils');
+
+router.get('/author', handlerWrapper(authorGet));
 
 router.post('/region', handlerWrapper(regionPost));
 router.get('/region', handlerWrapper(regionGet));
