@@ -66,7 +66,7 @@ const Message = async ({
   return Object.freeze({
     id,
     parent_message_id,
-    from: author_handle,
+    from: { author: author_handle, type: 'user' },
     to,
     subject,
     body,

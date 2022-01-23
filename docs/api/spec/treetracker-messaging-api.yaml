@@ -62,8 +62,13 @@ paths:
                           type: string
                           format: uuid
                         from:
-                          type: string
-                          minLength: 1
+                          type: object
+                            properties:
+                              author:
+                                type: string
+                              type:
+                                type: string
+                              
                         to:
                           type: array
                           items:

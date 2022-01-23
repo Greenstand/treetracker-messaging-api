@@ -727,6 +727,7 @@ describe('Message API tests.', () => {
             if (survey.title === survey_title) survey_two_exists = true;
             expect(message.to).to.have.length(1);
             expect(message.to[0]).to.have.keys(['recipient', 'type']);
+            expect(message.from).to.have.keys(['author', 'type']);
           }
 
           expect(survey_one_exists).to.be.true;
