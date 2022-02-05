@@ -16,7 +16,7 @@ class MessagePostObject extends GenericObject {
       body: 'Bodyyy',
       survey_id,
       composed_at: new Date().toISOString(),
-      survey_response: 'string',
+      survey_response: ['answer 1'],
       video_link: 'https://www.string.com',
     });
   }

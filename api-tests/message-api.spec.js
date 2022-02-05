@@ -184,9 +184,6 @@ describe('Message API tests.', () => {
         .where('subject', messagePostObject._object.subject)
         .where('body', messagePostObject._object.body)
         .where('composed_at', messagePostObject._object.composed_at)
-        .where('survey_response', {
-          survey_response: messagePostObject._object.survey_response,
-        })
         .where('video_link', messagePostObject._object.video_link);
 
       expect(message).have.lengthOf(1);
