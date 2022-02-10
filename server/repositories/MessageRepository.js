@@ -66,13 +66,14 @@ class MessageRepository extends BaseRepository {
         'message_request.recipient_organization_id',
         'message_request.recipient_region_id',
         'message.subject',
+        'message.title as title',
         'message.body',
         'message.id',
         'message.video_link',
         'message.composed_at',
         'message.survey_response',
         'message.survey_id',
-        'survey.title',
+        'survey.title as survey_title',
         this._session
           .getDB()
           .raw(

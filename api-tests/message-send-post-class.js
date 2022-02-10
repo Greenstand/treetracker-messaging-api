@@ -12,6 +12,7 @@ class MessageSendPostObject extends GenericObject {
       recipient_handle: author_one_handle,
       author_handle: author_two_handle,
       subject: 'Subject of the message',
+      title: 'Title of the message',
       body: 'Body of the message',
       survey: {
         questions: [

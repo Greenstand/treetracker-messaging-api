@@ -701,6 +701,7 @@ describe('Message API tests.', () => {
               'parent_message_id',
               'from',
               'to',
+              'title',
               'subject',
               'body',
               'composed_at',
