@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.4.0...v1.5.0) (2022-02-10)
+
+
+### Bug Fixes
+
+* modify get /message response from property ([be4222a](https://github.com/Greenstand/treetracker-messaging-api/commit/be4222aa7853d427af1d21263aaa3cc954455e45))
+
+
+### Features
+
+* update survey_response request data and handle possible duplicates ([bf07bf8](https://github.com/Greenstand/treetracker-messaging-api/commit/bf07bf8baccacee35e9d79f246d4300fa8f0ca93))
+
 # [1.4.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.3.0...v1.4.0) (2022-01-21)
 
 
