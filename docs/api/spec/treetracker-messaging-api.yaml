@@ -62,8 +62,13 @@ paths:
                           type: string
                           format: uuid
                         from:
-                          type: string
-                          minLength: 1
+                          type: object
+                          properties:
+                              author:
+                                type: string
+                              type:
+                                type: string
+                              
                         to:
                           type: array
                           items:
@@ -164,6 +169,9 @@ paths:
                   subject: string
                   body: string
               properties:
+                id:
+                  type: string
+                  format: uuid
                 parent_message_id:
                   type: string
                   format: uuid
@@ -185,7 +193,8 @@ paths:
                   type: string
                   format: uuid
                 survey_response:
-                  type: string
+                  type: array
+                  items: string
                 video_link:
                   type: string
               required:

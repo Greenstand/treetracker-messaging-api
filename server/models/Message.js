@@ -32,7 +32,7 @@ const Message = async ({
       title,
       response: !!answer,
       questions,
-      answers: answer ? [answer] : null,
+      answers: answer?.length > 0 ? answer : null,
     };
   }
 
@@ -66,7 +66,7 @@ const Message = async ({
   return Object.freeze({
     id,
     parent_message_id,
-    from: author_handle,
+    from: { author: author_handle, type: 'user' },
     to,
     subject,
     body,
@@ -77,17 +77,18 @@ const Message = async ({
 };
 
 const MessageObject = ({
+  id = uuid(),
   subject,
   body,
   composed_at = new Date().toISOString(),
   survey_id = null,
-  survey_response = null,
+  survey_response,
   video_link = null,
   author_id,
   active = true,
 }) =>
   Object.freeze({
-    id: uuid(),
+    id,
     created_at: new Date().toISOString(),
     subject,
     body,

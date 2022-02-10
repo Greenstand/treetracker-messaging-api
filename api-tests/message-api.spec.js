@@ -184,9 +184,6 @@ describe('Message API tests.', () => {
         .where('subject', messagePostObject._object.subject)
         .where('body', messagePostObject._object.body)
         .where('composed_at', messagePostObject._object.composed_at)
-        .where('survey_response', {
-          survey_response: messagePostObject._object.survey_response,
-        })
         .where('video_link', messagePostObject._object.video_link);
 
       expect(message).have.lengthOf(1);
@@ -727,6 +724,7 @@ describe('Message API tests.', () => {
             if (survey.title === survey_title) survey_two_exists = true;
             expect(message.to).to.have.length(1);
             expect(message.to[0]).to.have.keys(['recipient', 'type']);
+            expect(message.from).to.have.keys(['author', 'type']);
           }
 
           expect(survey_one_exists).to.be.true;

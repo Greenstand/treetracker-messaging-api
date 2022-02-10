@@ -33,6 +33,7 @@ const messageSendPostSchema = Joi.object({
   .oxor('recipient_handle', 'organization_id');
 
 const messagePostSchema = Joi.object({
+  id: Joi.string().uuid(),
   parent_message_id: Joi.string().uuid(),
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
@@ -40,7 +41,7 @@ const messagePostSchema = Joi.object({
   body: Joi.string().required(),
   composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
-  survey_response: Joi.string(),
+  survey_response: Joi.array().items(Joi.string()),
   video_link: Joi.string().uri(),
 }).unknown(false);
 
@@ -69,6 +70,18 @@ const messagePost = async (req, res, next) => {
   await messagePostSchema.validateAsync(req.body, { abortEarly: false });
   const session = new Session();
   const messageRepo = new MessageRepository(session);
+
+  if (req.body.id) {
+    const existingMessageArray = await messageRepo.getByFilter({
+      id: req.body.id,
+    });
+    const [existingMessage] = existingMessageArray;
+    if (existingMessage) {
+      res.status(204).send();
+      res.end();
+      return;
+    }
+  }
 
   // Get author id using author handle
   const author_id = await getAuthorId(req.body.author_handle);
