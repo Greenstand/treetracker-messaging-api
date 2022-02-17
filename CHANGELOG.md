@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.5.0...v1.6.0) (2022-02-17)
+
+
+### Features
+
+* add title for announce messages ([cdbf993](https://github.com/Greenstand/treetracker-messaging-api/commit/cdbf993a088d37763ebe088b70d6c13304f0f2e5))
+
 # [1.5.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.4.0...v1.5.0) (2022-02-10)
 
 
