@@ -13,13 +13,14 @@ const Message = async ({
   recipient_handle,
   recipient_organization_id,
   recipient_region_id,
+  title,
   subject,
   body,
   video_link,
   composed_at,
   survey_response,
   survey_id,
-  title,
+  survey_title,
   questions,
 }) => {
   const answer = survey_response?.survey_response;
@@ -29,7 +30,7 @@ const Message = async ({
   } else {
     survey = {
       id: survey_id,
-      title,
+      title: survey_title,
       response: !!answer,
       questions,
       answers: answer?.length > 0 ? answer : null,
@@ -66,6 +67,7 @@ const Message = async ({
   return Object.freeze({
     id,
     parent_message_id,
+    title,
     from: { author: author_handle, type: 'user' },
     to,
     subject,
@@ -83,6 +85,7 @@ const MessageObject = ({
   composed_at = new Date().toISOString(),
   survey_id = null,
   survey_response,
+  title = null,
   video_link = null,
   author_id,
   active = true,
@@ -92,6 +95,7 @@ const MessageObject = ({
     created_at: new Date().toISOString(),
     subject,
     body,
+    title,
     composed_at,
     survey_id,
     survey_response: survey_response ? { survey_response } : null,

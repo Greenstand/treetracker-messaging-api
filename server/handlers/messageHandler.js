@@ -9,6 +9,7 @@ const HttpError = require('../utils/HttpError');
 const messageSendPostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
   recipient_handle: Joi.string(),
+  title: Joi.string(),
   region_id: Joi.string().uuid(),
   organization_id: Joi.string().uuid(),
   author_handle: Joi.string().required(),

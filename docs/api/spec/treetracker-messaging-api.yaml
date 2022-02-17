@@ -64,11 +64,10 @@ paths:
                         from:
                           type: object
                           properties:
-                              author:
-                                type: string
-                              type:
-                                type: string
-                              
+                            author:
+                              type: string
+                            type:
+                              type: string
                         to:
                           type: array
                           items:
@@ -123,6 +122,8 @@ paths:
                         id:
                           type: string
                           format: uuid
+                        title:
+                          type: string
                       required:
                         - from
                         - to
