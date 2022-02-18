@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const Sentry = require('@sentry/node');
 // const walletRouter = require("./routes/entityRouter"); // create your router
 
@@ -10,6 +11,11 @@ const { handlerWrapper } = require('./utils/utils');
 const router = require('./routes');
 
 const app = express();
+
+if (process.env.NODE_ENV === 'development') {
+  log.info('disable cors');
+  app.use(cors());
+}
 
 Sentry.init({ dsn: sentryDSN });
 
