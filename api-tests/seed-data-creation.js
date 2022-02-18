@@ -53,6 +53,10 @@ before(async () => {
   });
 
   await knex.raw(`
+    DELETE FROM message_delivery;
+    DELETE FROM message;
+    DELETE FROM author;
+
     INSERT INTO author(
 	    id, handle, created_at)
 	  VALUES 

@@ -4,6 +4,7 @@ const axios = require('axios').default;
 const HttpError = require('../utils/HttpError');
 const { getAuthorId } = require('../handlers/helpers');
 const RegionRepository = require('../repositories/RegionRepository');
+const MessageDeliveryRepository = require('../repositories/MessageDeliveryRepository');
 const Session = require('./Session');
 
 const Message = async ({
@@ -176,10 +177,10 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
     for (const { email, phone } of ground_users) {
       let recipient_id;
       if (email) {
-        recipient_id = await getAuthorId(email, false);
+        recipient_id = await getAuthorId(email, session, false);
       }
       if (!recipient_id && phone) {
-        recipient_id = await getAuthorId(phone, false);
+        recipient_id = await getAuthorId(phone, session, false);
       }
       if (recipient_id) {
         groundUserRecipientIds.push(recipient_id);
@@ -243,8 +244,9 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let parent_message_delivery_id = null;
 
   // if parent_message_id exists get the message_delivery_id for the parent message
+  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TOOD: move to service
   if (requestBody.parent_message_id) {
-    parent_message_delivery_id = await messageRepo.getParentMessageDeliveryId(
+    parent_message_delivery_id = await messageDeliveryRepo.getParentMessageDeliveryId(
       requestBody.parent_message_id,
     );
   }
@@ -307,7 +309,7 @@ const getMessages =
   async (filterCriteria = undefined, url) => {
     let filter = {};
     let options = { limit: 100, offset: 0 };
-    const author_id = await getAuthorId(filterCriteria.author_handle);
+    const author_id = await getAuthorId(filterCriteria.author_handle, session);
     filter = FilterCriteria({
       ...filterCriteria,
       author_id,
