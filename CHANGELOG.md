@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.6.0...v1.6.1) (2022-02-19)
+
+
+### Bug Fixes
+
+* message delivery must be added when creating a message, solve this by beginning a refactor ([a176807](https://github.com/Greenstand/treetracker-messaging-api/commit/a176807aa44f44f28355a53840afcf64810882f9))
+
 # [1.6.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.5.0...v1.6.0) (2022-02-17)
 
 
