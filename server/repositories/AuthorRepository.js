@@ -6,6 +6,16 @@ class AuthorRepository extends BaseRepository {
     this._tableName = 'author';
     this._session = session;
   }
+
+  async getAuthorId(handle) {
+    console.log("handle");
+    console.log(handle);
+    return this._session
+      .getDB()
+      .select('id')
+      .from('author')
+      .where('handle', handle);
+  }
 }
 
 module.exports = AuthorRepository;

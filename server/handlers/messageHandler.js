@@ -1,6 +1,8 @@
 const Joi = require('joi');
 
 const Session = require('../models/Session');
+const { createMessage } = require('../services/MessageService');
+
 const { createMessageResourse, getMessages } = require('../models/Message');
 const MessageRepository = require('../repositories/MessageRepository');
 const { getAuthorId } = require('./helpers');
@@ -56,11 +58,10 @@ const messageGetQuerySchema = Joi.object({
 const messageGet = async (req, res, next) => {
   await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
   const session = new Session();
-  const messageRepo = new MessageRepository(session);
 
   const url = `message?author_handle=${req.query.author_handle}`;
 
-  const executeGetMessages = getMessages(messageRepo);
+  const executeGetMessages = getMessages(session);
   const result = await executeGetMessages(req.query, url);
   res.send(result);
   res.end();
@@ -69,48 +70,42 @@ const messageGet = async (req, res, next) => {
 // Create a new message resource
 const messagePost = async (req, res, next) => {
   await messagePostSchema.validateAsync(req.body, { abortEarly: false });
-  const session = new Session();
-  const messageRepo = new MessageRepository(session);
 
-  if (req.body.id) {
-    const existingMessageArray = await messageRepo.getByFilter({
-      id: req.body.id,
-    });
-    const [existingMessage] = existingMessageArray;
-    if (existingMessage) {
-      res.status(204).send();
-      res.end();
-      return;
-    }
+  try {
+    await createMessage(req.body);
+    res.status(204).send();
+    res.end();
+  } catch(e) {
+    next(e);
   }
 
   // Get author id using author handle
-  const author_id = await getAuthorId(req.body.author_handle);
+  // const author_id = await getAuthorId(req.body.author_handle);
 
-  let recipient_id = null;
+  // let recipient_id = null;
 
-  // Get recipient id using recipient handle
-  if (req.body.recipient_handle) {
-    recipient_id = await getAuthorId(req.body.recipient_handle);
-  }
+  // // Get recipient id using recipient handle
+  // if (req.body.recipient_handle) {
+  //   recipient_id = await getAuthorId(req.body.recipient_handle);
+  // }
 
-  try {
-    await session.beginTransaction();
-    await createMessageResourse(messageRepo, {
-      ...req.body,
-      author_id,
-      recipient_id,
-    });
-    await session.commitTransaction();
-    res.status(204).send();
-    res.end();
-  } catch (e) {
-    console.log(e);
-    if (session.isTransactionInProgress()) {
-      await session.rollbackTransaction();
-    }
-    next(e);
-  }
+  // try {
+  //   await session.beginTransaction();
+  //   await createMessageResourse(messageRepo, {
+  //     ...req.body,
+  //     author_id,
+  //     recipient_id,
+  //   });
+  //   await session.commitTransaction();
+  //   res.status(204).send();
+  //   res.end();
+  // } catch (e) {
+  //   console.log(e);
+  //   if (session.isTransactionInProgress()) {
+  //     await session.rollbackTransaction();
+  //   }
+  //   next(e);
+  // }
 };
 
 // Author a new message or group message
@@ -127,13 +122,13 @@ const messageSendPost = async (req, res, next) => {
 
   // Get author id using author handle
   const messageRepo = new MessageRepository(session);
-  const author_id = await getAuthorId(req.body.author_handle);
+  const author_id = await getAuthorId(req.body.author_handle, session);
 
   let recipient_id = null;
 
   // Get recipient id using recipient handle
   if (req.body.recipient_handle) {
-    recipient_id = await getAuthorId(req.body.recipient_handle);
+    recipient_id = await getAuthorId(req.body.recipient_handle, session);
   }
   try {
     await session.beginTransaction();

@@ -1,19 +1,12 @@
 const expect = require('expect-runtime');
 const BaseRepository = require('./BaseRepository');
 
+
 class MessageRepository extends BaseRepository {
   constructor(session) {
     super('message', session);
     this._tableName = 'message';
     this._session = session;
-  }
-
-  async getAuthorId(handle) {
-    return this._session
-      .getDB()
-      .select('id')
-      .from('author')
-      .where('handle', handle);
   }
 
   async createForOtherTables(object, tablename) {
@@ -41,16 +34,28 @@ class MessageRepository extends BaseRepository {
     return this._session
       .getDB()(this._tableName)
       .innerJoin(
+        'author AS author_sender',
+        'message.author_id',
+        '=',
+        'author_sender.id'
+      )
+      .leftJoin(
         'message_request',
         'message.id',
         '=',
         'message_request.message_id',
       )
-      .leftJoin(
+      .innerJoin(
         'message_delivery',
         'message.id',
         '=',
         'message_delivery.message_id',
+      )
+      .innerJoin(
+        'author AS author_recipient',
+        'message_delivery.recipient_id',
+        '=',
+        'author_recipient.id'
       )
       .leftJoin('survey', 'survey.id', '=', 'message.survey_id')
       .leftJoin(
@@ -60,9 +65,9 @@ class MessageRepository extends BaseRepository {
         'survey_question.survey_id',
       )
       .select(
-        'message_request.parent_message_id',
-        'message_request.author_handle',
-        'message_request.recipient_handle',
+        'message_delivery.parent_message_id',
+        'author_sender.handle as author_handle',
+        'author_recipient.handle as recipient_handle',
         'message_request.recipient_organization_id',
         'message_request.recipient_region_id',
         'message.subject',
@@ -81,12 +86,12 @@ class MessageRepository extends BaseRepository {
           ),
       )
       .limit(limit)
-      .groupBy(
-        'message_request.recipient_handle',
+      .groupBy( // TODO: what is going on with this group by clause, there are several content that would not be repeated
+        'author_recipient.handle',
         'message.id',
         'message.survey_id',
-        'message_request.parent_message_id',
-        'message_request.author_handle',
+        'message_delivery.parent_message_id',
+        'author_sender.handle',
         'message_request.recipient_organization_id',
         'message_request.recipient_region_id',
         'message.subject',
@@ -101,15 +106,6 @@ class MessageRepository extends BaseRepository {
       .where((builder) => whereBuilder(filter, builder));
   }
 
-  async getParentMessageDeliveryId(parent_message_id) {
-    const result = await this._session
-      .getDB()
-      .select('id')
-      .from('message_delivery')
-      .where('message_id', parent_message_id);
-
-    return result[0].id;
-  }
 }
 
 module.exports = MessageRepository;
