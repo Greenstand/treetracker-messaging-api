@@ -1,6 +1,5 @@
 const expect = require('expect-runtime');
 const BaseRepository = require('./BaseRepository');
-const MessageDeliveryRepository = require('../repositories/MessageDeliveryRepository');
 
 
 class MessageRepository extends BaseRepository {
@@ -88,11 +87,11 @@ class MessageRepository extends BaseRepository {
       )
       .limit(limit)
       .groupBy( // TODO: what is going on with this group by clause, there are several content that would not be repeated
-        'recipient_handle',
+        'author_recipient.handle',
         'message.id',
         'message.survey_id',
         'message_delivery.parent_message_id',
-        'author_handle',
+        'author_sender.handle',
         'message_request.recipient_organization_id',
         'message_request.recipient_region_id',
         'message.subject',

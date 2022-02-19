@@ -53,9 +53,12 @@ before(async () => {
   });
 
   await knex.raw(`
+    DELETE FROM message_request;
     DELETE FROM message_delivery;
     DELETE FROM message;
     DELETE FROM author;
+    DELETE FROM survey_question;
+    DELETE FROM survey;
 
     INSERT INTO author(
 	    id, handle, created_at)
@@ -91,32 +94,30 @@ after(async () => {
     .table('survey')
     .where('title', messageSendPostObject._object.survey.title);
 
-  await knex.raw(`
+  // await knex.raw(`
+  //   DELETE FROM message_delivery
+  //   WHERE parent_message_id = '${message_delivery_id}';
 
-    DELETE FROM message_delivery
-    WHERE parent_message_id = '${message_delivery_id}';
+  //   DELETE FROM message_delivery
+  //   WHERE message_id = '${existing_message.id}';
 
-    DELETE FROM message_delivery
-    WHERE message_id = '${existing_message.id}';
+  //   DELETE FROM message_request
+  //   WHERE message_id = '${existing_message.id}' or author_handle = '${messageSendPostObject._object.author_handle}' or author_handle = '${messagePostObject._object.author_handle}';
 
-    DELETE FROM message_request
-    WHERE message_id = '${existing_message.id}' or author_handle = '${messageSendPostObject._object.author_handle}' or author_handle = '${messagePostObject._object.author_handle}';
+  //   DELETE FROM message
+  //   WHERE id = '${existing_message.id}' or (body = '${messageSendPostObject._object.body}' and subject = '${messageSendPostObject._object.subject}') or (body = '${messagePostObject._object.body}' and subject = '${messagePostObject._object.subject}');
 
-    DELETE FROM message
-    WHERE id = '${existing_message.id}' or (body = '${messageSendPostObject._object.body}' and subject = '${messageSendPostObject._object.subject}') or (body = '${messagePostObject._object.body}' and subject = '${messagePostObject._object.subject}');
+  //   DELETE FROM survey_question;
 
-    DELETE FROM survey_question
-    WHERE survey_id = '${created_survey[0].id}' or survey_id = '${created_survey[1].id}';
-
-    DELETE FROM survey
-    WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';
+  //   DELETE FROM survey
+  //   WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';
     
-    DELETE FROM author
-	  WHERE id = '${author_one_id}' or id = '${author_two_id}';
+  //   DELETE FROM author
+	//   WHERE id = '${author_one_id}' or id = '${author_two_id}';
 
-    DELETE FROM region
-    WHERE id = '${existing_region_object.id}' or (name = '${region_object._object.name}' and description = '${region_object._object.description}');
-  `);
+  //   DELETE FROM region
+  //   WHERE id = '${existing_region_object.id}' or (name = '${region_object._object.name}' and description = '${region_object._object.description}');
+  // `);
 });
 
 module.exports = {

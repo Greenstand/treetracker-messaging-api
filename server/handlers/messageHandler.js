@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const Session = require('../models/Session');
-const MessageService = require('../services/MessageService.js');
+const { createMessage } = require('../services/MessageService');
 
 const { createMessageResourse, getMessages } = require('../models/Message');
 const MessageRepository = require('../repositories/MessageRepository');
@@ -58,11 +58,10 @@ const messageGetQuerySchema = Joi.object({
 const messageGet = async (req, res, next) => {
   await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
   const session = new Session();
-  const messageRepo = new MessageRepository(session);
 
   const url = `message?author_handle=${req.query.author_handle}`;
 
-  const executeGetMessages = getMessages(messageRepo);
+  const executeGetMessages = getMessages(session);
   const result = await executeGetMessages(req.query, url);
   res.send(result);
   res.end();
@@ -73,7 +72,7 @@ const messagePost = async (req, res, next) => {
   await messagePostSchema.validateAsync(req.body, { abortEarly: false });
 
   try {
-    await MessageService.createMessage(req.body);
+    await createMessage(req.body);
     res.status(204).send();
     res.end();
   } catch(e) {

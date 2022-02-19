@@ -1,10 +1,15 @@
 const { v4: uuid } = require('uuid');
 const axios = require('axios').default;
 
-const HttpError = require('../utils/HttpError');
+const HttpError = require('../utils/HttpError'); // Move to handler
 const { getAuthorId } = require('../handlers/helpers');
-const RegionRepository = require('../repositories/RegionRepository');
+
+const MessageRepository = require('../repositories/MessageRepository');
 const MessageDeliveryRepository = require('../repositories/MessageDeliveryRepository');
+const RegionRepository = require('../repositories/RegionRepository');
+const SurveyRepository = require('../repositories/SurveyRepository');
+const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
+
 const Session = require('./Session');
 
 const Message = async ({
@@ -154,6 +159,75 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
     created_at: new Date().toISOString(),
   });
 
+const createMessage = async (session, body) => { 
+  const messageRepo = new MessageRepository(session);
+  const messageDeliveryRepo = new MessageDeliveryRepository(session);
+  const surveyRepo = new SurveyRepository(session);
+  const surveyQuestionRepo = new SurveyQuestionRepository(session);
+
+  if (body.id) {
+    console.log(`check for existing ${  body.id}`);
+    const existingMessageArray = await messageRepo.getByFilter({
+      id: body.id,
+    });
+    const [existingMessage] = existingMessageArray;
+    if (existingMessage) {
+      return; // OK
+    }
+  }
+
+  // Get author id using author handle
+  const author_id = await getAuthorId(body.author_handle, session, true);
+
+  // Get recipient id using recipient handle
+  const recipient_id = await getAuthorId(body.recipient_handle, session, true);
+
+  // add message resource
+  const messageObject = MessageObject({ ...body, author_id});
+  const message = await messageRepo.create(messageObject);
+    
+    
+  // add message_delivery resource
+
+  // if parent_message_id exists get the message_delivery_id for the parent message
+  let parent_message_delivery_id = null;
+  if (body.parent_message_id) {
+    parent_message_delivery_id = await messageDeliveryRepo.getParentMessageDeliveryId(
+      body.parent_message_id,
+    );
+  }
+
+  const messageDeliveryObject = MessageDeliveryObject({
+    ...body,
+    message_id: message.id,
+    recipient_id,
+    parent_message_delivery_id
+  });
+    
+  messageDeliveryRepo.create(messageDeliveryObject);
+
+  if (body.survey) { // not currently supported by POST /message
+    const surveyObject = SurveyObject({ ...body.survey });
+    const survey = surveyRepo.create(surveyObject);
+
+    const survey_id = survey.id;
+
+    let rank = 1;
+
+    for (const { prompt, choices } of body.survey.questions) {
+      const surveyQuestionObject = SurveyQuestionObject({
+        survey_id,
+        prompt,
+        choices,
+        rank,
+      });
+      rank++;
+      surveyQuestionRepo.create(surveyQuestionObject);
+    }
+  }
+}
+
+
 const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
@@ -161,7 +235,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   const groundUserRecipientIds = [];
   let regionInfo;
   if (organization_id) {
-    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`;
+    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`; // this moves to the service
 
     // get ground_users in the specified organization from the treetracker-api
     const response = await axios.get(
@@ -305,8 +379,11 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 };
 
 const getMessages =
-  (messageRepo) =>
+  (session) =>
   async (filterCriteria = undefined, url) => {
+
+    const messageRepo = new MessageRepository(session);
+
     let filter = {};
     let options = { limit: 100, offset: 0 };
     const author_id = await getAuthorId(filterCriteria.author_handle, session);
@@ -341,6 +418,7 @@ const getMessages =
   };
 
 module.exports = {
+  createMessage,
   createMessageResourse,
   getMessages,
 };

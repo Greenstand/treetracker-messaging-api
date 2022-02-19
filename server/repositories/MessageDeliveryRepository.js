@@ -1,6 +1,6 @@
 const BaseRepository = require('./BaseRepository');
 
-class MessageRepository extends BaseRepository {
+class MessageDeliveryRepository extends BaseRepository {
   constructor(session) {
     super('message', session);
     this._tableName = 'message_delivery';
@@ -17,3 +17,5 @@ class MessageRepository extends BaseRepository {
     return result[0].id;
   }
 }
+
+module.exports = MessageDeliveryRepository;
