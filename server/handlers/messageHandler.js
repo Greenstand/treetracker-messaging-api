@@ -17,7 +17,7 @@ const messageSendPostSchema = Joi.object({
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
   body: Joi.string().required(),
-  video_link: Joi.string().uri(),
+  video_link: Joi.string().allow(null).uri(),
   survey: Joi.object({
     questions: Joi.array()
       .max(3)
@@ -45,7 +45,7 @@ const messagePostSchema = Joi.object({
   composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
   survey_response: Joi.array().items(Joi.string()),
-  video_link: Joi.string().uri(),
+  video_link: Joi.string().allow(null).uri(),
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({
@@ -61,10 +61,14 @@ const messageGet = async (req, res, next) => {
 
   const url = `message?author_handle=${req.query.author_handle}`;
 
-  const executeGetMessages = getMessages(session);
-  const result = await executeGetMessages(req.query, url);
-  res.send(result);
-  res.end();
+  try {
+    const executeGetMessages = getMessages(session);
+    const result = await executeGetMessages(req.query, url);
+    res.send(result);
+    res.end();
+  } catch(e) {
+    next(e);
+  }
 };
 
 // Create a new message resource
