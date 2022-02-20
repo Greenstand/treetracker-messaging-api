@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.6.1...v1.7.0) (2022-02-20)
+
+
+### Features
+
+* add /message/messageId endpoint ([8767efb](https://github.com/Greenstand/treetracker-messaging-api/commit/8767efbbbc15fc267dcb3e4183cd4d5b35b6aecd))
+
 ## [1.6.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.6.0...v1.6.1) (2022-02-19)
 
 
