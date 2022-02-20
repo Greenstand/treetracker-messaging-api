@@ -24,7 +24,7 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err) {
-          console.log("getting response");
+          console.log('getting response');
           if (err) return done(err);
           return done();
         });
@@ -39,7 +39,7 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(404)
         .end(function (err) {
-          console.log("getting response");
+          console.log('getting response');
           if (err) return done(err);
           return done();
         });
@@ -57,7 +57,7 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(404)
         .end(function (err) {
-          console.log("getting response");
+          console.log('getting response');
           if (err) return done(err);
           return done();
         });
@@ -166,7 +166,7 @@ describe('Message API tests.', () => {
 
     it(`Should be successful `, async function () {
       const messagePostObject = new MessagePostObject();
-      console.log("Message POST should be successful");
+      console.log('Message POST should be successful');
       console.log(messagePostObject._object);
       await request(server)
         .post(`/message`)
@@ -177,7 +177,6 @@ describe('Message API tests.', () => {
         .table('message_delivery')
         .select('id')
         .where('parent_message_id', message_delivery_id);
-
 
       const message = await knex
         .select('id')
@@ -738,8 +737,21 @@ describe('Message API tests.', () => {
           }
 
           expect(survey_one_exists).to.be.true;
-          // expect(survey_two_exists).to.be.true; 
+          // expect(survey_two_exists).to.be.true;
 
+          return done();
+        });
+    });
+
+    it('Get message by id', function (done) {
+      const messagePostObject = new MessagePostObject();
+      const messageId = messagePostObject._object.id;
+      request(server)
+        .get(`/message/${messageId}`)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body.id === messageId).to.equal(true);
           return done();
         });
     });

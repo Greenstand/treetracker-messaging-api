@@ -363,11 +363,12 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   }
 };
 
-const FilterCriteria = ({ author_handle, since, author_id }) => {
+const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
   return {
     author_handle,
     author_id,
     since: since ? new Date(since).toISOString() : since,
+    messageId,
   };
 };
 
@@ -382,27 +383,21 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 
 const getMessages =
   (session) =>
-  async (filterCriteria = undefined, url) => {
+  async (filterCriteria = undefined) => {
     const messageRepo = new MessageRepository(session);
 
     let filter = {};
     let options = { limit: 100, offset: 0 };
-    const author_id = await getAuthorId(filterCriteria.author_handle, session);
+
+    let author_id;
+    if (!filterCriteria.messageId) {
+      author_id = await getAuthorId(filterCriteria.author_handle, session);
+    }
     filter = FilterCriteria({
       ...filterCriteria,
       author_id,
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
-
-    const urlWithLimitAndOffset = `${url}${
-      filter.since ? `&since=${filter.since}` : ''
-    }&limit=${options.limit}&offset=`;
-
-    const next = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
-    let prev = null;
-    if (options.offset - +options.limit >= 0) {
-      prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
-    }
 
     const messages = await messageRepo.getMessages(filter, options);
     return {
@@ -411,10 +406,7 @@ const getMessages =
           return Message({ ...row });
         }),
       ),
-      links: {
-        prev,
-        next,
-      },
+      options,
     };
   };
 

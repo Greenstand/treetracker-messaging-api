@@ -1,7 +1,6 @@
 const expect = require('expect-runtime');
 const BaseRepository = require('./BaseRepository');
 
-
 class MessageRepository extends BaseRepository {
   constructor(session) {
     super('message', session);
@@ -25,10 +24,15 @@ class MessageRepository extends BaseRepository {
   async getMessages(filter, { limit, offset }) {
     const whereBuilder = function (object, builder) {
       let result = builder;
-      result.where('message_request.author_handle', filter.author_handle);
-      result.orWhere('message_delivery.recipient_id', filter.author_id);
-      if (object.since) {
-        result = result.andWhere('message.created_at', '>=', object.since);
+      // for /message/:message_id
+      if (object.messageId) {
+        result.where({ 'message.id': object.messageId });
+      } else {
+        result.where('message_request.author_handle', filter.author_handle);
+        result.orWhere('message_delivery.recipient_id', filter.author_id);
+        if (object.since) {
+          result = result.andWhere('message.created_at', '>=', object.since);
+        }
       }
     };
     return this._session
@@ -37,7 +41,7 @@ class MessageRepository extends BaseRepository {
         'author AS author_sender',
         'message.author_id',
         '=',
-        'author_sender.id'
+        'author_sender.id',
       )
       .leftJoin(
         'message_request',
@@ -55,7 +59,7 @@ class MessageRepository extends BaseRepository {
         'author AS author_recipient',
         'message_delivery.recipient_id',
         '=',
-        'author_recipient.id'
+        'author_recipient.id',
       )
       .leftJoin('survey', 'survey.id', '=', 'message.survey_id')
       .leftJoin(
@@ -86,7 +90,8 @@ class MessageRepository extends BaseRepository {
           ),
       )
       .limit(limit)
-      .groupBy( // TODO: what is going on with this group by clause, there are several content that would not be repeated
+      .groupBy(
+        // TODO: what is going on with this group by clause, there are several content that would not be repeated
         'author_recipient.handle',
         'message.id',
         'message.survey_id',
@@ -105,7 +110,6 @@ class MessageRepository extends BaseRepository {
       .offset(offset)
       .where((builder) => whereBuilder(filter, builder));
   }
-
 }
 
 module.exports = MessageRepository;
