@@ -17,7 +17,7 @@ const messageSendPostSchema = Joi.object({
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
   body: Joi.string().required(),
-  video_link: Joi.string().uri(),
+  video_link: Joi.string().allow(null, '').uri(),
   survey: Joi.object({
     questions: Joi.array()
       .max(3)
@@ -45,7 +45,7 @@ const messagePostSchema = Joi.object({
   composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
   survey_response: Joi.array().items(Joi.string()),
-  video_link: Joi.string().uri(),
+  video_link: Joi.string().allow(null, '').uri(),
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({
@@ -66,27 +66,31 @@ const messageGet = async (req, res, next) => {
   const url = `message?author_handle=${req.query.author_handle}`;
   const filter = req.query;
 
-  const executeGetMessages = getMessages(session);
-  const { messages, options } = await executeGetMessages(filter);
+  try {
+    const executeGetMessages = getMessages(session);
+    const { messages, options } = await executeGetMessages(filter);
 
-  const urlWithLimitAndOffset = `${url}${
-    filter.since ? `&since=${filter.since}` : ''
-  }&limit=${options.limit}&offset=`;
+    const urlWithLimitAndOffset = `${url}${
+      filter.since ? `&since=${filter.since}` : ''
+    }&limit=${options.limit}&offset=`;
 
-  const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
-  let prev = null;
-  if (options.offset - +options.limit >= 0) {
-    prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
+    const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
+    let prev = null;
+    if (options.offset - +options.limit >= 0) {
+      prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
+    }
+
+    res.send({
+      messages,
+      links: {
+        prev,
+        next: nextUrl,
+      },
+    });
+    res.end();
+  } catch(e) {
+    next(e);
   }
-
-  res.send({
-    messages,
-    links: {
-      prev,
-      next: nextUrl,
-    },
-  });
-  res.end();
 };
 
 const messageSingleGet = async (req, res, next) => {
