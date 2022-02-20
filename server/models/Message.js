@@ -233,36 +233,33 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
 
-  const groundUserRecipientIds = [];
+  const growerAccountRecipientIds = [];
   let regionInfo;
   if (organization_id) {
-    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`; // this moves to the service
+    const growerAccountUrl = `${process.env.TREETRACKER_API_URL}/grower_accounts`; // this moves to the service
 
-    // get ground_users in the specified organization from the treetracker-api
+    // get grower_accounts in the specified organization from the treetracker-api
     const response = await axios.get(
-      `${groundUsersUrl}?organization_id=${organization_id}`,
+      `${growerAccountUrl}?organization_id=${organization_id}`,
     );
-    const { ground_users } = response.data;
-    if (ground_users.length < 1) {
+    const { grower_accounts } = response.data;
+    if (grower_accounts.length < 1) {
       throw new HttpError(
         422,
         'No ground users found in the specified organization',
       );
     }
-    for (const { email, phone } of ground_users) {
+    for (const { email, phone, wallet } of grower_accounts) {
       let recipient_id;
-      if (email) {
-        recipient_id = await getAuthorId(email, session, false);
-      }
-      if (!recipient_id && phone) {
-        recipient_id = await getAuthorId(phone, session, false);
+      if (wallet) {
+        recipient_id = await getAuthorId(wallet, session, false);
       }
       if (recipient_id) {
-        groundUserRecipientIds.push(recipient_id);
+        growerAccountRecipientIds.push(recipient_id);
       }
     }
 
-    if (groundUserRecipientIds.length < 1)
+    if (growerAccountRecipientIds.length < 1)
       throw new HttpError(
         422,
         'No author handles found for any of the ground users found in the specified organization',
@@ -342,7 +339,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
 
   if (organization_id) {
     // create message_delivery for each of the ground users' recipientIds
-    for (const recipientId of groundUserRecipientIds) {
+    for (const recipientId of growerAccountRecipientIds) {
       const messageDeliveryObject = MessageDeliveryObject({
         ...requestBody,
         message_id: message.id,

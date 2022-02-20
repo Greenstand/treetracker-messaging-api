@@ -37,19 +37,19 @@ before(async () => {
     if (organization_id === db_organization_id)
       return {
         data: {
-          ground_users: [
-            { phone: author_two_handle },
-            { email: author_two_handle },
+          grower_account: [
+            { wallet: author_one_handle },
+            { wallet: author_two_handle },
           ],
         },
       };
     if (organization_id === organization_id_two)
       return {
         data: {
-          ground_users: [{ phone: 1234567 }, { email: 'email@email.com' }],
+          grower_account: [{ phone: 1234567 }, { email: 'email@email.com' }],
         },
       };
-    return { data: { ground_users: [] } };
+    return { data: { grower_account: [] } };
   });
 
   await knex.raw(`
@@ -62,7 +62,7 @@ before(async () => {
 
     INSERT INTO author(
 	    id, handle, created_at)
-	  VALUES 
+	  VALUES
         ('${author_one_id}', '${author_one_handle}', now()),
         ('${author_two_id}', '${author_two_handle}', now());
 
@@ -73,7 +73,7 @@ before(async () => {
     INSERT INTO message(
       id, author_id, subject, body, video_link, survey_id, survey_response, composed_at, created_at, active)
       VALUES ('${existing_message.id}', '${author_two_id}', 'subject', 'body', null, null, null, now(), now(), true);
-    
+
     INSERT INTO message_delivery(
       id, parent_message_id, message_id, recipient_id, created_at)
       VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_one_id}', now());
@@ -111,9 +111,9 @@ after(async () => {
 
   //   DELETE FROM survey
   //   WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';
-    
+
   //   DELETE FROM author
-	//   WHERE id = '${author_one_id}' or id = '${author_two_id}';
+  //   WHERE id = '${author_one_id}' or id = '${author_two_id}';
 
   //   DELETE FROM region
   //   WHERE id = '${existing_region_object.id}' or (name = '${region_object._object.name}' and description = '${region_object._object.description}');
