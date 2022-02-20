@@ -10,6 +10,7 @@ const {
   messagePost,
   messageGet,
   messageSendPost,
+  messageSingleGet,
 } = require('./handlers/messageHandler');
 const { authorGet } = require('./handlers/authorHandler');
 const { handlerWrapper } = require('./utils/utils');
@@ -22,6 +23,7 @@ router.get('/region/:region_id', handlerWrapper(regionIdGet));
 
 router.post('/message', handlerWrapper(messagePost));
 router.get('/message', handlerWrapper(messageGet));
+router.get('/message/:message_id', handlerWrapper(messageSingleGet));
 router.post('/message/send', handlerWrapper(messageSendPost));
 
 module.exports = router;

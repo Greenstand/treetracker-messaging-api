@@ -23,7 +23,14 @@ const regionGet = async (req, res, next) => {
   res.end();
 };
 
+const regionSingleGetQuerySchema = Joi.object({
+  region_id: Joi.string().uuid(),
+});
+
 const regionIdGet = async (req, res, next) => {
+  await regionSingleGetQuerySchema.validateAsync(req.params, {
+    abortEarly: false,
+  });
   const session = new Session();
   const regionRepo = new RegionRepository(session);
   const result = await regionRepo.getRegionById(req.params.region_id);

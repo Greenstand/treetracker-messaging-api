@@ -17,7 +17,7 @@ const messageSendPostSchema = Joi.object({
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
   body: Joi.string().required(),
-  video_link: Joi.string().allow(null).uri(),
+  video_link: Joi.string().allow(null, '').uri(),
   survey: Joi.object({
     questions: Joi.array()
       .max(3)
@@ -45,7 +45,7 @@ const messagePostSchema = Joi.object({
   composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
   survey_response: Joi.array().items(Joi.string()),
-  video_link: Joi.string().allow(null).uri(),
+  video_link: Joi.string().allow(null, '').uri(),
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({
@@ -55,20 +55,57 @@ const messageGetQuerySchema = Joi.object({
   since: Joi.date().iso(),
 }).unknown(false);
 
+const messageSingleGetQuerySchema = Joi.object({
+  message_id: Joi.string().uuid(),
+});
+
 const messageGet = async (req, res, next) => {
   await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
   const session = new Session();
 
   const url = `message?author_handle=${req.query.author_handle}`;
+  const filter = req.query;
 
   try {
     const executeGetMessages = getMessages(session);
-    const result = await executeGetMessages(req.query, url);
-    res.send(result);
+    const { messages, options } = await executeGetMessages(filter);
+
+    const urlWithLimitAndOffset = `${url}${
+      filter.since ? `&since=${filter.since}` : ''
+    }&limit=${options.limit}&offset=`;
+
+    const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
+    let prev = null;
+    if (options.offset - +options.limit >= 0) {
+      prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
+    }
+
+    res.send({
+      messages,
+      links: {
+        prev,
+        next: nextUrl,
+      },
+    });
     res.end();
   } catch(e) {
     next(e);
   }
+};
+
+const messageSingleGet = async (req, res, next) => {
+  await messageSingleGetQuerySchema.validateAsync(req.params, {
+    abortEarly: false,
+  });
+  const session = new Session();
+  const executeGetMessages = getMessages(session);
+  const {
+    messages: [message = {}],
+  } = await executeGetMessages({
+    messageId: req.params.message_id,
+  });
+  res.send(message);
+  res.end();
 };
 
 // Create a new message resource
@@ -79,7 +116,7 @@ const messagePost = async (req, res, next) => {
     await createMessage(req.body);
     res.status(204).send();
     res.end();
-  } catch(e) {
+  } catch (e) {
     next(e);
   }
 
@@ -161,4 +198,5 @@ module.exports = {
   messagePost,
   messageGet,
   messageSendPost,
+  messageSingleGet,
 };
