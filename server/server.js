@@ -1,14 +1,13 @@
-require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
 
-console.log(process.env);
-const log = require("loglevel");
+const log = require('loglevel');
 // setup log level
-require("./setup");
-const app = require("./app");
+require('./setup');
+const app = require('./app');
 
 const port = process.env.NODE_PORT || 3006;
 
-app.listen(port,()=>{
-    log.info(`listening on port:${  port}`);
-    log.debug("debug log level!");
+app.listen(port, () => {
+  log.info(`listening on port:${port}`);
+  log.debug('debug log level!');
 });

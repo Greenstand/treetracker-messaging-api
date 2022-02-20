@@ -9,6 +9,7 @@ const {
 class MessagePostObject extends GenericObject {
   constructor() {
     super({
+      id: 'd3b05f1b-c765-43f8-870d-4a3bb2ef277e',
       parent_message_id: existing_message.id,
       recipient_handle: author_two_handle,
       author_handle: author_one_handle,
