@@ -51,10 +51,11 @@ const Message = async ({
 
   if (recipient_organization_id) {
     // get organization name
-    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholder`;
+    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
     const organizationResponse = await axios.get(
-      `${stakeholderUrl}?stakeholder_uuid=${recipient_organization_id}`,
+      `${stakeholderUrl}?id=${recipient_organization_id}`,
     );
+
     to.push({
       recipient: organizationResponse.data.stakeholders[0]?.name,
       type: 'organization',
@@ -159,14 +160,14 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
     created_at: new Date().toISOString(),
   });
 
-const createMessage = async (session, body) => { 
+const createMessage = async (session, body) => {
   const messageRepo = new MessageRepository(session);
   const messageDeliveryRepo = new MessageDeliveryRepository(session);
   const surveyRepo = new SurveyRepository(session);
   const surveyQuestionRepo = new SurveyQuestionRepository(session);
 
   if (body.id) {
-    console.log(`check for existing ${  body.id}`);
+    console.log(`check for existing ${body.id}`);
     const existingMessageArray = await messageRepo.getByFilter({
       id: body.id,
     });
@@ -183,30 +184,31 @@ const createMessage = async (session, body) => {
   const recipient_id = await getAuthorId(body.recipient_handle, session, true);
 
   // add message resource
-  const messageObject = MessageObject({ ...body, author_id});
+  const messageObject = MessageObject({ ...body, author_id });
   const message = await messageRepo.create(messageObject);
-    
-    
+
   // add message_delivery resource
 
   // if parent_message_id exists get the message_delivery_id for the parent message
   let parent_message_delivery_id = null;
   if (body.parent_message_id) {
-    parent_message_delivery_id = await messageDeliveryRepo.getParentMessageDeliveryId(
-      body.parent_message_id,
-    );
+    parent_message_delivery_id =
+      await messageDeliveryRepo.getParentMessageDeliveryId(
+        body.parent_message_id,
+      );
   }
 
   const messageDeliveryObject = MessageDeliveryObject({
     ...body,
     message_id: message.id,
     recipient_id,
-    parent_message_delivery_id
+    parent_message_delivery_id,
   });
-    
+
   messageDeliveryRepo.create(messageDeliveryObject);
 
-  if (body.survey) { // not currently supported by POST /message
+  if (body.survey) {
+    // not currently supported by POST /message
     const surveyObject = SurveyObject({ ...body.survey });
     const survey = surveyRepo.create(surveyObject);
 
@@ -225,8 +227,7 @@ const createMessage = async (session, body) => {
       surveyQuestionRepo.create(surveyQuestionObject);
     }
   }
-}
-
+};
 
 const createMessageResourse = async (messageRepo, requestBody, session) => {
   let { survey_id } = requestBody;
@@ -318,11 +319,12 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let parent_message_delivery_id = null;
 
   // if parent_message_id exists get the message_delivery_id for the parent message
-  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TOOD: move to service
+  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TODO: move to service
   if (requestBody.parent_message_id) {
-    parent_message_delivery_id = await messageDeliveryRepo.getParentMessageDeliveryId(
-      requestBody.parent_message_id,
-    );
+    parent_message_delivery_id =
+      await messageDeliveryRepo.getParentMessageDeliveryId(
+        requestBody.parent_message_id,
+      );
   }
 
   if (requestBody.recipient_id) {
@@ -381,7 +383,6 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 const getMessages =
   (session) =>
   async (filterCriteria = undefined, url) => {
-
     const messageRepo = new MessageRepository(session);
 
     let filter = {};
