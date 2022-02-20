@@ -1,3 +1,13 @@
+## [1.7.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.0...v1.7.1) (2022-02-20)
+
+
+### Bug Fixes
+
+* add cors to devdeps ([6df9385](https://github.com/Greenstand/treetracker-messaging-api/commit/6df93859d58b9580f9add7faaee150947f7331d9))
+* cors logic on app.js and remove routes/**.spec.js from script since it doesn't exist ([15da52d](https://github.com/Greenstand/treetracker-messaging-api/commit/15da52d818beae2a870f4e51f3feffc5f28580e0))
+* stakeholder api url and update .env.example to include it ([8e78163](https://github.com/Greenstand/treetracker-messaging-api/commit/8e7816317bba4312efcc75b22ae9862d5f706ab3))
+* stakeholder api url and update .env.example to include it ([de2eb4d](https://github.com/Greenstand/treetracker-messaging-api/commit/de2eb4d3a103569d12b015fc6f1cfe55861dc6db))
+
 # [1.7.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.6.1...v1.7.0) (2022-02-20)
 
 
