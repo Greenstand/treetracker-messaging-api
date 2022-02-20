@@ -4,10 +4,9 @@ const { expect } = require('chai');
 const server = require('../server/app');
 const { author_one_id, author_two_id } = require('./seed-data-creation');
 const { author_one_handle, author_two_handle } = require('./generic-class');
-const { knex } = require('../server/database/knex');
+const knex = require('../server/database/knex');
 
 describe('Author API tests.', () => {
-
   describe('Author GET', () => {
     it(`Should get authors successfully`, function (done) {
       request(server)

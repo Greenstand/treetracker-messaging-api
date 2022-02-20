@@ -51,10 +51,11 @@ const Message = async ({
 
   if (recipient_organization_id) {
     // get organization name
-    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholder`;
+    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
     const organizationResponse = await axios.get(
-      `${stakeholderUrl}?stakeholder_uuid=${recipient_organization_id}`,
+      `${stakeholderUrl}?id=${recipient_organization_id}`,
     );
+
     to.push({
       recipient: organizationResponse.data.stakeholders[0]?.name,
       type: 'organization',
@@ -318,7 +319,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   let parent_message_delivery_id = null;
 
   // if parent_message_id exists get the message_delivery_id for the parent message
-  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TOOD: move to service
+  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TODO: move to service
   if (requestBody.parent_message_id) {
     parent_message_delivery_id =
       await messageDeliveryRepo.getParentMessageDeliveryId(
