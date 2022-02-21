@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.1...v1.7.2) (2022-02-20)
+
+
+### Bug Fixes
+
+* videolink validation ([761f5f7](https://github.com/Greenstand/treetracker-messaging-api/commit/761f5f744b1f0e011a731f7c3b165a88c095c5d5))
+
 ## [1.7.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.0...v1.7.1) (2022-02-20)
 
 
