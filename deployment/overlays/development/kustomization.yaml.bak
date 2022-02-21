@@ -3,5 +3,6 @@ bases:
 patchesStrategicMerge:
   - database-connection-sealed-secret.yaml
   - database-migration-connection-sealed-secret.yaml
+  - aws-key-sealed-secret.yaml
   - deployment.yaml
   - mapping.yaml
