@@ -12,7 +12,7 @@ describe("Survey get API", function () {
     await knex.raw('TRUNCATE TABLE message, survey_question, survey, author CASCADE');
   });
 
-  it.only("Get /survey/:uuid", async () => {
+  it("Get /survey/:uuid", async () => {
 
     // prepare the data
     const authorId = uuid();
