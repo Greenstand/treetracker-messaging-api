@@ -2,11 +2,11 @@
   "dev": {
     "driver": "pg",
     "user" : "m_messaging",
-    "password" : "xxxxx",
+    "password" : "{MIGRATION_PASSWORD}",
     "database" : "treetracker",
     "host" : "db-postgresql-sfo2-nextgen-do-user-1067699-0.db.ondigitalocean.com",
     "port" : "25060",
-    "schema" : "messaging",
+    "schema" : "{SCHEMA}",
     "ssl" : {
       "rejectUnauthorized": false
     }
@@ -14,11 +14,11 @@
   "integration": {
     "driver": "pg",
     "user" : "integration",
-    "password" : "xxxxxx",
+    "password" : "{INTEGRATION_PASSWORD}",
     "database" : "integration_test",
     "host" : "db-postgresql-sfo2-nextgen-do-user-1067699-0.db.ondigitalocean.com",
     "port" : "25060",
-    "schema" : "messaging",
+    "schema" : "{SCHEMA}",
     "ssl" : {
       "rejectUnauthorized": false
     }
