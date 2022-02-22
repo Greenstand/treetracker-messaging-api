@@ -1,3 +1,10 @@
+## [1.7.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.6...v1.7.7) (2022-02-22)
+
+
+### Bug Fixes
+
+* update deployment for dev migration ([762dc03](https://github.com/Greenstand/treetracker-messaging-api/commit/762dc03f78f6f552d4752469ae1f020d2d02cf75))
+
 ## [1.7.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.5...v1.7.6) (2022-02-21)
 
 
