@@ -1,5 +1,6 @@
 const expect = require('expect-runtime');
 const BaseRepository = require('./BaseRepository');
+const log = require("loglevel");
 
 class MessageRepository extends BaseRepository {
   constructor(session) {
@@ -109,6 +110,24 @@ class MessageRepository extends BaseRepository {
       )
       .offset(offset)
       .where((builder) => whereBuilder(filter, builder));
+  }
+
+  async getSurveyResponse(surveyId) {
+    const result = await this._session
+      .getDB()
+      .raw(`
+        SELECT
+          survey_id,
+          survey_response
+        FROM
+          message
+        WHERE
+          message.survey_id = ?
+          `
+        , [surveyId]
+      );
+    log.warn("result:", result);
+    return result.rows;
   }
 }
 

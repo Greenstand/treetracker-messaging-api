@@ -12,6 +12,9 @@ const {
   messageSendPost,
   messageSingleGet,
 } = require('./handlers/messageHandler');
+const {
+  get,
+} = require('./handlers/surveyHandler');
 const { authorGet } = require('./handlers/authorHandler');
 const { handlerWrapper } = require('./utils/utils');
 
@@ -25,5 +28,7 @@ router.post('/message', handlerWrapper(messagePost));
 router.get('/message', handlerWrapper(messageGet));
 router.get('/message/:message_id', handlerWrapper(messageSingleGet));
 router.post('/message/send', handlerWrapper(messageSendPost));
+
+router.get('/survey/:uuid', handlerWrapper(get));
 
 module.exports = router;
