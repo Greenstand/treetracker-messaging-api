@@ -1,3 +1,10 @@
+## [1.7.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.7...v1.7.8) (2022-02-22)
+
+
+### Bug Fixes
+
+* typo ([028715f](https://github.com/Greenstand/treetracker-messaging-api/commit/028715f3abceb7b04ec5af20d9e723d9ebdc3216))
+
 ## [1.7.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.6...v1.7.7) (2022-02-22)
 
 
