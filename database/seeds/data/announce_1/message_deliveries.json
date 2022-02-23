@@ -1,0 +1,32 @@
+[
+  {
+    "parent_message_id": null,
+    "message_id": "bc192b2d-b926-43a7-af9c-1a2ebeca1cad",
+    "recipient_id": "6e62b0b7-4203-4beb-a15a-7fa1114b8577",
+    "created_at": "2022-01-22"
+  },
+  {
+    "parent_message_id": null,
+    "message_id": "bc192b2d-b926-43a7-af9c-1a2ebeca1cad",
+    "recipient_id": "6e62b0b7-4203-4beb-a15a-7fa1114b8577",
+    "created_at": "2022-01-22"
+  },
+  {
+    "parent_message_id": null,
+    "message_id": "bc192b2d-b926-43a7-af9c-1a2ebeca1cad",
+    "recipient_id": "c72e6b02-f895-43a3-93b7-8a5242c8fb67",
+    "created_at": "2022-01-22"
+  },
+  {
+    "parent_message_id": null,
+    "message_id": "bc192b2d-b926-43a7-af9c-1a2ebeca1cad",
+    "recipient_id": "e2904bce-150c-41ed-a54b-693134b7ade8",
+    "created_at": "2022-01-22"
+  },
+  {
+    "parent_message_id": null,
+    "message_id": "bc192b2d-b926-43a7-af9c-1a2ebeca1cad",
+    "recipient_id": "f6cfa3da-42f3-46d9-91b6-9caad139c0f2",
+    "created_at": "2022-01-24"
+  }
+]

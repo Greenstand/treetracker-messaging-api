@@ -1,26 +1,26 @@
 [
   {
-    "id" : "3cbc7e66-87f1-4f74-bfc5-42de31b7aa19",
-    "author_id" : "f9cc2c9e-216c-483b-a73c-1d6378af9ed5",
-    "subject" : "",
-    "body" : "Greetings, can you confirm that you have uploaded?",
-    "video_link" : null,
-    "survey_id" : null,
-    "survey_response" : null,
-    "composed_at" : "2022-01-22", 
-    "created_at" : "2022-01-22",
-    "active" : true
+    "id": "3cbc7e66-87f1-4f74-bfc5-42de31b7aa19",
+    "author_id": "f9cc2c9e-216c-483b-a73c-1d6378af9ed5",
+    "subject": "",
+    "body": "Greetings, can you confirm that you have uploaded?",
+    "video_link": null,
+    "survey_id": null,
+    "survey_response": null,
+    "composed_at": "2022-01-22",
+    "created_at": "2022-01-22",
+    "active": true
   },
   {
-    "id" : "7b9019ac-df41-4f54-a263-1860aa07fac6",
-    "author_id" : "6e62b0b7-4203-4beb-a15a-7fa1114b8577",
-    "subject" : "",
-    "body" : "Yes I have uploaded",
-    "video_link" : null,
-    "survey_id" : null,
-    "survey_response" : null,
-    "composed_at" : "2022-01-23", 
-    "created_at" : "2022-01-24",
-    "active" : true
+    "id": "7b9019ac-df41-4f54-a263-1860aa07fac6",
+    "author_id": "6e62b0b7-4203-4beb-a15a-7fa1114b8577",
+    "subject": "",
+    "body": "Yes I have uploaded",
+    "video_link": null,
+    "survey_id": null,
+    "survey_response": null,
+    "composed_at": "2022-01-23",
+    "created_at": "2022-01-24",
+    "active": true
   }
 ]
