@@ -9,15 +9,15 @@ const createMessage = async (body) => {
     await Message.createMessage(session, body);
     // await session.commitTransaction();
   } catch (e) {
-    console.log("Error:");
+    console.log('Error:');
     console.log(e);
     // if (session.isTransactionInProgress()) {
-      // await session.rollbackTransaction();
+    // await session.rollbackTransaction();
     // }
-    throw(e);
+    throw e;
   }
-}
+};
 
 // createMessageRequest
 
-module.exports = { createMessage }
+module.exports = { createMessage };

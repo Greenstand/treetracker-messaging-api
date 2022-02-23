@@ -1,7 +1,9 @@
-const tag = "announce_1"
-const messages = require('./data/'+tag+'/messages.json');
-const message_deliveries = require('./data/'+tag+'/message_deliveries.json');
-const message_requests = require('./data/'+tag+'/message_requests.json');
+const tag = 'announce_1';
+/* eslint-disable */
+const messages = require(`./data/${tag}/messages.json`);
+const message_deliveries = require(`./data/${tag}/message_deliveries.json`);
+const message_requests = require(`./data/${tag}/message_requests.json`);
+/* eslint-enable */
 
 exports.seed = async function (knex) {
   const trx = await knex.transaction();

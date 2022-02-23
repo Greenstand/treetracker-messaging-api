@@ -1,6 +1,6 @@
 # Name of this microservice
 
-treetracker-messaging-api 
+treetracker-messaging-api
 
 Description of this microservice
 
@@ -12,7 +12,7 @@ db-migrate up --migrations-dir=database/migrations --config=database/database.js
 
 # Development toolkit
 
-This  repository was created from Greenstand's template for microservice projects. This means it comes with many development tools that we use for development and deployment. As a contributor to this repository, you should learn and use these tools. They are outlined below.
+This repository was created from Greenstand's template for microservice projects. This means it comes with many development tools that we use for development and deployment. As a contributor to this repository, you should learn and use these tools. They are outlined below.
 
 ## db-migrate
 
