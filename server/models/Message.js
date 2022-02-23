@@ -4,7 +4,7 @@ const axios = require('axios').default;
 const HttpError = require('../utils/HttpError'); // Move to handler
 const { getAuthorId } = require('../handlers/helpers');
 
-const MessageRepository = require('../repositories/MessageRepository');
+const ContentRepository = require('../repositories/ContentRepository');
 const MessageDeliveryRepository = require('../repositories/MessageDeliveryRepository');
 const RegionRepository = require('../repositories/RegionRepository');
 const SurveyRepository = require('../repositories/SurveyRepository');
@@ -161,14 +161,14 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
   });
 
 const createMessage = async (session, body) => {
-  const messageRepo = new MessageRepository(session);
+  const contentRepo = new ContentRepository(session);
   const messageDeliveryRepo = new MessageDeliveryRepository(session);
   const surveyRepo = new SurveyRepository(session);
   const surveyQuestionRepo = new SurveyQuestionRepository(session);
 
   if (body.id) {
     console.log(`check for existing ${body.id}`);
-    const existingMessageArray = await messageRepo.getByFilter({
+    const existingMessageArray = await contentRepo.getByFilter({
       id: body.id,
     });
     const [existingMessage] = existingMessageArray;
@@ -185,7 +185,7 @@ const createMessage = async (session, body) => {
 
   // add message resource
   const messageObject = MessageObject({ ...body, author_id });
-  const message = await messageRepo.create(messageObject);
+  const message = await contentRepo.create(messageObject);
 
   // add message_delivery resource
 
@@ -229,7 +229,7 @@ const createMessage = async (session, body) => {
   }
 };
 
-const createMessageResourse = async (messageRepo, requestBody, session) => {
+const createMessageResourse = async (contentRepo, requestBody, session) => {
   let { survey_id } = requestBody;
   const { organization_id, region_id } = requestBody;
 
@@ -277,7 +277,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   // IF this has a survey object, a message/send POST request
   if (requestBody.survey) {
     const surveyObject = SurveyObject({ ...requestBody });
-    const survey = await messageRepo.createForOtherTables(
+    const survey = await contentRepo.createForOtherTables(
       surveyObject,
       'survey',
     );
@@ -294,7 +294,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
         rank,
       });
       rank++;
-      await messageRepo.createForOtherTables(
+      await contentRepo.createForOtherTables(
         surveyQuestionObject,
         'survey_question',
       );
@@ -302,7 +302,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
   }
 
   const messageObject = MessageObject({ ...requestBody, survey_id });
-  const message = await messageRepo.create(messageObject);
+  const message = await contentRepo.create(messageObject);
 
   const messageRequestObject = MessageRequestObject({
     ...requestBody,
@@ -311,7 +311,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
     message_id: message.id,
   });
 
-  await messageRepo.createForOtherTables(
+  await contentRepo.createForOtherTables(
     messageRequestObject,
     'message_request',
   );
@@ -333,7 +333,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
       message_id: message.id,
       parent_message_delivery_id,
     });
-    await messageRepo.createForOtherTables(
+    await contentRepo.createForOtherTables(
       messageDeliveryObject,
       'message_delivery',
     );
@@ -349,7 +349,7 @@ const createMessageResourse = async (messageRepo, requestBody, session) => {
         parent_message_delivery_id,
         recipient_id: recipientId,
       });
-      await messageRepo.createForOtherTables(
+      await contentRepo.createForOtherTables(
         messageDeliveryObject,
         'message_delivery',
       );
@@ -384,7 +384,7 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 const getMessages =
   (session) =>
   async (filterCriteria = undefined) => {
-    const messageRepo = new MessageRepository(session);
+    const contentRepo = new ContentRepository(session);
 
     let filter = {};
     let options = { limit: 100, offset: 0 };
@@ -399,7 +399,7 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    const messages = await messageRepo.getMessages(filter, options);
+    const messages = await contentRepo.getMessages(filter, options);
     return {
       messages: await Promise.all(
         messages.map(async (row) => {

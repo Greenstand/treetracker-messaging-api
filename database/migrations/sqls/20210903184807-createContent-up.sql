@@ -10,5 +10,5 @@ CREATE TABLE content
     survey_response jsonb,
     composed_at timestamptz NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now(),
-    active boolean NOT NULL DEFAULT now()
+    active boolean NOT NULL DEFAULT true
 );

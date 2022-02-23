@@ -4,7 +4,7 @@ const Session = require('../models/Session');
 const { createMessage } = require('../services/MessageService');
 
 const { createMessageResourse, getMessages } = require('../models/Message');
-const MessageRepository = require('../repositories/MessageRepository');
+const ContentRepository = require('../repositories/ContentRepository');
 const { getAuthorId } = require('./helpers');
 const HttpError = require('../utils/HttpError');
 
@@ -134,7 +134,7 @@ const messagePost = async (req, res, next) => {
 
   // try {
   //   await session.beginTransaction();
-  //   await createMessageResourse(messageRepo, {
+  //   await createMessageResourse(contentRepo, {
   //     ...req.body,
   //     author_id,
   //     recipient_id,
@@ -164,7 +164,7 @@ const messageSendPost = async (req, res, next) => {
   const session = new Session();
 
   // Get author id using author handle
-  const messageRepo = new MessageRepository(session);
+  const contentRepo = new ContentRepository(session);
   const author_id = await getAuthorId(req.body.author_handle, session);
 
   let recipient_id = null;
@@ -176,7 +176,7 @@ const messageSendPost = async (req, res, next) => {
   try {
     await session.beginTransaction();
     await createMessageResourse(
-      messageRepo,
+      contentRepo,
       {
         ...req.body,
         author_id,
