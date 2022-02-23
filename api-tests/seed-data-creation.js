@@ -54,8 +54,8 @@ before(async () => {
 
   await knex.raw(`
     DELETE FROM message_request;
-    DELETE FROM message_delivery;
     DELETE FROM message;
+    DELETE FROM content;
     DELETE FROM author;
     DELETE FROM survey_question;
     DELETE FROM survey;
@@ -70,13 +70,13 @@ before(async () => {
         id, name, description, shape, created_at, creator_user_id, creator_organization_id, active)
         VALUES ('${existing_region_object.id}', '${existing_region_object.name}', '${existing_region_object.description}', null, now(), null, null, true);
 
-    INSERT INTO message(
-      id, author_id, subject, body, video_link, survey_id, survey_response, composed_at, created_at, active)
-      VALUES ('${existing_message.id}', '${author_two_id}', 'subject', 'body', null, null, null, now(), now(), true);
+    INSERT INTO content(
+      id, author_id, type, subject, body, video_link, survey_id, survey_response, composed_at, created_at, active)
+      VALUES ('${existing_message.id}', '${author_two_id}', 'message', 'subject', 'body', null, null, null, now(), now(), true);
     
-    INSERT INTO message_delivery(
-      id, parent_message_id, message_id, recipient_id, created_at)
-      VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_one_id}', now());
+    INSERT INTO message(
+      id, parent_message_id, content_id, sender_id, recipient_id, created_at)
+      VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_two_id}', '${author_one_id}', now());
 
     INSERT INTO survey(
       id, title, active, created_at)
