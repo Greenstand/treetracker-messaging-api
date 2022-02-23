@@ -1,3 +1,10 @@
+## [1.7.11](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.10...v1.7.11) (2022-02-23)
+
+
+### Bug Fixes
+
+* need .yaml ([9646e2f](https://github.com/Greenstand/treetracker-messaging-api/commit/9646e2f4a217166d35287f73ca72658299a23f42))
+
 ## [1.7.10](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.9...v1.7.10) (2022-02-23)
 
 
