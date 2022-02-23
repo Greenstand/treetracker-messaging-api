@@ -21,7 +21,7 @@ exports.up = function (db) {
   const filePath = path.join(
     __dirname,
     'sqls',
-    '20210903184807-createMessage-up.sql',
+    '20210903184807-createContent-up.sql',
   );
   return new Promise(function (resolve, reject) {
     fs.readFile(filePath, { encoding: 'utf-8' }, function (err, data) {
@@ -39,7 +39,7 @@ exports.down = function (db) {
   const filePath = path.join(
     __dirname,
     'sqls',
-    '20210903184807-createMessage-down.sql',
+    '20210903184807-createContent-down.sql',
   );
   return new Promise(function (resolve, reject) {
     fs.readFile(filePath, { encoding: 'utf-8' }, function (err, data) {
