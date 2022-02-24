@@ -24,6 +24,7 @@ spec:
                     values:
                       - microservices-node-pool
       containers:
+<<<<<<< HEAD
       - name: treetracker-messaging-api
         image: greenstand/treetracker-messaging-api:VERSION
         ports:
@@ -38,4 +39,17 @@ spec:
             value: messaging
       imagePullSecrets:
         - name: greenstand-docker-secret
-
+=======
+        - name: treetracker-messaging-api
+          image: greenstand/treetracker-messaging-api:TAG
+          ports:
+            - containerPort: 80
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-connection
+                  key: db
+            - name: DATABASE_SCHEMA
+              value: messaging
+>>>>>>> 32f840727f2394ec191cb632f1d21f7d68d372bd

@@ -111,9 +111,9 @@ after(async () => {
 
   //   DELETE FROM survey
   //   WHERE id = '${survey_id}' or title = '${messageSendPostObject._object.survey.title}';
-    
+
   //   DELETE FROM author
-	//   WHERE id = '${author_one_id}' or id = '${author_two_id}';
+  //   WHERE id = '${author_one_id}' or id = '${author_two_id}';
 
   //   DELETE FROM region
   //   WHERE id = '${existing_region_object.id}' or (name = '${region_object._object.name}' and description = '${region_object._object.description}');

@@ -7,5 +7,5 @@ exports.seed = async function (knex) {
   await trx('message').insert(messages);
   await trx('message_delivery').insert(message_deliveries);
   await trx('message_request').insert(message_requests);
-  await trx.commit()
+  await trx.commit();
 };

@@ -74,7 +74,9 @@ const messageGet = async (req, res, next) => {
       filter.since ? `&since=${filter.since}` : ''
     }&limit=${options.limit}&offset=`;
 
-    const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
+    const nextUrl = `${urlWithLimitAndOffset}${
+      +options.offset + +options.limit
+    }`;
     let prev = null;
     if (options.offset - +options.limit >= 0) {
       prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
@@ -88,7 +90,7 @@ const messageGet = async (req, res, next) => {
       },
     });
     res.end();
-  } catch(e) {
+  } catch (e) {
     next(e);
   }
 };
