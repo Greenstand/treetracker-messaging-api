@@ -18,6 +18,21 @@ const createMessage = async (body) => {
   }
 };
 
+const createBulkMessage = async (body) => {
+  const session = new Session();
+  try {
+    await session.beginTransaction();
+    await Message.createBulkMessage(session, body);
+    await session.commitTransaction();
+  } catch (e) {
+    console.log(e);
+    if (session.isTransactionInProgress()) {
+      await session.rollbackTransaction();
+    }
+    throw(e);
+  }
+}
+
 // createMessageRequest
 
-module.exports = { createMessage };
+module.exports = { createMessage, createBulkMessage };

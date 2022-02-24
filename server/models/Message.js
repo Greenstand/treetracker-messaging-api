@@ -5,7 +5,8 @@ const HttpError = require('../utils/HttpError'); // Move to handler
 const { getAuthorId } = require('../handlers/helpers');
 
 const ContentRepository = require('../repositories/ContentRepository');
-const MessageDeliveryRepository = require('../repositories/MessageDeliveryRepository');
+const MessageRepository = require('../repositories/MessageRepository');
+const MessageRequestRepository = require('../repositories/MessageRequestRepository');
 const RegionRepository = require('../repositories/RegionRepository');
 const SurveyRepository = require('../repositories/SurveyRepository');
 const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
@@ -29,6 +30,7 @@ const Message = async ({
   survey_title,
   questions,
 }) => {
+  
   const answer = survey_response?.survey_response;
   let survey;
   if (!survey_id) {
@@ -43,24 +45,26 @@ const Message = async ({
     };
   }
 
-  const to = [];
+  const bulk_message_recipients = [];
 
   if (recipient_handle) {
-    to.push({ recipient: recipient_handle, type: 'user' });
+    bulk_message_recipients.push({ recipient: recipient_handle, type: 'user' });
   }
 
-  if (recipient_organization_id) {
-    // get organization name
-    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
-    const organizationResponse = await axios.get(
-      `${stakeholderUrl}?id=${recipient_organization_id}`,
-    );
+  // TODO: move to service layer
+  // if (recipient_organization_id) {
+  //   // get organization name
+  //   console.log("get org name");
+  //   const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
+  //   const organizationResponse = await axios.get(
+  //     `${stakeholderUrl}?id=${recipient_organization_id}`,
+  //   );
 
-    to.push({
-      recipient: organizationResponse.data.stakeholders[0]?.name,
-      type: 'organization',
-    });
-  }
+  //   bulk_message_recipients.push({
+  //     recipient: organizationResponse.data.stakeholders[0]?.name,
+  //     type: 'organization',
+  //   });
+  // }
 
   if (recipient_region_id) {
     // get region name
@@ -68,15 +72,16 @@ const Message = async ({
     const regionRepo = new RegionRepository(session);
     const regionInfo = await regionRepo.getById(recipient_region_id);
 
-    to.push({ recipient: regionInfo.name, type: 'region' });
+    bulk_message_recipients.push({ recipient: regionInfo.name, type: 'region' });
   }
 
   return Object.freeze({
     id,
     parent_message_id,
     title,
-    from: { author: author_handle, type: 'user' },
-    to,
+    from: author_handle,
+    to: recipient_handle,
+    bulk_message_recipients,
     subject,
     body,
     composed_at,
@@ -85,24 +90,24 @@ const Message = async ({
   });
 };
 
-const MessageObject = ({
+const ContentObject = ({
   id = uuid(),
+  type = 'message',
   subject,
   body,
   composed_at = new Date().toISOString(),
   survey_id = null,
   survey_response,
-  title = null,
   video_link = null,
   author_id,
   active = true,
 }) =>
   Object.freeze({
     id,
+    type,
     created_at: new Date().toISOString(),
     subject,
     body,
-    title,
     composed_at,
     survey_id,
     survey_response: survey_response ? { survey_response } : null,
@@ -115,7 +120,7 @@ const MessageRequestObject = ({
   author_handle,
   recipient_handle = null,
   parent_message_id = null,
-  message_id,
+  content_id,
   region_id = null,
   organization_id = null,
 }) =>
@@ -123,23 +128,25 @@ const MessageRequestObject = ({
     id: uuid(),
     author_handle,
     recipient_handle,
-    message_id,
+    content_id,
     parent_message_id,
     recipient_region_id: region_id,
     recipient_organization_id: organization_id,
   });
 
-const MessageDeliveryObject = ({
-  parent_message_delivery_id = null,
-  message_id,
+const MessageObject = ({
+  parent_message_id = null,
+  content_id,
+  sender_id,
   recipient_id,
 }) =>
   Object.freeze({
     id: uuid(),
+    content_id,
     created_at: new Date().toISOString(),
-    parent_message_id: parent_message_delivery_id,
+    parent_message_id,
+    sender_id,
     recipient_id,
-    message_id,
   });
 
 const SurveyObject = ({ survey }) =>
@@ -161,14 +168,15 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
   });
 
 const createMessage = async (session, body) => {
+  console.log("Create message");
   const contentRepo = new ContentRepository(session);
-  const messageDeliveryRepo = new MessageDeliveryRepository(session);
+  const messageRepo = new MessageRepository(session);
   const surveyRepo = new SurveyRepository(session);
   const surveyQuestionRepo = new SurveyQuestionRepository(session);
 
   if (body.id) {
     console.log(`check for existing ${body.id}`);
-    const existingMessageArray = await contentRepo.getByFilter({
+    const existingMessageArray = await messageRepo.getByFilter({
       id: body.id,
     });
     const [existingMessage] = existingMessageArray;
@@ -183,104 +191,39 @@ const createMessage = async (session, body) => {
   // Get recipient id using recipient handle
   const recipient_id = await getAuthorId(body.recipient_handle, session, true);
 
+  // add content resource
+  const contentObject = ContentObject({ ...body, author_id });
+  const content = await contentRepo.create(contentObject);
+
   // add message resource
-  const messageObject = MessageObject({ ...body, author_id });
-  const message = await contentRepo.create(messageObject);
-
-  // add message_delivery resource
-
-  // if parent_message_id exists get the message_delivery_id for the parent message
-  let parent_message_delivery_id = null;
-  if (body.parent_message_id) {
-    parent_message_delivery_id =
-      await messageDeliveryRepo.getParentMessageDeliveryId(
-        body.parent_message_id,
-      );
-  }
-
-  const messageDeliveryObject = MessageDeliveryObject({
+  const messageObject = MessageObject({
     ...body,
-    message_id: message.id,
-    recipient_id,
-    parent_message_delivery_id,
+    content_id: content.id,
+    sender_id: author_id,
+    recipient_id
   });
 
-  messageDeliveryRepo.create(messageDeliveryObject);
+  await messageRepo.create(messageObject);
 
-  if (body.survey) {
-    // not currently supported by POST /message
-    const surveyObject = SurveyObject({ ...body.survey });
-    const survey = surveyRepo.create(surveyObject);
-
-    const survey_id = survey.id;
-
-    let rank = 1;
-
-    for (const { prompt, choices } of body.survey.questions) {
-      const surveyQuestionObject = SurveyQuestionObject({
-        survey_id,
-        prompt,
-        choices,
-        rank,
-      });
-      rank++;
-      surveyQuestionRepo.create(surveyQuestionObject);
-    }
-  }
+  
 };
 
-const createMessageResourse = async (contentRepo, requestBody, session) => {
-  let { survey_id } = requestBody;
-  const { organization_id, region_id } = requestBody;
+const createBulkMessage = async (session, requestBody) => {
+  const contentRepo = new ContentRepository(session); 
+  const messageRepo = new MessageRepository(session);
+  const messageRequestRepo = new MessageRequestRepository(session);
+  const surveyRepo = new SurveyRepository(session);
+  const surveyQuesetionRepo = new SurveyQuestionRepository(session);
 
-  const groundUserRecipientIds = [];
-  let regionInfo;
-  if (organization_id) {
-    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`; // this moves to the service
 
-    // get ground_users in the specified organization from the treetracker-api
-    const response = await axios.get(
-      `${groundUsersUrl}?organization_id=${organization_id}`,
-    );
-    const { ground_users } = response.data;
-    if (ground_users.length < 1) {
-      throw new HttpError(
-        422,
-        'No ground users found in the specified organization',
-      );
-    }
-    for (const { email, phone } of ground_users) {
-      let recipient_id;
-      if (email) {
-        recipient_id = await getAuthorId(email, session, false);
-      }
-      if (!recipient_id && phone) {
-        recipient_id = await getAuthorId(phone, session, false);
-      }
-      if (recipient_id) {
-        groundUserRecipientIds.push(recipient_id);
-      }
-    }
-
-    if (groundUserRecipientIds.length < 1)
-      throw new HttpError(
-        422,
-        'No author handles found for any of the ground users found in the specified organization',
-      );
-  }
-
-  if (region_id) {
-    const regionRepo = new RegionRepository(session);
-    regionInfo = await regionRepo.getById(region_id);
-  }
-
-  // IF this has a survey object, a message/send POST request
+  // IF this has a survey object, create the survey
+  // TODO: Survey.createSurvey(requestBody) - move ot its own model
+  let type = "announce";
+  let survey_id = null;
   if (requestBody.survey) {
+    type = "survey";
     const surveyObject = SurveyObject({ ...requestBody });
-    const survey = await contentRepo.createForOtherTables(
-      surveyObject,
-      'survey',
-    );
+    const survey = await surveyRepo.create(surveyObject);
 
     survey_id = survey.id;
 
@@ -294,73 +237,95 @@ const createMessageResourse = async (contentRepo, requestBody, session) => {
         rank,
       });
       rank++;
-      await contentRepo.createForOtherTables(
-        surveyQuestionObject,
-        'survey_question',
-      );
+      const surveyQuestion = await surveyQuesetionRepo.create(surveyQuestionObject);
     }
   }
 
-  const messageObject = MessageObject({ ...requestBody, survey_id });
-  const message = await contentRepo.create(messageObject);
+  // Insert content object
+  const author_id = await getAuthorId(requestBody.author_handle, session);
+  const contentObject = ContentObject({ ...requestBody, survey_id, author_id, type });
+  const content = await contentRepo.create(contentObject);
 
+  // Insert message request object
+  const { organization_id, region_id } = requestBody;
   const messageRequestObject = MessageRequestObject({
     ...requestBody,
     organization_id,
     region_id,
-    message_id: message.id,
+    content_id: content.id
   });
+  const messageRequest = await messageRequestRepo.create(messageRequestObject);
 
-  await contentRepo.createForOtherTables(
-    messageRequestObject,
-    'message_request',
-  );
+  // Handle a single recipient message
+  // This should just be done with a POST to /message - duplicated logic
+  // if (requestBody.recipient_handle) {
+  //   const recipient_id = await getAuthorId(requestBody.recipient_handle, session);
+  //     // if parent_message_id exists get the message_id for the parent message
+  //   const messageObject = MessageObject({
+  //     ...requestBody,
+  //     sender_id : author_id,
+  //     recipient_id,
+  //     content_id: content.id
+  //   });
+  //   await messageRepo.create(messageObject);
+  //   return;
+  // }
 
-  let parent_message_delivery_id = null;
 
-  // if parent_message_id exists get the message_delivery_id for the parent message
-  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TODO: move to service
-  if (requestBody.parent_message_id) {
-    parent_message_delivery_id =
-      await messageDeliveryRepo.getParentMessageDeliveryId(
-        requestBody.parent_message_id,
+  // This where we woud access the query service
+  // TODO: move to a service class
+  const growerAccountRecipientIds = [];
+  if (organization_id) {
+    const growerAccountUrl = `${process.env.TREETRACKER_API_URL}/grower_accounts`; // this moves to the service
+
+    // get ground_users in the specified organization from the treetracker-api
+    const response = await axios.get(
+      `${growerAccountUrl}?organization_id=${organization_id}`,
+    );
+    const { growers } = response.data;
+    if (growers.length < 1) {
+      throw new HttpError(
+        422,
+        'No ground users found in the specified organization',
+      );
+    }
+    for (const { wallet } of growers) {
+      const recipient_id = await getAuthorId(wallet, session, false);
+      if (recipient_id) {
+        growerAccountRecipientIds.push(recipient_id);
+      }
+    }
+
+    if (growerAccountRecipientIds.length < 1)
+      throw new HttpError(
+        422,
+        'No author handles found for any of the ground users found in the specified organization',
       );
   }
 
-  if (requestBody.recipient_id) {
-    const messageDeliveryObject = MessageDeliveryObject({
-      ...requestBody,
-      message_id: message.id,
-      parent_message_delivery_id,
-    });
-    await contentRepo.createForOtherTables(
-      messageDeliveryObject,
-      'message_delivery',
-    );
-    return;
-  }
 
   if (organization_id) {
-    // create message_delivery for each of the ground users' recipientIds
-    for (const recipientId of groundUserRecipientIds) {
-      const messageDeliveryObject = MessageDeliveryObject({
+    // create message for each of the ground users' recipientIds
+    for (const recipientId of growerAccountRecipientIds) {
+      const messageObject = MessageObject({
         ...requestBody,
-        message_id: message.id,
-        parent_message_delivery_id,
-        recipient_id: recipientId,
+        content_id: content.id,
+        sender_id: author_id,
+        recipient_id: recipientId
       });
-      await contentRepo.createForOtherTables(
-        messageDeliveryObject,
-        'message_delivery',
-      );
+      await messageRepo.create(messageObject);
     }
   }
 
-  if (region_id) {
-    // Get all recipients by region_id
-    // create message_delivery for each of them
-    // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
-  }
+  // if (region_id) {
+  //   const regionRepo = new RegionRepository(session);
+  //   regionInfo = await regionRepo.getById(region_id);
+  // }
+  // if (region_id) {
+  //   // Get all recipients by region_id
+  //   // create message_delivery for each of them
+  //   // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
+  // }
 };
 
 const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
@@ -382,9 +347,8 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 };
 
 const getMessages =
-  (session) =>
-  async (filterCriteria = undefined) => {
-    const contentRepo = new ContentRepository(session);
+  async (session, filterCriteria = undefined) => {
+    const messageRepo = new MessageRepository(session);
 
     let filter = {};
     let options = { limit: 100, offset: 0 };
@@ -399,10 +363,12 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    const messages = await contentRepo.getMessages(filter, options);
+    console.log("getMessages");
+    const messages = await messageRepo.getMessages(filter, options);
     return {
       messages: await Promise.all(
         messages.map(async (row) => {
+          console.log(row);
           return Message({ ...row });
         }),
       ),
@@ -412,6 +378,6 @@ const getMessages =
 
 module.exports = {
   createMessage,
-  createMessageResourse,
+  createBulkMessage,
   getMessages,
 };

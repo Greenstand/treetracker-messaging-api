@@ -209,14 +209,14 @@ paths:
                 - subject
                 - body
                 - composed_at
-  /message/send:
+  /bulk_message:
     post:
-      summary: Author a new message or group message.
+      summary: Author an message to a group
       operationId: post-message-send
       responses:
         '204':
           description: OK
-      description: Create a new message or group message.  Only one of recipient_handle or (organization_id and/or region_id) can be specified to direct a message to users.   This is a special API path to be used by the admin panel tool to queue messages for delivery
+      description: Create a group message.  Only one of recipient_handle or (organization_id and/or region_id) can be specified to direct a message to users.   This is a special API path to be used by the admin panel tool to queue messages for delivery
       requestBody:
         content:
           application/json:
@@ -235,9 +235,6 @@ paths:
                 parent_message_id:
                   type: string
                   format: uuid
-                recipient_handle:
-                  type: string
-                  minLength: 1
                 region_id:
                   type: string
                   format: uuid
@@ -300,6 +297,7 @@ paths:
                           - 'yes'
                           - 'no'
                           - sometimes
+    parameters: []
   /region:
     get:
       summary: Your GET endpoint

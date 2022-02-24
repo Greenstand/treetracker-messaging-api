@@ -1,9 +1,9 @@
 const Joi = require('joi');
 
 const Session = require('../models/Session');
-const { createMessage } = require('../services/MessageService');
+const { createMessage, createBulkMessage } = require('../services/MessageService');
 
-const { createMessageResourse, getMessages } = require('../models/Message');
+const { getMessages } = require('../models/Message');
 const ContentRepository = require('../repositories/ContentRepository');
 const { getAuthorId } = require('./helpers');
 const HttpError = require('../utils/HttpError');
@@ -11,7 +11,6 @@ const HttpError = require('../utils/HttpError');
 const messageSendPostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
   recipient_handle: Joi.string(),
-  title: Joi.string(),
   region_id: Joi.string().uuid(),
   organization_id: Joi.string().uuid(),
   author_handle: Joi.string().required(),
@@ -67,16 +66,13 @@ const messageGet = async (req, res, next) => {
   const filter = req.query;
 
   try {
-    const executeGetMessages = getMessages(session);
-    const { messages, options } = await executeGetMessages(filter);
+    const { messages, options } = await getMessages(session, filter);
 
-    const urlWithLimitAndOffset = `${url}${
-      filter.since ? `&since=${filter.since}` : ''
-    }&limit=${options.limit}&offset=`;
+    const urlWithLimitAndOffset = `${url}${filter.since ? `&since=${filter.since}` : ''
+      }&limit=${options.limit}&offset=`;
 
-    const nextUrl = `${urlWithLimitAndOffset}${
-      +options.offset + +options.limit
-    }`;
+    const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit
+      }`;
     let prev = null;
     if (options.offset - +options.limit >= 0) {
       prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
@@ -112,88 +108,38 @@ const messageSingleGet = async (req, res, next) => {
 
 // Create a new message resource
 const messagePost = async (req, res, next) => {
-  await messagePostSchema.validateAsync(req.body, { abortEarly: false });
-
+  console.log("messagePost");
   try {
+    await messagePostSchema.validateAsync(req.body, { abortEarly: false });
     await createMessage(req.body);
     res.status(204).send();
     res.end();
   } catch (e) {
+    console.log(e);
     next(e);
   }
-
-  // Get author id using author handle
-  // const author_id = await getAuthorId(req.body.author_handle);
-
-  // let recipient_id = null;
-
-  // // Get recipient id using recipient handle
-  // if (req.body.recipient_handle) {
-  //   recipient_id = await getAuthorId(req.body.recipient_handle);
-  // }
-
-  // try {
-  //   await session.beginTransaction();
-  //   await createMessageResourse(contentRepo, {
-  //     ...req.body,
-  //     author_id,
-  //     recipient_id,
-  //   });
-  //   await session.commitTransaction();
-  //   res.status(204).send();
-  //   res.end();
-  // } catch (e) {
-  //   console.log(e);
-  //   if (session.isTransactionInProgress()) {
-  //     await session.rollbackTransaction();
-  //   }
-  //   next(e);
-  // }
 };
 
 // Author a new message or group message
 const messageSendPost = async (req, res, next) => {
-  await messageSendPostSchema.validateAsync(req.body, { abortEarly: false });
-  const { recipient_handle, region_id, organization_id } = req.body;
-  if (!recipient_handle && !region_id && !organization_id) {
-    throw new HttpError(
-      422,
-      'At least one of recipient_handle, organization_id and region_id must be provided',
-    );
-  }
-  const session = new Session();
 
-  // Get author id using author handle
-  const contentRepo = new ContentRepository(session);
-  const author_id = await getAuthorId(req.body.author_handle, session);
-
-  let recipient_id = null;
-
-  // Get recipient id using recipient handle
-  if (req.body.recipient_handle) {
-    recipient_id = await getAuthorId(req.body.recipient_handle, session);
-  }
   try {
-    await session.beginTransaction();
-    await createMessageResourse(
-      contentRepo,
-      {
-        ...req.body,
-        author_id,
-        recipient_id,
-      },
-      session,
-    );
-    await session.commitTransaction();
+    await messageSendPostSchema.validateAsync(req.body, { abortEarly: false });
+    const { recipient_handle, region_id, organization_id } = req.body;
+    if (!recipient_handle && !region_id && !organization_id) {
+      throw new HttpError(
+        422,
+        'At least one of recipient_handle, organization_id and region_id must be provided',
+      );
+    }
+
+    await createBulkMessage(req.body);
     res.status(204).send();
     res.end();
   } catch (e) {
-    console.log(e);
-    if (session.isTransactionInProgress()) {
-      await session.rollbackTransaction();
-    }
     next(e);
   }
+
 };
 
 module.exports = {

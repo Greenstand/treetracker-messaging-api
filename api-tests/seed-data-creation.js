@@ -4,8 +4,6 @@ const axios = require('axios').default;
 const knex = require('../server/database/knex');
 const {
   existing_message,
-  author_one_handle,
-  author_two_handle,
   survey_id,
   organization_id: db_organization_id,
   organization_id_two,
@@ -24,6 +22,12 @@ const survey_title = 'Just just another another random title';
 
 const author_one_id = uuid();
 const author_two_id = uuid();
+const author_three_id = uuid();
+const author_four_id = uuid();
+const author_one_handle = 'handle1';
+const author_two_handle = 'handle2';
+const author_three_handle = 'handle3';
+const author_four_handle = 'handle4';
 
 const message_delivery_id = uuid();
 
@@ -32,60 +36,57 @@ const region_object = new RegionObject();
 let axiosStub;
 
 before(async () => {
-  axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
-    const organization_id = url.split('=')[1];
-    if (organization_id === db_organization_id)
-      return {
-        data: {
-          ground_users: [
-            { phone: author_two_handle },
-            { email: author_two_handle },
-          ],
-        },
-      };
-    if (organization_id === organization_id_two)
-      return {
-        data: {
-          ground_users: [{ phone: 1234567 }, { email: 'email@email.com' }],
-        },
-      };
-    return { data: { ground_users: [] } };
-  });
+//   axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+//     const organization_id = url.split('=')[1];
+//     if (organization_id === db_organization_id)
+//       return {
+//         data: {
+//           ground_users: [
+//             { phone: author_two_handle },
+//             { email: author_two_handle },
+//           ],
+//         },
+//       };
+//     if (organization_id === organization_id_two)
+//       return {
+//         data: {
+//           ground_users: [{ phone: 1234567 }, { email: 'email@email.com' }],
+//         },
+//       };
+//     return { data: { ground_users: [] } };
+//   });
 
   await knex.raw(`
-    DELETE FROM message_request;
-    DELETE FROM message;
-    DELETE FROM content;
-    DELETE FROM author;
-    DELETE FROM survey_question;
-    DELETE FROM survey;
-
     INSERT INTO author(
 	    id, handle, created_at)
 	  VALUES 
         ('${author_one_id}', '${author_one_handle}', now()),
-        ('${author_two_id}', '${author_two_handle}', now());
+        ('${author_two_id}', '${author_two_handle}', now()),
+        ('${author_three_id}', '${author_three_handle}', now()),
+        ('${author_four_id}', '${author_four_handle}', now());
 
-    INSERT INTO region(
-        id, name, description, shape, created_at, creator_user_id, creator_organization_id, active)
-        VALUES ('${existing_region_object.id}', '${existing_region_object.name}', '${existing_region_object.description}', null, now(), null, null, true);
+        `);
 
-    INSERT INTO content(
-      id, author_id, type, subject, body, video_link, survey_id, survey_response, composed_at, created_at, active)
-      VALUES ('${existing_message.id}', '${author_two_id}', 'message', 'subject', 'body', null, null, null, now(), now(), true);
+  //   INSERT INTO region(
+  //       id, name, description, shape, created_at, creator_user_id, creator_organization_id, active)
+  //       VALUES ('${existing_region_object.id}', '${existing_region_object.name}', '${existing_region_object.description}', null, now(), null, null, true);
+
+  //   INSERT INTO content(
+  //     id, author_id, type, subject, body, video_link, survey_id, survey_response, composed_at, created_at, active)
+  //     VALUES ('${existing_message.id}', '${author_two_id}', 'message', 'subject', 'body', null, null, null, now(), now(), true);
     
-    INSERT INTO message(
-      id, parent_message_id, content_id, sender_id, recipient_id, created_at)
-      VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_two_id}', '${author_one_id}', now());
+  //   INSERT INTO message(
+  //     id, parent_message_id, content_id, sender_id, recipient_id, created_at)
+  //     VALUES ('${message_delivery_id}', null, '${existing_message.id}', '${author_two_id}', '${author_one_id}', now());
 
-    INSERT INTO survey(
-      id, title, active, created_at)
-      VALUES ('${survey_id}', '${survey_title}', true, now());
-  `);
+  //   INSERT INTO survey(
+  //     id, title, active, created_at)
+  //     VALUES ('${survey_id}', '${survey_title}', true, now());
+  // `);
 });
 
 after(async () => {
-  axiosStub.restore();
+  // axiosStub.restore();
   const messageSendPostObject = new MessageSendPostObject();
   const messagePostObject = new MessagePostObject();
 

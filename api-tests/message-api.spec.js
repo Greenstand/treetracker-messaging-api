@@ -1,681 +1,429 @@
 require('dotenv').config();
 const request = require('supertest');
-const { expect } = require('chai');
+const chai = require('chai');
+
+  const {expect} = chai;
+chai.use(require('chai-like'));
+chai.use(require('chai-things'));
+const sinon = require('sinon');
+const axios = require('axios').default;
+
 const { v4: uuid } = require('uuid');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
-const { message_delivery_id, survey_title } = require('./seed-data-creation');
+
+// Mock Data
+const author_one_id = uuid();
+const author_two_id = uuid();
+const author_three_id = uuid();
+const author_four_id = uuid();
+const author_one_handle = 'handle1';
+const author_two_handle = 'handle2';
+const author_three_handle = 'handle3';
+const author_four_handle = 'handle4';
+
 const {
-  author_one_handle,
   organization_id,
   organization_id_two,
+  existing_message,
 } = require('./generic-class');
+
 const MessagePostObject = require('./message-post-class');
 const MessageSendPostObject = require('./message-send-post-class');
 
 describe('Message API tests.', () => {
-  describe('Message POST', () => {
-    it(`Should raise validation error with error code 422 -- author_handle is required `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.delete_property('author_handle');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          console.log('getting response');
-          if (err) return done(err);
-          return done();
-        });
-    });
 
-    it(`Should raise validation error with error code 404 -- author_handle must exist `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.change_property('author_handle', 'author_handle_23423');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(404)
-        .end(function (err) {
-          console.log('getting response');
-          if (err) return done(err);
-          return done();
-        });
-    });
+  before(async function () {
+    await knex.raw(`
+    DELETE FROM message_request;
+    DELETE FROM message;
+    DELETE FROM content;
+    DELETE FROM author;
+    DELETE FROM survey_question;
+    DELETE FROM survey;
+    `);
 
-    it(`Should raise validation error with error code 404 -- recipient_handle must exist `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.change_property(
-        'recipient_handle',
-        'recipient_handle_@!@#',
-      );
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(404)
-        .end(function (err) {
-          console.log('getting response');
-          if (err) return done(err);
-          return done();
-        });
-    });
+    await knex.raw(`
+    INSERT INTO author(
+	    id, handle, created_at)
+	  VALUES 
+        ('${author_one_id}', '${author_one_handle}', now()),
+        ('${author_two_id}', '${author_two_handle}', now()),
+        ('${author_three_id}', '${author_three_handle}', now()),
+        ('${author_four_id}', '${author_four_handle}', now());
+        `);
 
-    it(`Should raise validation error with error code 422 -- subject is required `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.delete_property('subject');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
+  });
 
-    it(`Should raise validation error with error code 422 -- body is required `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.delete_property('body');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
 
-    it(`Should raise validation error with error code 422 -- composed_at is required `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.delete_property('composed_at');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
+  describe('Message POST Resource Creation', () => {
 
-    it(`Should raise validation error with error code 422 -- composed_at should be date in iso format`, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.change_property('composed_at', 'composed_at');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- survey_id should be a uuid `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.change_property('survey_id', 'survey_id');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- parent_message_id should be a uuid `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.change_property(
-        'parent_message_id',
-        'parent_message_id',
-      );
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- video_link should be a uri `, function (done) {
-      const messagePostObject = new MessagePostObject();
-      messagePostObject.change_property('video_link', 'video_link');
-      request(server)
-        .post(`/message`)
-        .send(messagePostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should be successful `, async function () {
-      const messagePostObject = new MessagePostObject();
-      console.log('Message POST should be successful');
-      console.log(messagePostObject._object);
+    it(`Should create a message `, async function () {
+      const messagePostObject = {
+        recipient_handle: author_two_handle,
+        author_handle: author_one_handle,
+        subject: uuid(),
+        body: 'Bodyyy',
+        composed_at: new Date().toISOString(),
+      }
+      console.log(messagePostObject);
       await request(server)
         .post(`/message`)
-        .send(messagePostObject._object)
+        .send(messagePostObject)
         .set('Accept', 'application/json')
         .expect(204);
-      const message_delivery = await knex
-        .table('message_delivery')
-        .select('id')
-        .where('parent_message_id', message_delivery_id);
+
+      const content = await knex
+        .select('*')
+        .table('content')
+        .where('subject', messagePostObject.subject);
+
+      expect(content).have.lengthOf(1);
 
       const message = await knex
-        .select('id')
         .table('message')
-        .where('subject', messagePostObject._object.subject)
-        .where('body', messagePostObject._object.body)
-        .where('composed_at', messagePostObject._object.composed_at)
-        .where('video_link', messagePostObject._object.video_link);
-
+        .select('id')
+        .where('content_id', content[0].id);
       expect(message).have.lengthOf(1);
-      expect(message_delivery).have.lengthOf(1);
+
+    });
+
+    it(`Should respond to an existing message `, async function () {
+
+      const messagePostObject = {
+        recipient_handle: author_two_handle,
+        author_handle: author_one_handle,
+        subject: uuid(),
+        body: 'Body',
+        composed_at: new Date().toISOString(),
+      }
+      await request(server)
+        .post(`/message`)
+        .send(messagePostObject)
+        .set('Accept', 'application/json')
+        .expect(204);
+
+      const message = await knex
+        .select(['message.id as message_id', '*'])
+        .table('message')
+        .join('content', 'message.content_id', '=', 'content.id')
+        .where('subject', messagePostObject.subject);
+
+      const messageReplyObject = {
+        recipient_handle: author_one_handle,
+        author_handle: author_two_handle,
+        parent_message_id: message[0].message_id,
+        subject: uuid(),
+        body: 'Body',
+        composed_at: new Date().toISOString(),
+        video_link: 'https://www.string.com',
+      }
+
+      await request(server)
+        .post(`/message`)
+        .send(messageReplyObject)
+        .set('Accept', 'application/json')
+        .expect(204);
+
+      const messageReply = await knex
+        .select(['message.id as message_id', '*'])
+        .table('message')
+        .join('content', 'message.content_id', '=', 'content.id')
+        .where('subject', messageReplyObject.subject);
+      expect(messageReply).have.lengthOf(1);
+      expect(messageReply[0].parent_message_id).to.equal(message[0].message_id);
+
+    });
+
+    it(`Should send a regular message and pass tests using API `, async function () {
+
+      // const messagePostObject = {
+      //   recipient_handle: author_two_handle,
+      //   author_handle: author_one_handle,
+      //   subject: uuid(),
+      //   body: 'Bodyyy',
+      //   composed_at: new Date().toISOString(),
+      // }
+      // console.log(messagePostObject);
+      // await request(server)
+      //   .post(`/message`)
+      //   .send(messagePostObject)
+      //   .set('Accept', 'application/json')
+      //   .expect(204);
+
+      const messagePostObject = {
+        recipient_handle: author_one_handle,
+        author_handle: author_two_handle,
+        subject: uuid(),
+        body: 'Check in to get your trees',
+        composed_at: new Date().toISOString()
+      }
+      await request(server)
+      .post(`/message`)
+      .send(messagePostObject)
+      .set('Accept', 'application/json')
+      .expect(204);
+
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_one_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res.body.messages);
+      expect(res.body.messages).to.be.an('array')
+        .that.contains.something.like({subject: messagePostObject.subject, from: author_two_handle, to: author_one_handle});
+
+      const res2 = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_two_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res2.body.messages);
+      expect(res2.body.messages).to.be.an('array')
+        .that.contains.something.like({subject: messagePostObject.subject, from: author_two_handle, to: author_one_handle})
+
+    });
+
+    it.skip(`Should respond to a survey`, async function () {
+
+    });
+
+    it.skip(`Should respond to an announce message`, async function () {
+
     });
   });
 
-  describe('Message/Send POST', () => {
-    it(`Should raise validation error with error code 422 -- author_handle is required `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('author_handle');
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
 
-    it(`Should raise validation error with error code 404 -- author_handle should exist `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property(
-        'author_handle',
-        'author_handle_@!@#',
-      );
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(404)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
+  describe.skip('Message/Send POST resource creation', () => {
 
-    it(`Should raise validation error with error code 404 -- recipient_handle should exist `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property(
-        'recipient_handle',
-        'recipient_handle_@!@#',
-      );
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(404)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
+    it(`Should send an announce message to an organization`, async function () {
+      const messageSendPostObject = {
+        author_handle: author_one_handle,
+        subject: uuid(),
+        body: 'This is an announcement to come pick up some trees',
+        organization_id
+      }
 
-    it(`Should raise validation error with error code 404 -- organization_id should be a uuid `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('recipient_handle');
-      messageSendPostObject.change_property(
-        'organization_id',
-        'organization_id@!@#',
-      );
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- subject is required `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('subject');
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- body is required `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('body');
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- parent_message_id should be a uuid `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property(
-        'parent_message_id',
-        'parent_message_id',
-      );
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- region_id should be a uuid `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('recipient_handle');
-      messageSendPostObject.change_property('region_id', 'region_id');
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- only one of recipient_handle or organization_id should be allowed`, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('organization_id', 41258);
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- only one of recipient_handle or region_id should be allowed`, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('region_id', uuid());
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- at least one of organization_id, recipient_handle or region_id should be present`, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('recipient_handle');
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- survey should be an object with questions as an array `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('survey', {
-        questions: { question: 'question' },
+      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+        return {
+          data: {
+            growers: [
+              { wallet: author_two_handle },
+            ],
+          },
+        };
       });
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
 
-    it(`Should raise validation error with error code 422 -- survey should be an object with questions as a property `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('survey', {
-        title: { ...messageSendPostObject._object.survey.title },
-      });
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- survey should be an object with title as a property `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('survey', {
-        questions: { ...messageSendPostObject._object.survey.questions },
-      });
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- survey.questions should not be greater than 3 `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('survey', {
-        questions: [
-          { prompt: 'question1', choices: ['a1'] },
-          { prompt: 'question2', choices: ['a2'] },
-          { prompt: 'question3', choices: ['a3'] },
-          { prompt: 'question4', choices: ['a4'] },
-        ],
-      });
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- survey.questions is an array of objects with prompt and choices `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.change_property('survey', {
-        questions: [
-          { question: 'question1', choices: ['a1'] },
-          { question: 'question2', choices: ['a2'] },
-          { question: 'question3', choices: ['a3'] },
-        ],
-      });
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Message to an organization should error out -- no ground users found for specified organization_id `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('recipient_handle');
-      messageSendPostObject.change_property('organization_id', uuid());
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err, res) {
-          if (err) return done(err);
-          expect(res.body.message).to.eql(
-            'No ground users found in the specified organization',
-          );
-          return done();
-        });
-    });
-
-    it(`Message to an organization should error out -- ground users found for specified organization_id but no author_handles were associated with them `, function (done) {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('recipient_handle');
-      messageSendPostObject.change_property(
-        'organization_id',
-        organization_id_two,
-      );
-      request(server)
-        .post(`/message/send`)
-        .send(messageSendPostObject._object)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err, res) {
-          console.log(res);
-          if (err) return done(err);
-          expect(res.body.message).to.eql(
-            'No author handles found for any of the ground users found in the specified organization',
-          );
-          return done();
-        });
-    });
-
-    it(`Message to an organization should be successful `, async function () {
-      const messageSendPostObject = new MessageSendPostObject();
-      messageSendPostObject.delete_property('recipient_handle');
-      messageSendPostObject.change_property('organization_id', organization_id);
       await request(server)
         .post(`/message/send`)
-        .send(messageSendPostObject._object)
+        .send(messageSendPostObject)
         .set('Accept', 'application/json')
         .expect(204);
-      const message_delivery = await knex
-        .table('message_delivery')
-        .select('id')
-        .where('parent_message_id', message_delivery_id);
 
-      const message_request = await knex
-        .select('id')
-        .table('message_request')
-        .where('recipient_organization_id', organization_id);
+      axiosStub.restore();
 
-      const message = await knex
-        .select('id')
-        .table('message')
-        .where('subject', messageSendPostObject._object.subject)
-        .where('body', messageSendPostObject._object.body);
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_one_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res.body.messages);
+      expect(res.body.messages).to.be.an('array')
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: null });
 
-      const survey = await knex
-        .select('id')
-        .table('survey')
-        .where('title', messageSendPostObject._object.survey.title);
-
-      expect(message).have.lengthOf(1);
-      expect(survey).have.lengthOf(1);
-      expect(message_delivery).have.lengthOf(3);
-      expect(message_request).have.lengthOf(1);
+      const res2 = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_two_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res2.body.messages);
+      expect(res2.body.messages).to.be.an('array')
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_two_handle })
     });
 
-    it(`Should be successful `, async function () {
-      const messageSendPostObject = new MessageSendPostObject();
+    it(`Should send an announce message to multiple recipients in an organization`, async function () {
+      const messageSendPostObject = {
+        author_handle: author_one_handle,
+        subject: uuid(),
+        body: 'This is an announcement to come pick up some trees',
+        organization_id
+      }
+
+      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+        return {
+          data: {
+            growers: [
+              { wallet: author_two_handle },
+              { wallet: author_three_handle },
+              { wallet: author_four_handle }
+            ],
+          },
+        };
+      });
+
       await request(server)
         .post(`/message/send`)
-        .send(messageSendPostObject._object)
+        .send(messageSendPostObject)
         .set('Accept', 'application/json')
         .expect(204);
-      const message_delivery = await knex
-        .table('message_delivery')
-        .select('id')
-        .where('parent_message_id', message_delivery_id);
 
-      const message_request = await knex
-        .select('id')
-        .table('message_request')
-        .where('author_handle', messageSendPostObject._object.author_handle);
+      axiosStub.restore();
 
-      const message = await knex
-        .select('id')
-        .table('message')
-        .where('subject', messageSendPostObject._object.subject)
-        .where('body', messageSendPostObject._object.body);
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_one_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res.body.messages);
+      expect(res.body.messages).to.be.an('array')
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: null });
 
-      const survey = await knex
-        .select('id')
-        .table('survey')
-        .where('title', messageSendPostObject._object.survey.title);
+      const res2 = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_two_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res2.body.messages);
+      expect(res2.body.messages).to.be.an('array')
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_two_handle })
 
-      expect(message).have.lengthOf(2);
-      expect(survey).have.lengthOf(2);
-      expect(message_delivery).have.lengthOf(4);
-      expect(message_request).have.lengthOf(2);
+      const res3 = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_three_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res3.body.messages);
+      expect(res3.body.messages).to.be.an('array')
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_three_handle })
+
+      const res4 = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_four_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+      console.log(res4.body.messages);
+      expect(res4.body.messages).to.be.an('array')
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_four_handle })
+    });
+
+
+    it(`Should send a survey message`, async function () {
+      const messageSendPostObject = {
+        author_handle: author_one_handle,
+        subject: uuid(),
+        body: 'This is an announcement to come pick up some trees',
+        organization_id,
+        survey: {
+          questions: [
+            {
+              prompt: 'What is the capital of atlantis?',
+              choices: ['konoha', "Bermuda's triangle"],
+            },
+          ],
+          title: uuid(),
+        },
+      }
+
+      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+        return {
+          data: {
+            growers: [
+              { wallet: author_two_handle },
+            ],
+          },
+        };
+      });
+
+      await request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject)
+        .set('Accept', 'application/json')
+        .expect(204);
+
+      axiosStub.restore();
+
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_one_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      console.log(res.body.messages);
+      expect(res.body.messages).to.be.an('array')
+        .that.contains.something.like({ from: author_one_handle, to: null, survey: { title: messageSendPostObject.survey.title } });
+    });
+
+    it(`Send a survey message and recipient should recieve it`, async function () {
+      const messageSendPostObject = {
+        author_handle: author_one_handle,
+        subject: uuid(),
+        body: 'This is an announcement to come pick up some trees',
+        organization_id,
+        survey: {
+          questions: [
+            {
+              prompt: 'What is the capital of atlantis?',
+              choices: ['konoha', "Bermuda's triangle"],
+            },
+          ],
+          title: uuid(),
+        },
+      }
+
+      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+        return {
+          data: {
+            growers: [
+              { wallet: author_two_handle },
+            ],
+          },
+        };
+      });
+
+      await request(server)
+        .post(`/message/send`)
+        .send(messageSendPostObject)
+        .set('Accept', 'application/json')
+        .expect(204);
+
+      axiosStub.restore();
+
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: author_two_handle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      console.log(res.body.messages);
+      expect(res.body.messages).to.be.an('array')
+        .that.contains.something.like({ from: author_one_handle, to: author_two_handle, survey: { title: messageSendPostObject.survey.title } });
+        
     });
   });
 
-  describe('Message GET', () => {
-    it(`Should raise validation error with error code 422 -- author_handle is required as a query parameter `, function (done) {
-      request(server)
-        .get(`/message`)
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
+  
 
-    it(`Should raise validation error with error code 404 -- author_handle should exist `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          author_handle: 'author_handle@!@#@!@#@',
-        })
-        .set('Accept', 'application/json')
-        .expect(404)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- 'since' query parameter should be a date  `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          since: 'since',
-          author_handle: 'author_handle',
-        })
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- 'limit' query parameter should be an integer  `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          limit: 'limit',
-          author_handle: 'author_handle',
-        })
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- 'limit' query parameter should be greater than 0  `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          limit: 0,
-          author_handle: 'author_handle',
-        })
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- 'limit' query parameter should be less than 101  `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          limit: 101,
-          author_handle: 'author_handle',
-        })
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- 'offset' query parameter should be an integer  `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          offset: 'offset',
-          author_handle: 'author_handle',
-        })
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
-    it(`Should raise validation error with error code 422 -- 'offset' query parameter should be at least 0  `, function (done) {
-      request(server)
-        .get(`/message`)
-        .query({
-          offset: -1,
-          author_handle: 'author_handle',
-        })
-        .set('Accept', 'application/json')
-        .expect(422)
-        .end(function (err) {
-          if (err) return done(err);
-          return done();
-        });
-    });
-
+  describe.skip('Message GET', () => {
     it(`Should get messages successfully`, function (done) {
       request(server)
         .get(`/message`)
@@ -704,7 +452,6 @@ describe('Message API tests.', () => {
               'parent_message_id',
               'from',
               'to',
-              'title',
               'subject',
               'body',
               'composed_at',
@@ -726,7 +473,6 @@ describe('Message API tests.', () => {
                   messageSendPostObject._object.survey.questions,
                 );
               }
-              console.log('AAAAAAA');
               console.log(survey.title);
               console.log(res.body.messages.length);
               if (survey.title === survey_title) survey_two_exists = true;
@@ -743,7 +489,7 @@ describe('Message API tests.', () => {
         });
     });
 
-    it('Get message by id', function (done) {
+    it.skip('Get message by id', function (done) {
       const messagePostObject = new MessagePostObject();
       const messageId = messagePostObject._object.id;
       request(server)
