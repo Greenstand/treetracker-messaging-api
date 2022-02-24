@@ -6,5 +6,6 @@ CREATE TABLE message_request
     author_handle varchar NOT NULL,
     recipient_handle varchar,
     recipient_organization_id varchar,
-    recipient_region_id uuid REFERENCES region(id)
+    recipient_region_id uuid REFERENCES region(id),
+    created_at timestampz NOT NULL DEFAULT now()
 );
