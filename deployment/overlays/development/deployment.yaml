@@ -6,33 +6,3 @@ metadata:
     app: treetracker-messaging-api
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: treetracker-messaging-api
-  template:
-    metadata:
-      labels:
-        app: treetracker-messaging-api
-    spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: doks.digitalocean.com/node-pool
-                    operator: In
-                    values:
-                      - microservices-node-pool
-      containers:
-        - name: treetracker-messaging-api
-          image: greenstand/treetracker-messaging-api:TAG
-          ports:
-            - containerPort: 80
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: database-connection
-                  key: db
-            - name: DATABASE_SCHEMA
-              value: messaging
