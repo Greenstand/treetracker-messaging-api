@@ -1,3 +1,10 @@
+## [1.7.13](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.12...v1.7.13) (2022-02-24)
+
+
+### Bug Fixes
+
+* remove shared configuration from overlay deployment.yaml ([36f9782](https://github.com/Greenstand/treetracker-messaging-api/commit/36f97829d218dcf69604c601e6178aab47d2c425))
+
 ## [1.7.12](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.11...v1.7.12) (2022-02-24)
 
 
