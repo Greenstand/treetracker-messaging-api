@@ -25,7 +25,7 @@ spec:
                 - microservices-node-pool
       containers:
       - name: treetracker-messaging-api
-        image: greenstand/treetracker-messaging-api:TAG
+        image: greenstand/treetracker-messaging-api:VERSION
         ports:
         - containerPort: 80
         env:

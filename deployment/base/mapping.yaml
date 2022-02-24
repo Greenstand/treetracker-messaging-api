@@ -4,5 +4,5 @@ metadata:
   name: treetracker-messaging-api
 spec:
   prefix: /messaging/
-  service: treetracker-messaging-api
+  service: treetracker-earning-api
   rewrite: /
