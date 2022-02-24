@@ -6,6 +6,7 @@ const createMessage = async (body) => {
   const session = new Session();
   try {
     // await session.beginTransaction();
+    console.log('create message');
     await Message.createMessage(session, body);
     // await session.commitTransaction();
   } catch (e) {
@@ -32,7 +33,5 @@ const createBulkMessage = async (body) => {
     throw(e);
   }
 }
-
-// createMessageRequest
 
 module.exports = { createMessage, createBulkMessage };

@@ -8,9 +8,8 @@ const ContentRepository = require('../repositories/ContentRepository');
 const { getAuthorId } = require('./helpers');
 const HttpError = require('../utils/HttpError');
 
-const messageSendPostSchema = Joi.object({
+const bulkMessagePostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
-  recipient_handle: Joi.string(),
   region_id: Joi.string().uuid(),
   organization_id: Joi.string().uuid(),
   author_handle: Joi.string().required(),
@@ -59,20 +58,20 @@ const messageSingleGetQuerySchema = Joi.object({
 });
 
 const messageGet = async (req, res, next) => {
-  await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
-  const session = new Session();
-
-  const url = `message?author_handle=${req.query.author_handle}`;
-  const filter = req.query;
 
   try {
+    const filter = req.query;
+    await messageGetQuerySchema.validateAsync(filter, { abortEarly: false });
+
+    const session = new Session();
     const { messages, options } = await getMessages(session, filter);
 
+    const url = `message?author_handle=${filter.author_handle}`;
     const urlWithLimitAndOffset = `${url}${filter.since ? `&since=${filter.since}` : ''
       }&limit=${options.limit}&offset=`;
 
     const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit
-      }`;
+    }`;
     let prev = null;
     if (options.offset - +options.limit >= 0) {
       prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
@@ -87,6 +86,7 @@ const messageGet = async (req, res, next) => {
     });
     res.end();
   } catch (e) {
+    console.log(e);
     next(e);
   }
 };
@@ -108,7 +108,7 @@ const messageSingleGet = async (req, res, next) => {
 
 // Create a new message resource
 const messagePost = async (req, res, next) => {
-  console.log("messagePost");
+
   try {
     await messagePostSchema.validateAsync(req.body, { abortEarly: false });
     await createMessage(req.body);
@@ -118,18 +118,19 @@ const messagePost = async (req, res, next) => {
     console.log(e);
     next(e);
   }
+
 };
 
 // Author a new message or group message
-const messageSendPost = async (req, res, next) => {
+const bulkMessagePost = async (req, res, next) => {
 
   try {
-    await messageSendPostSchema.validateAsync(req.body, { abortEarly: false });
-    const { recipient_handle, region_id, organization_id } = req.body;
-    if (!recipient_handle && !region_id && !organization_id) {
+    await bulkMessagePostSchema.validateAsync(req.body, { abortEarly: false });
+    const {region_id, organization_id } = req.body;
+    if (!region_id && !organization_id) {
       throw new HttpError(
         422,
-        'At least one of recipient_handle, organization_id and region_id must be provided',
+        'At least one of organization_id and region_id must be provided',
       );
     }
 
@@ -145,6 +146,6 @@ const messageSendPost = async (req, res, next) => {
 module.exports = {
   messagePost,
   messageGet,
-  messageSendPost,
+  bulkMessagePost,
   messageSingleGet,
 };

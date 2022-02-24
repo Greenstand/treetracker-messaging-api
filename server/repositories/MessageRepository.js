@@ -51,10 +51,10 @@ class MessageRepository extends BaseRepository {
           })
         })
       .leftJoin(
-        'message_request',
+        'bulk_message',
         'content.id',
         '=',
-        'message_request.content_id',
+        'bulk_message.content_id',
       )
       .leftJoin(
         'author AS author_recipient',
@@ -70,13 +70,14 @@ class MessageRepository extends BaseRepository {
         'survey_question.survey_id',
       )
       .select(
-        'message_request.id',
+        'bulk_message.id',
         'message.id',
         'message.parent_message_id',
         'author_sender.handle as author_handle',
         'author_recipient.handle as recipient_handle',
-        'message_request.recipient_organization_id',
-        'message_request.recipient_region_id',
+        'bulk_message.recipient_organization_id',
+        'bulk_message.recipient_region_id',
+        'content.type',
         'content.subject',
         'content.body',
         'content.video_link',
@@ -84,16 +85,11 @@ class MessageRepository extends BaseRepository {
         'content.survey_response',
         'content.survey_id',
         'survey.title as survey_title',
-        // this._session
-        //   .getDB()
-        //   .raw(
-        //     `json_agg(json_build_object('prompt', survey_question.prompt, 'choices', survey_question.choices)) as questions`,
-        //   ),
       )
       // .groupBy('recipient_handle')
       .limit(limit)
       
-      // when there is an associate message_request object, there should only be one record
+      // when there is an associate bulk_message object, there should only be one record
 
       // .groupBy(
       //   // TODO: what is going on with this group by clause, there are several content that would not be repeated
@@ -102,8 +98,8 @@ class MessageRepository extends BaseRepository {
       //   'message.survey_id',
       //   'message_delivery.parent_message_id',
       //   'author_sender.handle',
-      //   'message_request.recipient_organization_id',
-      //   'message_request.recipient_region_id',
+      //   'bulk_message.recipient_organization_id',
+      //   'bulk_message.recipient_region_id',
       //   'message.subject',
       //   'message.body',
       //   'message.video_link',

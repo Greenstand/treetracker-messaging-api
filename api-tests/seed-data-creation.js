@@ -102,7 +102,7 @@ after(async () => {
   //   DELETE FROM message_delivery
   //   WHERE message_id = '${existing_message.id}';
 
-  //   DELETE FROM message_request
+  //   DELETE FROM bulk_message
   //   WHERE message_id = '${existing_message.id}' or author_handle = '${messageSendPostObject._object.author_handle}' or author_handle = '${messagePostObject._object.author_handle}';
 
   //   DELETE FROM message

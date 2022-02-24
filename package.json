@@ -15,7 +15,7 @@
     "test": "npm run test-unit-ci && npm run test-integration-ci && npm run test-repository",
     "test-unit-ci": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit ./server/models/**/*.spec.js",
     "test-integration-ci": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit --timeout 30000 './api-tests'",
-    "test-integration-working": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit --timeout 30000 './api-tests/message-api.spec.js'",
+    "test-integration-working": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit --timeout 30000 ./api-tests/${npm_config_test}.spec.js",
     "test-repository": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit --require co-mocha  ./server/repositories/**/*.spec.js",
     "server-test": "DEBUG=express:* NODE_LOG_LEVEL=debug nodemon server/serverTest.js",
     "server": "NODE_ENV=dev nodemon server/server.js",
