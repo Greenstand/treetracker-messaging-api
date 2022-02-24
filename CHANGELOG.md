@@ -1,3 +1,10 @@
+## [1.7.12](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.11...v1.7.12) (2022-02-24)
+
+
+### Bug Fixes
+
+* add affinity to database migration job ([0c8b9d7](https://github.com/Greenstand/treetracker-messaging-api/commit/0c8b9d71817851ca631946b34b905d453d0f1a52))
+
 ## [1.7.11](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.10...v1.7.11) (2022-02-23)
 
 
