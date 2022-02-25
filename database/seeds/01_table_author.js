@@ -17,27 +17,25 @@ const author_four_handle = 'handle4';
 // Create author data in the database
 //
 const seed = async function (knex) {
-
-  const authorNumber = 10
+  const authorNumber = 10;
   const authors = [];
   for (let index = 0; index < authorNumber; index++) {
     authors.push({
-      handle: chance.word()
+      handle: chance.word(),
     });
   }
   const adminAuthor = {
-    handle: 'admin'
-  }
+    handle: 'admin',
+  };
   authors.push(adminAuthor);
 
-  authors.push({id: author_one_id, handle: author_one_handle});
-  authors.push({handle: author_two_handle});
-  authors.push({handle: author_three_handle});
-  authors.push({handle: author_four_handle});
+  authors.push({ id: author_one_id, handle: author_one_handle });
+  authors.push({ handle: author_two_handle });
+  authors.push({ handle: author_three_handle });
+  authors.push({ handle: author_four_handle });
 
   await knex('author').insert(authors);
 };
-
 
 module.exports = {
   seed,
@@ -45,6 +43,5 @@ module.exports = {
   author_two_handle,
   author_three_handle,
   author_four_handle,
-  author_one_id
+  author_one_id,
 };
-

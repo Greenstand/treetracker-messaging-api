@@ -4,16 +4,13 @@ const HttpError = require('../utils/HttpError');
 
 const { getAuthorId } = require('../handlers/helpers');
 
-const Survey = require("./Survey");
-
+const Survey = require('./Survey');
 
 const ContentRepository = require('../repositories/ContentRepository');
 const MessageRepository = require('../repositories/MessageRepository');
 const BulkMessageRepository = require('../repositories/BulkMessageRepository');
-const RegionRepository = require('../repositories/RegionRepository');
 const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
 
-const Session = require('./Session');
 
 const Message = async ({
   id,
@@ -33,7 +30,6 @@ const Message = async ({
   survey_title,
   questions,
 }) => {
-
   const answer = survey_response?.survey_response;
   let survey;
   if (!survey_id) {
@@ -48,37 +44,6 @@ const Message = async ({
     };
   }
 
-  const bulk_message_recipients = [];
-
-  if (recipient_handle) {
-    bulk_message_recipients.push({ recipient: recipient_handle, type: 'user' });
-  }
-
-  // TODO: move to service layer
-  // if (recipient_organization_id) {
-  //   // get organization name
-  //   log.info("get org name");
-  //   const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
-  //   const organizationResponse = await axios.get(
-  //     `${stakeholderUrl}?id=${recipient_organization_id}`,
-  //   );
-
-  //   bulk_message_recipients.push({
-  //     recipient: organizationResponse.data.stakeholders[0]?.name,
-  //     type: 'organization',
-  //   });
-  // }
-
-  if (recipient_region_id) {
-    // get region name
-    const session = new Session();
-    const regionRepo = new RegionRepository(session);
-    const regionInfo = await regionRepo.getById(recipient_region_id);
-
-    bulk_message_recipients.push({ recipient: regionInfo.name, type: 'region' });
-  }
-
-
   const rval = {
     id,
     type,
@@ -86,15 +51,14 @@ const Message = async ({
     title,
     from: author_handle,
     to: recipient_handle,
+    recipient_organization_id,
+    recipient_region_id,
     subject,
     body,
     composed_at,
     video_link,
     survey,
-  }
-  if (['announce', 'survey'].includes(type)) {
-    rval.bulk_message_recipients = bulk_message_recipients
-  }
+  };
 
   return Object.freeze(rval);
 };
@@ -154,7 +118,6 @@ const MessageObject = ({
     recipient_id,
   });
 
-
 const createMessage = async (session, body) => {
   const contentRepo = new ContentRepository(session);
   const messageRepo = new MessageRepository(session);
@@ -184,12 +147,10 @@ const createMessage = async (session, body) => {
     ...body,
     content_id: content.id,
     sender_id: author_id,
-    recipient_id
+    recipient_id,
   });
 
   await messageRepo.create(messageObject);
-
-
 };
 
 const createBulkMessage = async (session, requestBody, recipientHandles) => {
@@ -197,28 +158,36 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   const messageRepo = new MessageRepository(session);
   const bulkMessageRepo = new BulkMessageRepository(session);
 
-  let recipientIds = await Promise.all( 
-      recipientHandles.map( async (row) => {
+  let recipientIds = await Promise.all(
+    recipientHandles.map(async (row) => {
       return getAuthorId(row, session, false);
-    })
+    }),
   );
-  recipientIds = recipientIds.filter(n => n)
+  recipientIds = recipientIds.filter((n) => n);
 
   if (recipientIds.length < 1)
-      throw new HttpError(404, 'No author handles found for any of the growers found in the specified organization');
+    throw new HttpError(
+      404,
+      'No author handles found for any of the growers found in the specified organization',
+    );
 
   // If this has a survey object, create the survey
-  let type = "announce";
+  let type = 'announce';
   let survey_id = null;
   if (requestBody.survey) {
-    type = "survey";
+    type = 'survey';
     const survey = await Survey.createSurvey(session, requestBody.survey);
-    survey_id = survey.id
+    survey_id = survey.id;
   }
 
   // Insert content object
   const author_id = await getAuthorId(requestBody.author_handle, session);
-  const contentObject = ContentObject({ ...requestBody, survey_id, author_id, type });
+  const contentObject = ContentObject({
+    ...requestBody,
+    survey_id,
+    author_id,
+    type,
+  });
   const content = await contentRepo.create(contentObject);
 
   // Insert bulk messageobject
@@ -228,7 +197,7 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
     ...requestBody,
     organization_id,
     region_id,
-    content_id: content.id
+    content_id: content.id,
   });
 
   await bulkMessageRepo.create(bulkMessageObject);
@@ -238,7 +207,7 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
       ...requestBody,
       content_id: content.id,
       sender_id: author_id,
-      recipient_id: recipientId
+      recipient_id: recipientId,
     });
     await messageRepo.create(messageObject);
   }
@@ -263,60 +232,47 @@ const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
   };
 };
 
-const QueryOptions = ({ limit = undefined, offset = undefined }) => {
-  return Object.entries({ limit, offset })
-    .filter((entry) => entry[1] !== undefined)
-    .reduce((result, item) => {
-      result[item[0]] = item[1];
-      return result;
-    }, {});
+const getMessages = async (session, filterCriteria = undefined) => {
+  log.info('getMessages');
+
+  const messageRepo = new MessageRepository(session);
+
+  let filter = {};
+  const options = { limit: filter.limit, offset: filter.offset };
+
+  let author_id;
+  if (!filterCriteria.messageId) {
+    author_id = await getAuthorId(filterCriteria.author_handle, session);
+  }
+  filter = FilterCriteria({
+    ...filterCriteria,
+    author_id,
+  });
+
+  log.info('getMessages');
+  const messages = await messageRepo.getMessages(filter, options);
+  return await Promise.all(
+    messages.map(async (row) => {
+      let questionsArray = null;
+      if (row.survey_id != null) {
+        const surveyQuesetionRepo = new SurveyQuestionRepository(session);
+        const questions = await surveyQuesetionRepo.getQuestionsForSurvey(
+          row.survey_id,
+        );
+        questionsArray = await Promise.all(
+          questions.map(async (question) => {
+            return {
+              prompt: question.prompt,
+              choices: question.choices,
+            };
+          }),
+        );
+      }
+
+      return Message({ ...row, questions: questionsArray });
+    }),
+  );
 };
-
-const getMessages =
-  async (session, filterCriteria = undefined) => {
-    log.info("getMessages");
-
-    const messageRepo = new MessageRepository(session);
-
-    let filter = {};
-    let options = { limit: 100, offset: 0 };
-
-    let author_id;
-    if (!filterCriteria.messageId) {
-      author_id = await getAuthorId(filterCriteria.author_handle, session);
-    }
-    filter = FilterCriteria({
-      ...filterCriteria,
-      author_id,
-    });
-    options = { ...options, ...QueryOptions({ ...filterCriteria }) };
-
-    log.info("getMessages");
-    const messages = await messageRepo.getMessages(filter, options);
-    return {
-      messages: await Promise.all(
-        messages.map(async (row) => {
-
-          let questionsArray = null
-          if (row.survey_id != null) {
-            const surveyQuesetionRepo = new SurveyQuestionRepository(session);
-            const questions = await surveyQuesetionRepo.getQuestionsForSurvey(row.survey_id);
-            questionsArray = await Promise.all(
-              questions.map(async (question) => {
-                return {
-                  prompt: question.prompt,
-                  choices: question.choices
-                }
-              })
-            )
-          }
-
-          return Message({ ...row, questions: questionsArray });
-        }),
-      ),
-      options,
-    };
-  };
 
 module.exports = {
   createMessage,

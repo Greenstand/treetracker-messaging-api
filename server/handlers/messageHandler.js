@@ -2,8 +2,11 @@ const log = require('loglevel');
 const Joi = require('joi');
 
 const Session = require('../models/Session');
-const { createMessage, createBulkMessage } = require('../services/MessageService');
-const { getMessages } = require('../models/Message');
+const {
+  getMessages,
+  createMessage,
+  createBulkMessage,
+} = require('../services/MessageService');
 
 const HttpError = require('../utils/HttpError');
 
@@ -47,7 +50,7 @@ const messagePostSchema = Joi.object({
 
 const messageGetQuerySchema = Joi.object({
   author_handle: Joi.string().required(),
-  limit: Joi.number().integer().greater(0).less(101),
+  limit: Joi.number().integer().greater(0).less(501),
   offset: Joi.number().integer().greater(-1),
   since: Joi.date().iso(),
 }).unknown(false);
@@ -57,23 +60,27 @@ const messageSingleGetQuerySchema = Joi.object({
 });
 
 const messageGet = async (req, res, next) => {
-
   try {
     const filter = req.query;
     await messageGetQuerySchema.validateAsync(filter, { abortEarly: false });
 
+    const defaultRange = { limit: '100', offset: '0' };
+    filter.limit = filter.limit ?? defaultRange.limit;
+    filter.offset = filter.offset ?? defaultRange.offset;
+    log.debug(filter);
+
     const session = new Session();
-    const { messages, options } = await getMessages(session, filter);
+    const messages = await getMessages(session, filter);
 
     const url = `message?author_handle=${filter.author_handle}`;
-    const urlWithLimitAndOffset = `${url}${filter.since ? `&since=${filter.since}` : ''
-      }&limit=${options.limit}&offset=`;
+    const urlWithLimitAndOffset = `${url}${
+      filter.since ? `&since=${filter.since}` : ''
+    }&limit=${filter.limit}&offset=`;
 
-    const nextUrl = `${urlWithLimitAndOffset}${+options.offset + +options.limit
-    }`;
+    const nextUrl = `${urlWithLimitAndOffset}${+filter.offset + +filter.limit}`;
     let prev = null;
-    if (options.offset - +options.limit >= 0) {
-      prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
+    if (filter.offset - +filter.limit >= 0) {
+      prev = `${urlWithLimitAndOffset}${+filter.offset - +filter.limit}`;
     }
 
     res.send({
@@ -85,7 +92,7 @@ const messageGet = async (req, res, next) => {
     });
     res.end();
   } catch (e) {
-    log.info(e);
+    log.error(e);
     next(e);
   }
 };
@@ -107,7 +114,6 @@ const messageSingleGet = async (req, res, _next) => {
 
 // Create a new message resource
 const messagePost = async (req, res, next) => {
-
   try {
     await messagePostSchema.validateAsync(req.body, { abortEarly: false });
     await createMessage(req.body);
@@ -117,15 +123,13 @@ const messagePost = async (req, res, next) => {
     log.info(e);
     next(e);
   }
-
 };
 
 // Author a new message or group message
 const bulkMessagePost = async (req, res, next) => {
-
   try {
     await bulkMessagePostSchema.validateAsync(req.body, { abortEarly: false });
-    const {region_id, organization_id } = req.body;
+    const { region_id, organization_id } = req.body;
     if (!region_id && !organization_id) {
       throw new HttpError(
         422,
@@ -139,7 +143,6 @@ const bulkMessagePost = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-
 };
 
 module.exports = {

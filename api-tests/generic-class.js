@@ -18,8 +18,6 @@ const existing_message = Object.freeze({
   id: uuid(),
 });
 
-
-
 const survey_id = uuid();
 
 const organization_id = uuid();

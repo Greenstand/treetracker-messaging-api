@@ -6,7 +6,6 @@ class ContentRepository extends BaseRepository {
     this._tableName = 'content';
     this._session = session;
   }
- 
 }
 
 module.exports = ContentRepository;

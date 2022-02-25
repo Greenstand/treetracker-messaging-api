@@ -21,27 +21,27 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
     created_at: new Date().toISOString(),
   });
 
-  const createSurvey = async (session, body) => {
-    const surveyRepo = new SurveyRepository(session);
-    const surveyQuesetionRepo = new SurveyQuestionRepository(session);
-  
-    const surveyObject = SurveyObject(body);
-    const survey = await surveyRepo.create(surveyObject);
+const createSurvey = async (session, body) => {
+  const surveyRepo = new SurveyRepository(session);
+  const surveyQuesetionRepo = new SurveyQuestionRepository(session);
 
-    let rank = 1;
-    for (const { prompt, choices } of body.questions) {
-      const surveyQuestionObject = SurveyQuestionObject({
-        survey_id: survey.id,
-        prompt,
-        choices,
-        rank,
-      });
-      rank += 1;
-      await surveyQuesetionRepo.create(surveyQuestionObject);
-    }
-    return survey;
+  const surveyObject = SurveyObject(body);
+  const survey = await surveyRepo.create(surveyObject);
+
+  let rank = 1;
+  for (const { prompt, choices } of body.questions) {
+    const surveyQuestionObject = SurveyQuestionObject({
+      survey_id: survey.id,
+      prompt,
+      choices,
+      rank,
+    });
+    rank += 1;
+    await surveyQuesetionRepo.create(surveyQuestionObject);
   }
+  return survey;
+};
 
-  module.exports = {
-    createSurvey
-  };
+module.exports = {
+  createSurvey,
+};

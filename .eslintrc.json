@@ -14,7 +14,10 @@
     "simple-import-sort/imports": "error",
     "no-underscore-dangle": "off",
     "camelcase": "off",
-    "no-unused-vars": [ "warn", { "argsIgnorePattern": "^_" }],
+    "no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
     "func-names": "off",
     "no-param-reassign": "warn",
     "consistent-return": "warn",

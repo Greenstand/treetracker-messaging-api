@@ -4,7 +4,45 @@ const Message = require('../models/Message');
 const HttpError = require('../utils/HttpError');
 
 const GrowerAccountService = require('./GrowerAccountService');
+const StakeholderService = require('./StakeholderService');
 
+const getMessages = async (session, filter) => {
+  const messages = await Message.getMessages(session, filter);
+  log.trace(messages);
+  const messagesWithRecipientInfo = await Promise.all(
+    messages.map(async (row) => {
+      const newRow = { ...row }
+      if (row.recipient_organization_id || row.region_id) {
+        newRow.bulk_message_recipients = [];
+      }
+
+      if (row.organization_id) {
+        const orgName = StakeholderService.getOrganizationName(
+          row.recipient_organization_id,
+        );
+        newRow.bulk_message_recipients.push({
+          recipient: orgName,
+          type: 'organization',
+        });
+      }
+
+      // TODO: look up region name
+      // if (row.recipient_region_id) {
+      //   // get region name
+      //   const session = new Session();
+      //   const regionRepo = new RegionRepository(session);
+      //   const regionInfo = await regionRepo.getById(row.recipient_region_id);
+
+      //   bulk_message_recipients.push({ recipient: regionInfo.name, type: 'region' });
+      // }
+
+      return row;
+    }),
+  );
+  log.trace(messagesWithRecipientInfo);
+
+  return messagesWithRecipientInfo;
+};
 
 const createMessage = async (body) => {
   const session = new Session();
@@ -26,9 +64,12 @@ const createBulkMessage = async (body) => {
   const session = new Session();
   try {
     await session.beginTransaction();
-    let recipientHandles = []
-    if(body.organization_id) {
-      recipientHandles = await GrowerAccountService.getGrowerAccountWalletsForOrganization(body.organization_id);
+    let recipientHandles = [];
+    if (body.organization_id) {
+      recipientHandles =
+        await GrowerAccountService.getGrowerAccountWalletsForOrganization(
+          body.organization_id,
+        );
     }
     if (recipientHandles.length < 1) {
       throw new HttpError(
@@ -45,8 +86,8 @@ const createBulkMessage = async (body) => {
     if (session.isTransactionInProgress()) {
       await session.rollbackTransaction();
     }
-    throw(e);
+    throw e;
   }
-}
+};
 
-module.exports = { createMessage, createBulkMessage };
+module.exports = { getMessages, createMessage, createBulkMessage };

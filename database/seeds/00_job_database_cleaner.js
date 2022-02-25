@@ -1,5 +1,5 @@
 exports.seed = async function (knex) {
- await knex.raw(`
+  await knex.raw(`
     DELETE FROM bulk_message;
     DELETE FROM message;
     DELETE FROM content;
@@ -8,4 +8,3 @@ exports.seed = async function (knex) {
     DELETE FROM survey;
   `);
 };
-

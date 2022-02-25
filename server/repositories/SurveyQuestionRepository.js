@@ -9,11 +9,10 @@ class SurveyQuestionRepository extends BaseRepository {
 
   async getQuestionsForSurvey(surveyId) {
     return this._session
-    .getDB()(this._tableName)
-    .where('survey_id', '=', surveyId)
-    .orderBy('rank', 'desc');
+      .getDB()(this._tableName)
+      .where('survey_id', '=', surveyId)
+      .orderBy('rank', 'desc');
   }
-
 }
 
 module.exports = SurveyQuestionRepository;
