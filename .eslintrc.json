@@ -9,11 +9,15 @@
   "parserOptions": {
     "ecmaVersion": 12
   },
+  "ignorePatterns": ["database/migrations/*"],
   "rules": {
     "simple-import-sort/imports": "error",
     "no-underscore-dangle": "off",
     "camelcase": "off",
-    "no-unused-vars": "warn",
+    "no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
     "func-names": "off",
     "no-param-reassign": "warn",
     "consistent-return": "warn",

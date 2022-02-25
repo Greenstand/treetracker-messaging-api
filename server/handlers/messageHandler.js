@@ -1,17 +1,17 @@
+const log = require('loglevel');
 const Joi = require('joi');
 
 const Session = require('../models/Session');
-const { createMessage } = require('../services/MessageService');
+const {
+  getMessages,
+  createMessage,
+  createBulkMessage,
+} = require('../services/MessageService');
 
-const { createMessageResourse, getMessages } = require('../models/Message');
-const MessageRepository = require('../repositories/MessageRepository');
-const { getAuthorId } = require('./helpers');
 const HttpError = require('../utils/HttpError');
 
-const messageSendPostSchema = Joi.object({
+const bulkMessagePostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
-  recipient_handle: Joi.string(),
-  title: Joi.string(),
   region_id: Joi.string().uuid(),
   organization_id: Joi.string().uuid(),
   author_handle: Joi.string().required(),
@@ -50,7 +50,7 @@ const messagePostSchema = Joi.object({
 
 const messageGetQuerySchema = Joi.object({
   author_handle: Joi.string().required(),
-  limit: Joi.number().integer().greater(0).less(101),
+  limit: Joi.number().integer().greater(0).less(501),
   offset: Joi.number().integer().greater(-1),
   since: Joi.date().iso(),
 }).unknown(false);
@@ -60,26 +60,27 @@ const messageSingleGetQuerySchema = Joi.object({
 });
 
 const messageGet = async (req, res, next) => {
-  await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
-  const session = new Session();
-
-  const url = `message?author_handle=${req.query.author_handle}`;
-  const filter = req.query;
-
   try {
-    const executeGetMessages = getMessages(session);
-    const { messages, options } = await executeGetMessages(filter);
+    const filter = req.query;
+    await messageGetQuerySchema.validateAsync(filter, { abortEarly: false });
 
+    const defaultRange = { limit: '100', offset: '0' };
+    filter.limit = filter.limit ?? defaultRange.limit;
+    filter.offset = filter.offset ?? defaultRange.offset;
+    log.debug(filter);
+
+    const session = new Session();
+    const messages = await getMessages(session, filter);
+
+    const url = `message?author_handle=${filter.author_handle}`;
     const urlWithLimitAndOffset = `${url}${
       filter.since ? `&since=${filter.since}` : ''
-    }&limit=${options.limit}&offset=`;
+    }&limit=${filter.limit}&offset=`;
 
-    const nextUrl = `${urlWithLimitAndOffset}${
-      +options.offset + +options.limit
-    }`;
+    const nextUrl = `${urlWithLimitAndOffset}${+filter.offset + +filter.limit}`;
     let prev = null;
-    if (options.offset - +options.limit >= 0) {
-      prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
+    if (filter.offset - +filter.limit >= 0) {
+      prev = `${urlWithLimitAndOffset}${+filter.offset - +filter.limit}`;
     }
 
     res.send({
@@ -91,11 +92,12 @@ const messageGet = async (req, res, next) => {
     });
     res.end();
   } catch (e) {
+    log.error(e);
     next(e);
   }
 };
 
-const messageSingleGet = async (req, res, next) => {
+const messageSingleGet = async (req, res, _next) => {
   await messageSingleGetQuerySchema.validateAsync(req.params, {
     abortEarly: false,
   });
@@ -112,86 +114,33 @@ const messageSingleGet = async (req, res, next) => {
 
 // Create a new message resource
 const messagePost = async (req, res, next) => {
-  await messagePostSchema.validateAsync(req.body, { abortEarly: false });
-
   try {
+    await messagePostSchema.validateAsync(req.body, { abortEarly: false });
     await createMessage(req.body);
     res.status(204).send();
     res.end();
   } catch (e) {
+    log.info(e);
     next(e);
   }
-
-  // Get author id using author handle
-  // const author_id = await getAuthorId(req.body.author_handle);
-
-  // let recipient_id = null;
-
-  // // Get recipient id using recipient handle
-  // if (req.body.recipient_handle) {
-  //   recipient_id = await getAuthorId(req.body.recipient_handle);
-  // }
-
-  // try {
-  //   await session.beginTransaction();
-  //   await createMessageResourse(messageRepo, {
-  //     ...req.body,
-  //     author_id,
-  //     recipient_id,
-  //   });
-  //   await session.commitTransaction();
-  //   res.status(204).send();
-  //   res.end();
-  // } catch (e) {
-  //   console.log(e);
-  //   if (session.isTransactionInProgress()) {
-  //     await session.rollbackTransaction();
-  //   }
-  //   next(e);
-  // }
 };
 
 // Author a new message or group message
-const messageSendPost = async (req, res, next) => {
-  await messageSendPostSchema.validateAsync(req.body, { abortEarly: false });
-  const { recipient_handle, region_id, organization_id } = req.body;
-  if (!recipient_handle && !region_id && !organization_id) {
-    throw new HttpError(
-      422,
-      'At least one of recipient_handle, organization_id and region_id must be provided',
-    );
-  }
-  const session = new Session();
-
-  // Get author id using author handle
-  const messageRepo = new MessageRepository(session);
-  const author_id = await getAuthorId(req.body.author_handle, session);
-
-  let recipient_id = null;
-
-  // Get recipient id using recipient handle
-  if (req.body.recipient_handle) {
-    recipient_id = await getAuthorId(req.body.recipient_handle, session);
-  }
+const bulkMessagePost = async (req, res, next) => {
   try {
-    await session.beginTransaction();
-    await createMessageResourse(
-      messageRepo,
-      {
-        ...req.body,
-        author_id,
-        recipient_id,
-      },
-      session,
-    );
-    await session.commitTransaction();
+    await bulkMessagePostSchema.validateAsync(req.body, { abortEarly: false });
+    const { region_id, organization_id } = req.body;
+    if (!region_id && !organization_id) {
+      throw new HttpError(
+        422,
+        'At least one of organization_id and region_id must be provided',
+      );
+    }
+
+    await createBulkMessage(req.body);
     res.status(204).send();
     res.end();
   } catch (e) {
-    console.log(e);
-    if (session.isTransactionInProgress()) {
-      await session.rollbackTransaction();
-    }
     next(e);
   }
 };
@@ -199,6 +148,6 @@ const messageSendPost = async (req, res, next) => {
 module.exports = {
   messagePost,
   messageGet,
-  messageSendPost,
+  bulkMessagePost,
   messageSingleGet,
 };

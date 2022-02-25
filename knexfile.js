@@ -20,4 +20,17 @@ module.exports = {
     },
     debug: process.env.NODE_LOG_LEVEL === 'debug',
   },
+  test: {
+    client: 'pg',
+    connection,
+    searchPath: [process.env.DATABASE_SCHEMA, 'public'],
+    pool: {
+      min: 1,
+      max: 100,
+    },
+    seeds: {
+      directory: path.join(__dirname, 'database', 'seeds'),
+    },
+    debug: process.env.NODE_LOG_LEVEL === 'debug',
+  },
 };
