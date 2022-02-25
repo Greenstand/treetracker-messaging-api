@@ -1,3 +1,20 @@
+# [1.8.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.14...v1.8.0) (2022-02-25)
+
+
+### Bug Fixes
+
+* add missing file ([af33350](https://github.com/Greenstand/treetracker-messaging-api/commit/af33350ed5d72cd243b5c94f8811b06b497db7dd))
+* convert all tests to async and some linting ([66fa7ef](https://github.com/Greenstand/treetracker-messaging-api/commit/66fa7efea616f86bb4fdca43477a5b8579ec0f29))
+* create extension uuid in migrations ([7d6a49b](https://github.com/Greenstand/treetracker-messaging-api/commit/7d6a49b93f5caa4066bbbc237b3f065ae71fd40e))
+* created stakeholder service ([ff29bff](https://github.com/Greenstand/treetracker-messaging-api/commit/ff29bff38bd4922fde17c974830acfeae8ee3ec5))
+* linting ([a43363f](https://github.com/Greenstand/treetracker-messaging-api/commit/a43363fff4e6a6ccd950054d35911b2010ae4507))
+* resolve all linter errors, add missing files ([9bc62b5](https://github.com/Greenstand/treetracker-messaging-api/commit/9bc62b5d8a82e0013768c86ab5e944f9d43f0018))
+
+
+### Features
+
+* complete refactor of model and integration tests ([a0609f8](https://github.com/Greenstand/treetracker-messaging-api/commit/a0609f87b99febaa3a566723391645645372f182))
+
 ## [1.7.14](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.13...v1.7.14) (2022-02-24)
 
 
