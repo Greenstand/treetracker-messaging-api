@@ -8,7 +8,7 @@ const authorGetQuerySchema = Joi.object({
   id: Joi.string().uuid(),
 }).unknown(false);
 
-const authorGet = async (req, res, next) => {
+const authorGet = async (req, res, _next) => {
   await authorGetQuerySchema.validateAsync(req.query, { abortEarly: false });
   const session = new Session();
   const authorRepo = new AuthorRepository(session);

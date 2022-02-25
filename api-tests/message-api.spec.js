@@ -2,31 +2,24 @@ require('dotenv').config();
 const request = require('supertest');
 const chai = require('chai');
 
-  const {expect} = chai;
+const {expect} = chai;
 chai.use(require('chai-like'));
 chai.use(require('chai-things'));
 const sinon = require('sinon');
 const axios = require('axios').default;
 
+const { v4: uuid } = require('uuid');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
 
 // Mock Data
-const { v4: uuid } = require('uuid');
 
-const author_one_id = uuid();
-const author_two_id = uuid();
-const author_three_id = uuid();
-const author_four_id = uuid();
-const author_one_handle = 'handle1';
-const author_two_handle = 'handle2';
-const author_three_handle = 'handle3';
-const author_four_handle = 'handle4';
+const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
+const authorSeed = require('../database/seeds/01_table_author');
+
 
 const {
   organization_id,
-  organization_id_two,
-  existing_message,
 } = require('./generic-class');
 
 const MessagePostObject = require('./message-post-class');
@@ -35,25 +28,10 @@ const MessageSendPostObject = require('./message-send-post-class');
 describe('Message API tests.', () => {
 
   before(async function () {
-    await knex.raw(`
-    DELETE FROM bulk_message;
-    DELETE FROM message;
-    DELETE FROM content;
-    DELETE FROM author;
-    DELETE FROM survey_question;
-    DELETE FROM survey;
-    `);
 
-    await knex.raw(`
-    INSERT INTO author(
-	    id, handle, created_at)
-	  VALUES 
-        ('${author_one_id}', '${author_one_handle}', now()),
-        ('${author_two_id}', '${author_two_handle}', now()),
-        ('${author_three_id}', '${author_three_handle}', now()),
-        ('${author_four_id}', '${author_four_handle}', now());
-        `);
-
+    databaseCleaner.seed();
+    authorSeed.seed();
+      
   });
 
 
@@ -61,13 +39,12 @@ describe('Message API tests.', () => {
 
     it(`Should create a message `, async function () {
       const messagePostObject = {
-        recipient_handle: author_two_handle,
-        author_handle: author_one_handle,
+        recipient_handle: authorSeed.author_two_handle,
+        author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'Bodyyy',
         composed_at: new Date().toISOString(),
       }
-      console.log(messagePostObject);
       await request(server)
         .post(`/message`)
         .send(messagePostObject)
@@ -92,8 +69,8 @@ describe('Message API tests.', () => {
     it(`Should respond to an existing message `, async function () {
 
       const messagePostObject = {
-        recipient_handle: author_two_handle,
-        author_handle: author_one_handle,
+        recipient_handle: authorSeed.author_two_handle,
+        author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'Body',
         composed_at: new Date().toISOString(),
@@ -111,8 +88,8 @@ describe('Message API tests.', () => {
         .where('subject', messagePostObject.subject);
 
       const messageReplyObject = {
-        recipient_handle: author_one_handle,
-        author_handle: author_two_handle,
+        recipient_handle: authorSeed.author_one_handle,
+        author_handle: authorSeed.author_two_handle,
         parent_message_id: message[0].message_id,
         subject: uuid(),
         body: 'Body',
@@ -139,8 +116,8 @@ describe('Message API tests.', () => {
     it(`Should send a regular message and pass tests using API `, async function () {
 
       const messagePostObject = {
-        recipient_handle: author_one_handle,
-        author_handle: author_two_handle,
+        recipient_handle: authorSeed.author_one_handle,
+        author_handle: authorSeed.author_two_handle,
         subject: uuid(),
         body: 'Check in to get your trees',
         composed_at: new Date().toISOString()
@@ -154,33 +131,46 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_one_handle,
+          author_handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res.body.messages);
       expect(res.body.messages).to.be.an('array')
-        .that.contains.something.like({subject: messagePostObject.subject, from: author_two_handle, to: author_one_handle});
+        .that.contains.something.like({subject: messagePostObject.subject, from: authorSeed.author_two_handle, to: authorSeed.author_one_handle});
 
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_two_handle,
+          author_handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res2.body.messages);
       expect(res2.body.messages).to.be.an('array')
-        .that.contains.something.like({subject: messagePostObject.subject, from: author_two_handle, to: author_one_handle})
+        .that.contains.something.like({subject: messagePostObject.subject, from: authorSeed.author_two_handle, to: authorSeed.author_one_handle})
 
     });
 
     it.skip(`Should respond to a survey`, async function () {
+      const seeder = require('../database/seeds/12_survey_1');
+      seeder.seed();
+
+      const messagePostObject = {
+        author_handle: seeder.survey_recipient_id,
+        recipient_handle: seeder.survey_author_id,
+        parent_message_id: seeder.survey_message_id,
+        survey_reponse: [],
+        composed_at: new Date().toISOString()
+      }
+      await request(server)
+      .post(`/message`)
+      .send(messagePostObject)
+      .set('Accept', 'application/json')
+      .expect(204);
 
     });
 
     it.skip(`Should respond to an announce message`, async function () {
-
+      expect(false).to.be.true;
     });
   });
 
@@ -189,18 +179,17 @@ describe('Message API tests.', () => {
 
     it(`Should send an announce message to an organization`, async function () {
       const messageSendPostObject = {
-        author_handle: author_one_handle,
+        author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
         organization_id
       }
 
-      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
-        console.log("STUB");
+      const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
             grower_accounts: [
-              { wallet: author_two_handle },
+              { wallet: authorSeed.author_two_handle },
             ],
           },
         };
@@ -211,47 +200,45 @@ describe('Message API tests.', () => {
         .send(messageSendPostObject)
         .set('Accept', 'application/json')
         .expect(204);
-
+      
       axiosStub.restore();
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_one_handle,
+          author_handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res.body.messages);
       expect(res.body.messages).to.be.an('array')
-        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: null });
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: authorSeed.author_one_handle, to: null });
 
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_two_handle,
+          author_handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res2.body.messages);
       expect(res2.body.messages).to.be.an('array')
-        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_two_handle })
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: authorSeed.author_one_handle, to: authorSeed.author_two_handle })
     });
 
     it(`Should send an announce message to multiple recipients in an organization`, async function () {
       const messageSendPostObject = {
-        author_handle: author_one_handle,
+        author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
         organization_id
       }
 
-      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+      const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
             grower_accounts: [
-              { wallet: author_two_handle },
-              { wallet: author_three_handle },
-              { wallet: author_four_handle }
+              { wallet: authorSeed.author_two_handle },
+              { wallet: authorSeed.author_three_handle },
+              { wallet: authorSeed.author_four_handle }
             ],
           },
         };
@@ -268,52 +255,48 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_one_handle,
+          author_handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res.body.messages);
       expect(res.body.messages).to.be.an('array')
-        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: null });
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: authorSeed.author_one_handle, to: null });
 
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_two_handle,
+          author_handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res2.body.messages);
       expect(res2.body.messages).to.be.an('array')
-        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_two_handle })
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: authorSeed.author_one_handle, to: authorSeed.author_two_handle })
 
       const res3 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_three_handle,
+          author_handle: authorSeed.author_three_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res3.body.messages);
       expect(res3.body.messages).to.be.an('array')
-        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_three_handle })
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: authorSeed.author_one_handle, to: authorSeed.author_three_handle })
 
       const res4 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_four_handle,
+          author_handle: authorSeed.author_four_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
-      console.log(res4.body.messages);
       expect(res4.body.messages).to.be.an('array')
-        .that.contains.something.like({ subject: messageSendPostObject.subject, from: author_one_handle, to: author_four_handle })
+        .that.contains.something.like({ subject: messageSendPostObject.subject, from: authorSeed.author_one_handle, to: authorSeed.author_four_handle })
     });
 
 
     it(`Should send a survey message`, async function () {
       const messageSendPostObject = {
-        author_handle: author_one_handle,
+        author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is a survey about trees',
         organization_id,
@@ -328,11 +311,11 @@ describe('Message API tests.', () => {
         },
       }
 
-      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+      const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
             grower_accounts: [
-              { wallet: author_two_handle },
+              { wallet: authorSeed.author_two_handle },
             ],
           },
         };
@@ -349,19 +332,19 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_one_handle,
+          author_handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
 
       console.log(res.body.messages);
       expect(res.body.messages).to.be.an('array')
-        .that.contains.something.like({ from: author_one_handle, to: null, survey: { title: messageSendPostObject.survey.title } });
+        .that.contains.something.like({ from: authorSeed.author_one_handle, to: null, survey: { title: messageSendPostObject.survey.title } });
     });
 
     it(`Send a survey message and recipient should recieve it`, async function () {
       const messageSendPostObject = {
-        author_handle: author_one_handle,
+        author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
         organization_id,
@@ -376,11 +359,11 @@ describe('Message API tests.', () => {
         },
       }
 
-      axiosStub = sinon.stub(axios, 'get').callsFake(async (url) => {
+      const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
             grower_accounts: [
-              { wallet: author_two_handle },
+              { wallet: authorSeed.author_two_handle },
             ],
           },
         };
@@ -397,14 +380,14 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: author_two_handle,
+          author_handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
 
       console.log(res.body.messages);
       expect(res.body.messages).to.be.an('array')
-        .that.contains.something.like({ from: author_one_handle, to: author_two_handle, survey: { title: messageSendPostObject.survey.title } });
+        .that.contains.something.like({ from: authorSeed.author_one_handle, to: authorSeed.author_two_handle, survey: { title: messageSendPostObject.survey.title } });
         
     });
   });
@@ -415,16 +398,19 @@ describe('Message API tests.', () => {
     it(`Should get messages successfully`, function (done) {
 
       // run a knex seed here
+      // const seeder = require('database/seeds/02_conversation_1');
+      // seeder.seed();
 
       request(server)
         .get(`/message`)
         .query({
-          author_handle: author_one_handle,
+          author_handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200)
         .end(function (err, res) {
           if (err) {
+            console.log(err)
             return done(err);
           }
           expect(res.body).to.have.keys(['messages', 'links']);
@@ -435,8 +421,8 @@ describe('Message API tests.', () => {
           // TODO: tests should be atomic, not interdependent.
           const messageSendPostObject = new MessageSendPostObject();
 
-          let survey_one_exists = false;
-          let survey_two_exists = false;
+          // let survey_one_exists = false;
+          // const survey_two_exists = false;
           for (const message of res.body.messages) {
             // console.log("returned message");
             console.log(message);
@@ -462,7 +448,7 @@ describe('Message API tests.', () => {
               ]);
               const { survey } = message;
               if (survey.title === messageSendPostObject._object.survey.title) {
-                survey_one_exists = true;
+                // survey_one_exists = true;
                 expect(survey.questions).eql(
                   messageSendPostObject._object.survey.questions,
                 );

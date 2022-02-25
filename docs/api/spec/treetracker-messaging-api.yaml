@@ -130,6 +130,13 @@ paths:
                           format: uuid
                         title:
                           type: string
+                        bulk_message_recipients:
+                          type: object
+                          properties:
+                            recipient:
+                              type: string
+                            type:
+                              type: string
                       required:
                         - from
                         - to

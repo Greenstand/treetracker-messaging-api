@@ -1,6 +1,6 @@
 const expect = require('expect-runtime');
 const log = require('loglevel');
-
+const Knex = require('knex')
 const connection = require('../../config/config').connectionString;
 
 expect(connection).to.match(/^postgresql:\//);
@@ -19,6 +19,6 @@ if (process.env.DATABASE_SCHEMA) {
 }
 log.debug(knexConfig.searchPath);
 
-const knex = require('knex')(knexConfig);
+const knex = Knex(knexConfig);
 
 module.exports = knex;

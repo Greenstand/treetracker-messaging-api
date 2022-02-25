@@ -1,44 +1,22 @@
 require('dotenv').config();
 const request = require('supertest');
-const { expect } = require('chai');
+const chai = require('chai');
+
+const {expect} = chai;
+chai.use(require('chai-like'));
+chai.use(require('chai-things'));
 const server = require('../server/app');
-// const { author_one_id, author_two_id } = require('./seed-data-creation');
-// const { author_one_handle, author_two_handle } = require('./generic-class');
 const knex = require('../server/database/knex');
 
-// Mock Data
-const { v4: uuid } = require('uuid');
-
-const author_one_id = uuid();
-const author_two_id = uuid();
-const author_three_id = uuid();
-const author_four_id = uuid();
-const author_one_handle = 'handle1';
-const author_two_handle = 'handle2';
-const author_three_handle = 'handle3';
-const author_four_handle = 'handle4';
-
+// Global Seed
+const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
+const authorSeed = require('../database/seeds/01_table_author');
 
 describe('Author API tests.', () => {
 
   before(async function () {
-    await knex.raw(`
-    DELETE FROM bulk_message;
-    DELETE FROM message;
-    DELETE FROM content;
-    DELETE FROM author;
-    DELETE FROM survey_question;
-    DELETE FROM survey;
-    `);
-
-    await knex.raw(`
-    INSERT INTO author(
-	    id, handle, created_at)
-	  VALUES 
-        ('${author_one_id}', '${author_one_handle}', now()),
-        ('${author_two_id}', '${author_two_handle}', now());
-        `);
-
+    await databaseCleaner.seed(knex);
+    await authorSeed.seed(knex);
   });
 
   describe('Author GET', () => {
@@ -50,14 +28,9 @@ describe('Author API tests.', () => {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body).to.have.keys(['authors']);
-          expect(res.body.authors).to.have.length(2);
-          res.body.authors.map(
-            (a) =>
-              expect(
-                (a.handle === author_one_handle && a.id === author_one_id) ||
-                  (a.handle === author_two_handle && a.id === author_two_id),
-              ).to.be.true,
-          );
+          expect(res.body.authors).to.have.length(15);
+          expect(res.body.authors).to.be.an('array').that.contains.something.like({handle: authorSeed.author_one_handle})
+          expect(res.body.authors).to.be.an('array').that.contains.something.like({handle: authorSeed.author_two_handle})
           return done();
         });
     });
@@ -68,7 +41,7 @@ describe('Author API tests.', () => {
       request(server)
         .get(`/author`)
         .query({
-          id: author_one_id,
+          id: authorSeed.author_one_id,
         })
         .set('Accept', 'application/json')
         .expect(200)
@@ -78,7 +51,7 @@ describe('Author API tests.', () => {
           expect(res.body.authors).to.have.length(1);
           res.body.authors.map(
             (a) =>
-              expect(a.handle === author_one_handle && a.id === author_one_id)
+              expect(a.handle === authorSeed.author_one_handle)
                 .to.be.true,
           );
           return done();

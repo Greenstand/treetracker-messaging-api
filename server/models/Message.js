@@ -1,21 +1,20 @@
+const log = require('loglevel');
 const { v4: uuid } = require('uuid');
 const axios = require('axios').default;
 
 const HttpError = require('../utils/HttpError'); // Move to handler
 const { getAuthorId } = require('../handlers/helpers');
 
-const Survey = require('../models/Survey');
+const Survey = require("./Survey");
 
 
 const ContentRepository = require('../repositories/ContentRepository');
 const MessageRepository = require('../repositories/MessageRepository');
 const BulkMessageRepository = require('../repositories/BulkMessageRepository');
 const RegionRepository = require('../repositories/RegionRepository');
-const SurveyRepository = require('../repositories/SurveyRepository');
 const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
 
 const Session = require('./Session');
-const { removeAllListeners } = require('nodemon');
 
 const Message = async ({
   id,
@@ -59,7 +58,7 @@ const Message = async ({
   // TODO: move to service layer
   // if (recipient_organization_id) {
   //   // get organization name
-  //   console.log("get org name");
+  //   log.info("get org name");
   //   const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
   //   const organizationResponse = await axios.get(
   //     `${stakeholderUrl}?id=${recipient_organization_id}`,
@@ -81,7 +80,7 @@ const Message = async ({
   }
 
 
-  let rval = {
+  const rval = {
     id,
     type,
     parent_message_id,
@@ -158,12 +157,10 @@ const MessageObject = ({
 
 
 const createMessage = async (session, body) => {
-  console.log("Create message");
   const contentRepo = new ContentRepository(session);
   const messageRepo = new MessageRepository(session);
 
   if (body.id) {
-    console.log(`check for existing ${body.id}`);
     const existingMessageArray = await messageRepo.getByFilter({
       id: body.id,
     });
@@ -226,8 +223,8 @@ const createBulkMessage = async (session, requestBody) => {
     content_id: content.id
   });
 
-  const bulkMessage = await bulkMessageRepo.create(bulkMessageObject);
-  console.log("inserted bulk");
+  await bulkMessageRepo.create(bulkMessageObject);
+  log.info("inserted bulk");
 
   // This where we would access the query service
   // TODO: move to a service class
@@ -239,10 +236,7 @@ const createBulkMessage = async (session, requestBody) => {
     const response = await axios.get(
       `${growerAccountUrl}?organization_id=${organization_id}`,
     );
-    console.log(response.data);
     const { grower_accounts } = response.data;
-    console.log('got');
-    console.log(grower_accounts);
     if (grower_accounts.length < 1) {
       throw new HttpError(
         422,
@@ -266,7 +260,7 @@ const createBulkMessage = async (session, requestBody) => {
 
 
   if (organization_id) {
-    // create message for each of the ground users' recipientIds
+    // create message for each of the grower accounts' recipientIds
     for (const recipientId of growerAccountRecipientIds) {
       const messageObject = MessageObject({
         ...requestBody,
@@ -309,7 +303,7 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 
 const getMessages =
   async (session, filterCriteria = undefined) => {
-    console.log("getMessages");
+    log.info("getMessages");
 
     const messageRepo = new MessageRepository(session);
 
@@ -326,7 +320,7 @@ const getMessages =
     });
     options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-    console.log("getMessages");
+    log.info("getMessages");
     const messages = await messageRepo.getMessages(filter, options);
     return {
       messages: await Promise.all(

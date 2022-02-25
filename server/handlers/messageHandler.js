@@ -1,11 +1,10 @@
+const log = require('loglevel');
 const Joi = require('joi');
 
 const Session = require('../models/Session');
 const { createMessage, createBulkMessage } = require('../services/MessageService');
-
 const { getMessages } = require('../models/Message');
-const ContentRepository = require('../repositories/ContentRepository');
-const { getAuthorId } = require('./helpers');
+
 const HttpError = require('../utils/HttpError');
 
 const bulkMessagePostSchema = Joi.object({
@@ -86,12 +85,12 @@ const messageGet = async (req, res, next) => {
     });
     res.end();
   } catch (e) {
-    console.log(e);
+    log.info(e);
     next(e);
   }
 };
 
-const messageSingleGet = async (req, res, next) => {
+const messageSingleGet = async (req, res, _next) => {
   await messageSingleGetQuerySchema.validateAsync(req.params, {
     abortEarly: false,
   });
@@ -115,7 +114,7 @@ const messagePost = async (req, res, next) => {
     res.status(204).send();
     res.end();
   } catch (e) {
-    console.log(e);
+    log.info(e);
     next(e);
   }
 

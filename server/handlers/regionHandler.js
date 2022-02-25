@@ -1,3 +1,4 @@
+const log = require('loglevel');
 const Joi = require('joi');
 
 const Session = require('../models/Session');
@@ -15,7 +16,7 @@ const regionPostSchema = Joi.object({
   creator_organization_id: Joi.string().uuid(),
 }).unknown(false);
 
-const regionGet = async (req, res, next) => {
+const regionGet = async (req, res, _next) => {
   const session = new Session();
   const regionRepo = new RegionRepository(session);
   const result = await regionRepo.getRegions();
@@ -27,7 +28,7 @@ const regionSingleGetQuerySchema = Joi.object({
   region_id: Joi.string().uuid(),
 });
 
-const regionIdGet = async (req, res, next) => {
+const regionIdGet = async (req, res, _next) => {
   await regionSingleGetQuerySchema.validateAsync(req.params, {
     abortEarly: false,
   });
@@ -38,7 +39,7 @@ const regionIdGet = async (req, res, next) => {
   res.end();
 };
 
-const regionPost = async (req, res, next) => {
+const regionPost = async (req, res, _next) => {
   await regionPostSchema.validateAsync(req.body, { abortEarly: false });
   const session = new Session();
   const regionRepo = new RegionRepository(session);
@@ -51,7 +52,7 @@ const regionPost = async (req, res, next) => {
     res.status(200).send();
     res.end();
   } catch (e) {
-    console.log(e);
+    log.info(e);
     if (session.isTransactionInProgress()) {
       await session.rollbackTransaction();
     }

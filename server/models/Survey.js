@@ -25,11 +25,10 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
     const surveyRepo = new SurveyRepository(session);
     const surveyQuesetionRepo = new SurveyQuestionRepository(session);
   
-    console.log(body);
     const surveyObject = SurveyObject(body);
     const survey = await surveyRepo.create(surveyObject);
 
-    survey_id = survey.id;
+    const { survey_id } = body;
 
     let rank = 1;
 
@@ -40,8 +39,8 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
         choices,
         rank,
       });
-      rank++;
-      const surveyQuestion = await surveyQuesetionRepo.create(surveyQuestionObject);
+      rank += 1;
+      await surveyQuesetionRepo.create(surveyQuestionObject);
     }
     return survey;
   }
