@@ -1,8 +1,7 @@
 const log = require('loglevel');
 const { v4: uuid } = require('uuid');
-const axios = require('axios').default;
+const HttpError = require('../utils/HttpError');
 
-const HttpError = require('../utils/HttpError'); // Move to handler
 const { getAuthorId } = require('../handlers/helpers');
 
 const Survey = require("./Survey");
@@ -193,13 +192,22 @@ const createMessage = async (session, body) => {
 
 };
 
-const createBulkMessage = async (session, requestBody) => {
+const createBulkMessage = async (session, requestBody, recipientHandles) => {
   const contentRepo = new ContentRepository(session);
   const messageRepo = new MessageRepository(session);
   const bulkMessageRepo = new BulkMessageRepository(session);
 
-  // IF this has a survey object, create the survey
-  // TODO: Survey.createSurvey(requestBody) - move ot its own model
+  let recipientIds = await Promise.all( 
+      recipientHandles.map( async (row) => {
+      return getAuthorId(row, session, false);
+    })
+  );
+  recipientIds = recipientIds.filter(n => n)
+
+  if (recipientIds.length < 1)
+      throw new HttpError(404, 'No author handles found for any of the growers found in the specified organization');
+
+  // If this has a survey object, create the survey
   let type = "announce";
   let survey_id = null;
   if (requestBody.survey) {
@@ -224,52 +232,15 @@ const createBulkMessage = async (session, requestBody) => {
   });
 
   await bulkMessageRepo.create(bulkMessageObject);
-  log.info("inserted bulk");
 
-  // This where we would access the query service
-  // TODO: move to a service class
-  const growerAccountRecipientIds = [];
-  if (organization_id) {
-    const growerAccountUrl = `${process.env.TREETRACKER_API_URL}/grower_accounts`; // this moves to the service
-
-    // get grower_accounts in the specified organization from the treetracker-api
-    const response = await axios.get(
-      `${growerAccountUrl}?organization_id=${organization_id}`,
-    );
-    const { grower_accounts } = response.data;
-    if (grower_accounts.length < 1) {
-      throw new HttpError(
-        422,
-        'No grower accounts found in the specified organization',
-      );
-    }
-    for (const { wallet } of grower_accounts) {
-      const recipient_id = await getAuthorId(wallet, session, false);
-      if (recipient_id) {
-        growerAccountRecipientIds.push(recipient_id);
-      }
-    }
-
-
-    if (growerAccountRecipientIds.length < 1)
-      throw new HttpError(
-        422,
-        'No author handles found for any of the growers found in the specified organization',
-      );
-  }
-
-
-  if (organization_id) {
-    // create message for each of the grower accounts' recipientIds
-    for (const recipientId of growerAccountRecipientIds) {
-      const messageObject = MessageObject({
-        ...requestBody,
-        content_id: content.id,
-        sender_id: author_id,
-        recipient_id: recipientId
-      });
-      await messageRepo.create(messageObject);
-    }
+  for (const recipientId of recipientIds) {
+    const messageObject = MessageObject({
+      ...requestBody,
+      content_id: content.id,
+      sender_id: author_id,
+      recipient_id: recipientId
+    });
+    await messageRepo.create(messageObject);
   }
 
   // if (region_id) {

@@ -393,7 +393,7 @@ describe('Message API Request Validation tests.', () => {
         });
     });
 
-    it.only(`Message to an organization should error out -- no growers found for specified organization_id `, async function () {
+    it(`Message to an organization should error out -- no growers found for specified organization_id `, async function () {
       const messageSendPostObject = { ...MessageSendPostObject }
       messageSendPostObject.organization_id = uuid();
 
@@ -435,7 +435,7 @@ describe('Message API Request Validation tests.', () => {
         .post(`/bulk_message`)
         .send(messageSendPostObject)
         .set('Accept', 'application/json')
-        .expect(422)
+        // .expect(422)
         if(res.error ) {
           // eslint-disable-next-line no-console
           console.log(res.error);

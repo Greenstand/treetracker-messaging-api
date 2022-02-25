@@ -28,13 +28,10 @@ const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
     const surveyObject = SurveyObject(body);
     const survey = await surveyRepo.create(surveyObject);
 
-    const { survey_id } = body;
-
     let rank = 1;
-
     for (const { prompt, choices } of body.questions) {
       const surveyQuestionObject = SurveyQuestionObject({
-        survey_id,
+        survey_id: survey.id,
         prompt,
         choices,
         rank,
