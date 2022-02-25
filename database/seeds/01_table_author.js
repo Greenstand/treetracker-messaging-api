@@ -19,7 +19,7 @@ const author_four_handle = 'handle4';
 const seed = async function (knex) {
   const authorNumber = 10;
   const authors = [];
-  for (let index = 0; index < authorNumber; index++) {
+  for (let index = 0; index < authorNumber; index += 1) {
     authors.push({
       handle: chance.word(),
     });

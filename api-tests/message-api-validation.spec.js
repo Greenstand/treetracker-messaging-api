@@ -1,7 +1,6 @@
 require('dotenv').config();
 const { v4: uuid } = require('uuid');
 const chai = require('chai');
-const log = require('loglevel');
 
 const { expect } = chai;
 chai.use(require('chai-like'));
@@ -165,7 +164,6 @@ describe('Message API Request Validation tests.', () => {
 
     it(`Should raise validation error with error code 404 -- author_handle should exist `, async function () {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
-        console.log('HERE');
         return {
           data: {
             grower_accounts: [{ wallet: 'another_wallet' }],

@@ -29,7 +29,8 @@ const createSurvey = async (session, body) => {
   const survey = await surveyRepo.create(surveyObject);
 
   let rank = 1;
-  for (const { prompt, choices } of body.questions) {
+  await Promise.all(body.questions.map(async (question) => {
+    const { prompt, choices } = question;
     const surveyQuestionObject = SurveyQuestionObject({
       survey_id: survey.id,
       prompt,
@@ -38,7 +39,7 @@ const createSurvey = async (session, body) => {
     });
     rank += 1;
     await surveyQuesetionRepo.create(surveyQuestionObject);
-  }
+  }));
   return survey;
 };
 

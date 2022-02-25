@@ -1,7 +1,6 @@
 require('dotenv').config();
 const chai = require('chai');
 const log = require('loglevel');
-const request = require('./lib/supertest');
 
 const { expect } = chai;
 chai.use(require('chai-like'));
@@ -10,6 +9,8 @@ const sinon = require('sinon');
 const axios = require('axios').default;
 
 const { v4: uuid } = require('uuid');
+
+const request = require('./lib/supertest');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
 
@@ -171,7 +172,8 @@ describe('Message API tests.', () => {
     });
 
     it.skip(`Should respond to an announce message`, async function () {
-      expect(false).to.be.true;
+      const seeder = require('../database/seeds/12_survey_1');
+      seeder.seed();
     });
   });
 
@@ -447,7 +449,7 @@ describe('Message API tests.', () => {
 
       // let survey_one_exists = false;
       // const survey_two_exists = false;
-      for (const message of res.body.messages) {
+      res.body.messages.forEach( message => {
         // log.debug("returned message");
         log.debug(message);
         expect(message).to.include.keys([
@@ -481,7 +483,7 @@ describe('Message API tests.', () => {
           log.debug(res.body.messages.length);
           // if (survey.title === survey_title) survey_two_exists = true;
         }
-      }
+      });
 
       // expect(survey_one_exists).to.be.true;
       // expect(survey_two_exists).to.be.true;

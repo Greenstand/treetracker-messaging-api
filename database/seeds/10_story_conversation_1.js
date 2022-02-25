@@ -1,4 +1,4 @@
-const authorSeed = require('01_table_author');
+const authorSeed = require('./01_table_author');
 
 exports.seed = async function (knex) {
   // Author table is globally populated

@@ -33,7 +33,7 @@ class BaseRepository {
       if (object.and) {
         expect(Object.keys(object)).lengthOf(1);
         expect(object.and).a(expect.any(Array));
-        for (const one of object.and) {
+        object.and.forEach( one => {
           if (one.or) {
             result = result.andWhere((subBuilder) =>
               whereBuilder(one, subBuilder),
@@ -45,11 +45,11 @@ class BaseRepository {
               Object.values(one)[0],
             );
           }
-        }
+        });
       } else if (object.or) {
         expect(Object.keys(object)).lengthOf(1);
         expect(object.or).a(expect.any(Array));
-        for (const one of object.or) {
+        object.or.forEach( one => {
           if (one.and) {
             result = result.orWhere((subBuilder) =>
               whereBuilder(one, subBuilder),
@@ -58,7 +58,7 @@ class BaseRepository {
             expect(Object.keys(one)).lengthOf(1);
             result = result.orWhere(Object.keys(one)[0], Object.values(one)[0]);
           }
-        }
+        });
       } else {
         result.where(object);
       }

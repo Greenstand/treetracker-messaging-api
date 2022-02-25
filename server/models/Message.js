@@ -202,7 +202,7 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
 
   await bulkMessageRepo.create(bulkMessageObject);
 
-  for (const recipientId of recipientIds) {
+  await Promise.all(recipientIds.map(async (recipientId) => {
     const messageObject = MessageObject({
       ...requestBody,
       content_id: content.id,
@@ -210,7 +210,7 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
       recipient_id: recipientId,
     });
     await messageRepo.create(messageObject);
-  }
+  }));
 
   // if (region_id) {
   //   const regionRepo = new RegionRepository(session);
@@ -221,7 +221,7 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   //   // create message_delivery for each of them
   //   // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
   // }
-};
+}
 
 const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
   return {
@@ -251,7 +251,7 @@ const getMessages = async (session, filterCriteria = undefined) => {
 
   log.info('getMessages');
   const messages = await messageRepo.getMessages(filter, options);
-  return await Promise.all(
+  return Promise.all(
     messages.map(async (row) => {
       let questionsArray = null;
       if (row.survey_id != null) {
