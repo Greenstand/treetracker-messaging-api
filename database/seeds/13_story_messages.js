@@ -1,12 +1,13 @@
 const { v4: uuid } = require('uuid');
 const Chance = require('chance');
+
 const chance = new Chance();
 
 const authorSeed = require('./01_table_author');
 
-let messageId1 = uuid();
-let messageId2 = uuid();
-let messageId3 = uuid();
+const messageId1 = uuid();
+const messageId2 = uuid();
+const messageId3 = uuid();
 
 
 const fakeMessageContent = function (authorId) {
@@ -32,7 +33,6 @@ const seed = async function (knex) {
       sender_id: authorSeed.author_one_id,
       recipient_id: authorSeed.author_two_id,
     };
-    console.log(message);
     await knex('message').insert(message).returning('id');
   }
 

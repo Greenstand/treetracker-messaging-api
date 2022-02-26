@@ -18,6 +18,7 @@ sed -i ''  "s/{PASSWORD}/$INTEGRATION_PASSWORD/" .env.test
 cp .env.development.example .env.development
 sed -i '' "s/{SCHEMA}/$SCHEMA/" .env.development
 sed -i ''  "s/{PASSWORD}/$SERVICE_PASSWORD/" .env.development
+sed -i ''  "s/{SEEDER_PASSWORD}/$MIGRATION_PASSWORD/" .env.development
 
 cp database/database.json.example database/database.json
 

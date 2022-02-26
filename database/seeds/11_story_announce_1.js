@@ -1,10 +1,9 @@
-const { exist } = require('joi');
 const { v4: uuid } = require('uuid');
 const authorSeed = require('./01_table_author');
 
-let recipientId = authorSeed.author_two_id;
-let authorId = authorSeed.author_one_id;
-let messageId = uuid();
+const recipientId = authorSeed.author_two_id;
+const authorId = authorSeed.author_one_id;
+const messageId = uuid();
 
 const seed = async function (knex) {
 
@@ -19,7 +18,6 @@ const seed = async function (knex) {
     .insert(content)
     .returning('id'))[0];
 
-  recipientId = authorSeed.author_two_id;
   const message = {
     id: messageId,
     content_id: contentId,

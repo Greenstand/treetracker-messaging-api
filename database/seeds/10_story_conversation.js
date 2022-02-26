@@ -16,6 +16,7 @@ exports.seed = async function (knex) {
   const firstMessage = {
     content_id: firstContentId,
     recipient_id: authorSeed.author_two_id,
+    sender_id: authorSeed.author_one_id,
   };
   const firstMessageid = (await knex('message').insert(firstMessage).returning('id'))[0];
 
@@ -34,7 +35,8 @@ exports.seed = async function (knex) {
   const secondMessage = {
     parent_message_id: firstMessageid,
     content_id: secondContentId,
-    recipient_id: authorId,
+    recipient_id: authorSeed.author_one_id,
+    sender_id: authorSeed.author_two_id,
   };
   const _secondMessageid = await knex('message')
     .insert(secondMessage)
