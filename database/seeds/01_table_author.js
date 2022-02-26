@@ -8,7 +8,10 @@ const { v4: uuid } = require('uuid');
 // Do not edit!
 //
 const author_one_id = uuid();
-const author_one_handle = 'handle1';
+const author_two_id = uuid();
+const author_three_id = uuid();
+const author_four_id = uuid();
+const author_one_handle = 'admin';
 const author_two_handle = 'handle2';
 const author_three_handle = 'handle3';
 const author_four_handle = 'handle4';
@@ -24,24 +27,23 @@ const seed = async function (knex) {
       handle: chance.word(),
     });
   }
-  const adminAuthor = {
-    handle: 'admin',
-  };
-  authors.push(adminAuthor);
-
+ 
   authors.push({ id: author_one_id, handle: author_one_handle });
-  authors.push({ handle: author_two_handle });
-  authors.push({ handle: author_three_handle });
-  authors.push({ handle: author_four_handle });
+  authors.push({ id: author_two_id, handle: author_two_handle });
+  authors.push({ id: author_three_id, handle: author_three_handle });
+  authors.push({ id: author_four_id, handle: author_four_handle });
 
   await knex('author').insert(authors);
 };
 
 module.exports = {
   seed,
+  author_one_id,
+  author_two_id,
+  author_three_id,
+  author_four_id,
   author_one_handle,
   author_two_handle,
   author_three_handle,
   author_four_handle,
-  author_one_id,
 };

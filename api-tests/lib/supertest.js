@@ -2,6 +2,8 @@ const supertest = require('supertest'); /* eslint-disable-line import/no-extrane
 const status = require('statuses'); /* eslint-disable-line import/no-extraneous-dependencies */
 const log = require('loglevel');
 
+log.setLevel(process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'warn');
+
 // Override supertest expect to get the error
 supertest.Test.prototype.expect = function (statusCode) {
   return this.then((res) => {

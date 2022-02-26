@@ -1,1 +1,0 @@
-ALTER TABLE region ALTER COLUMN creator_organization_id TYPE varchar;

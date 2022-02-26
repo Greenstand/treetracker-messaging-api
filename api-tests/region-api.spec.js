@@ -1,98 +1,119 @@
 require('dotenv').config();
+const { v4: uuid } = require('uuid');
 const { _expect } = require('chai');
 const request = require('./lib/supertest');
 const server = require('../server/app');
-const RegionObject = require('./region-class');
+
+const RegionObject = {
+  name: 'Konoha',
+  description: 'The hidden leaf village',
+  shape: {
+    type: 'MultiPolygon',
+    coordinates: [
+      [
+        [
+          [1, 2],
+          [2, 3],
+          [0, 3],
+          [2, 8],
+        ],
+      ],
+    ],
+  },
+  creator_user_id: uuid(),
+  creator_organization_id: uuid(),
+}
 
 describe('Region API tests.', () => {
   it(`Should raise validation error with error code 422 -- name is required `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.delete_property('name');
+    const regionObject = {...RegionObject}
+    delete regionObject.name;
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   it(`Should raise validation error with error code 422 -- description is required `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.delete_property('description');
+    const regionObject = {...RegionObject}
+    delete regionObject.description;
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   it(`Should raise validation error with error code 422 -- creator_user_id is not a uuid `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.change_property('creator_user_id', 'creator_user_id');
+    const regionObject = {...RegionObject}
+    regionObject.creator_user_id = 'creator_user_id';
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   it(`Should raise validation error with error code 422 -- creator_organization_id is not a uuid `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.change_property(
-      'creator_organization_id',
-      'creator_organization_id',
-    );
+    const regionObject = {...RegionObject}
+    regionObject.creator_organization_id = 'creator_organization_id';
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   it(`Should raise validation error with error code 422 -- shape is not an object `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.change_property('shape', 'shape');
+    const regionObject = {...RegionObject}
+
+    regionObject.shape = 'shape';
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   it(`Should raise validation error with error code 422 -- shape is not an object with type = Polygon `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.change_property('shape', {
-      ...regionObject._object.shape,
+    const regionObject = {...RegionObject}
+
+    regionObject.shape = {
+      ...regionObject.shape,
       type: 'Not Polygon',
-    });
+    };
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   it(`Should raise validation error with error code 422 -- shape is not an object with valid polygon coordinates `, async () => {
-    const regionObject = new RegionObject();
-    regionObject.change_property('shape', {
-      ...regionObject._object.shape,
+    const regionObject = {...RegionObject}
+
+    regionObject.shape = {
+      ...regionObject.shape,
       value: [
         [1, 2],
         [1, 3],
       ],
-    });
+    };
     const _res = await request(server)
       .post(`/region`)
-      .send(regionObject._object)
+      .send(regionObject)
       .set('Accept', 'application/json')
       .expect(422);
   });
 
   describe('Region should be added sucessfully', () => {
-    const regionObject = new RegionObject();
+    const regionObject = {...RegionObject}
+
     it(`Region should be successfully added`, async () => {
       const _res = await request(server)
         .post(`/region`)
-        .send(regionObject._object)
+        .send(regionObject)
         .set('Accept', 'application/json')
         .expect(200);
     });

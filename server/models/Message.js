@@ -119,6 +119,7 @@ const MessageObject = ({
   });
 
 const createMessage = async (session, body) => {
+  log.debug(body);
   const contentRepo = new ContentRepository(session);
   const messageRepo = new MessageRepository(session);
 

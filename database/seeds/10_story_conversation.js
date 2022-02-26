@@ -1,50 +1,44 @@
 const authorSeed = require('./01_table_author');
 
 exports.seed = async function (knex) {
-  // Author table is globally populated
-  const authorId = knex('author')
-    .where({ handle: authorSeed.author_one_handle })
-    .pluck('id');
-  const recipientId = knex('author')
-    .where({ handle: authorSeed.author_two_handle })
-    .pluck('id');
-
+ 
   const contentOfFirstMessage = {
     type: 'message',
-    author_id: authorId,
+    author_id: authorSeed.author_one_id,
     subject: '',
     body: 'Greetings, can you confirm that you have uploaded?',
     composed_at: '2022-01-22',
   };
-  const firstContentId = knex('content')
+  const firstContentId = (await knex('content')
     .insert(contentOfFirstMessage)
-    .returning('id');
+    .returning('id'))[0];
 
-  // get content
   const firstMessage = {
     content_id: firstContentId,
-    recipient_id: recipientId,
+    recipient_id: authorSeed.author_two_id,
+    sender_id: authorSeed.author_one_id,
   };
-  const firstMessageid = knex('message').insert(firstMessage).returning('id');
+  const firstMessageid = (await knex('message').insert(firstMessage).returning('id'))[0];
 
   const contentOfSecondMessage = {
     type: 'message',
-    author_id: recipientId,
+    author_id: authorSeed.author_two_id,
     subject: '',
     body: 'I have, I have?',
     composed_at: '2022-01-22',
   };
-  const secondContentId = knex('content')
+  const secondContentId = (await knex('content')
     .insert(contentOfSecondMessage)
-    .returning('id');
+    .returning('id'))[0];
 
   // get content
   const secondMessage = {
     parent_message_id: firstMessageid,
     content_id: secondContentId,
-    recipient_id: authorId,
+    recipient_id: authorSeed.author_one_id,
+    sender_id: authorSeed.author_two_id,
   };
-  const _secondMessageid = knex('message')
+  const _secondMessageid = await knex('message')
     .insert(secondMessage)
     .returning('id');
 };
