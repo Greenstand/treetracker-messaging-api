@@ -1,6 +1,7 @@
 const log = require('loglevel');
 const Joi = require('joi');
 
+// TODO: needs refactor to user RegionService, or possibly superceded by region tool
 const Session = require('../models/Session');
 const RegionRepository = require('../repositories/RegionRepository');
 const { RegionObject } = require('../models/Region');

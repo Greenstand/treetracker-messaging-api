@@ -1,7 +1,6 @@
 const log = require('loglevel');
 const Joi = require('joi');
 
-const Session = require('../models/Session');
 const {
   getMessages,
   createMessage,
@@ -69,8 +68,7 @@ const messageGet = async (req, res, next) => {
     filter.offset = filter.offset ?? defaultRange.offset;
     log.debug(filter);
 
-    const session = new Session();
-    const messages = await getMessages(session, filter);
+    const messages = await getMessages(filter);
 
     const url = `message?author_handle=${filter.author_handle}`;
     const urlWithLimitAndOffset = `${url}${
@@ -98,15 +96,19 @@ const messageGet = async (req, res, next) => {
 };
 
 const messageSingleGet = async (req, res, _next) => {
-  await messageSingleGetQuerySchema.validateAsync(req.params, {
-    abortEarly: false,
-  });
-  const session = new Session();
-  const messages = await getMessages(session, {
-    messageId: req.params.message_id,
-  });
-  res.send(messages[0]);
-  res.end();
+  try {
+    await messageSingleGetQuerySchema.validateAsync(req.params, {
+      abortEarly: false,
+    });
+    const messages = await getMessages({
+      messageId: req.params.message_id,
+    });
+    res.send(messages[0]);
+    res.end();
+  } catch (e) {
+    log.error(e);
+    _next(e);
+  }
 };
 
 // Create a new message resource

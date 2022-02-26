@@ -6,7 +6,8 @@ const HttpError = require('../utils/HttpError');
 const GrowerAccountService = require('./GrowerAccountService');
 const StakeholderService = require('./StakeholderService');
 
-const getMessages = async (session, filter) => {
+const getMessages = async (filter) => {
+  const session = new Session();
   const messages = await Message.getMessages(session, filter);
   log.trace(messages);
   const messagesWithRecipientInfo = await Promise.all(

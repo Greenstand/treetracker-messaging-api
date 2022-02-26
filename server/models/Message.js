@@ -2,7 +2,7 @@ const log = require('loglevel');
 const { v4: uuid } = require('uuid');
 const HttpError = require('../utils/HttpError');
 
-const { getAuthorId } = require('../handlers/helpers');
+const { getAuthorId } = require('./Author');
 
 const Survey = require('./Survey');
 

@@ -145,7 +145,7 @@ describe('Message API tests.', () => {
         });
     });
 
-    it.only(`Should respond to a survey`, async function () {
+    it(`Should respond to a survey`, async function () {
       const surveySeed = require('../database/seeds/12_story_survey');
       await surveySeed.seed(knex);
 
