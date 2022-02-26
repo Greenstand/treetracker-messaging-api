@@ -16,7 +16,7 @@ const bulkMessagePostSchema = Joi.object({
   organization_id: Joi.string().uuid(),
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
-  body: Joi.string().required(),
+  body: Joi.string(),
   video_link: Joi.string().allow(null, '').uri(),
   survey: Joi.object({
     questions: Joi.array()
@@ -41,7 +41,7 @@ const messagePostSchema = Joi.object({
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
-  body: Joi.string().required(),
+  body: Joi.string(),
   composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
   survey_response: Joi.array().items(Joi.string()),
@@ -102,19 +102,23 @@ const messageSingleGet = async (req, res, _next) => {
     abortEarly: false,
   });
   const session = new Session();
-  const executeGetMessages = getMessages(session);
-  const {
-    messages: [message = {}],
-  } = await executeGetMessages({
+  const messages = await getMessages(session, {
     messageId: req.params.message_id,
   });
-  res.send(message);
+  res.send(messages[0]);
   res.end();
 };
 
 // Create a new message resource
 const messagePost = async (req, res, next) => {
   try {
+    log.warn(req.body);
+    if (!req.body.body && !req.body.survey_id) {
+      throw new HttpError(
+        422,
+        'Body is required',
+      );
+    }
     await messagePostSchema.validateAsync(req.body, { abortEarly: false });
     await createMessage(req.body);
     res.status(204).send();

@@ -15,22 +15,14 @@ const server = require('../server/app');
 const knex = require('../server/database/knex');
 
 // Mock Data
-
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
 
-log.setLevel(process.env.LOG_LEVEL ? process.env.LOG_LEVEL : 'warn');
-
-// TODO: remove this.
-const { organization_id } = require('./generic-class');
-
-const MessagePostObject = require('./message-post-class');
-const MessageSendPostObject = require('./message-send-post-class');
 
 describe('Message API tests.', () => {
   before(async function () {
-    databaseCleaner.seed();
-    authorSeed.seed();
+    await databaseCleaner.seed(knex);
+    await authorSeed.seed(knex);
   });
 
   describe('Message POST Resource Creation', () => {
@@ -153,15 +145,17 @@ describe('Message API tests.', () => {
         });
     });
 
-    it.skip(`Should respond to a survey`, async function () {
-      const seeder = require('../database/seeds/12_survey_1');
-      seeder.seed();
+    it(`Should respond to a survey`, async function () {
+      const surveySeed = require('../database/seeds/12_story_survey');
+      await surveySeed.seed(knex);
 
       const messagePostObject = {
-        author_handle: seeder.survey_recipient_id,
-        recipient_handle: seeder.survey_author_id,
-        parent_message_id: seeder.survey_message_id,
-        survey_reponse: [],
+        author_handle: surveySeed.recipientHandle,
+        recipient_handle: surveySeed.authorHandle,
+        parent_message_id: surveySeed.messageId,
+        subject: "Survey response",
+        survey_id: surveySeed.surveyId,
+        survey_response: ["1"],
         composed_at: new Date().toISOString(),
       };
       await request(server)
@@ -169,11 +163,28 @@ describe('Message API tests.', () => {
         .send(messagePostObject)
         .set('Accept', 'application/json')
         .expect(204);
+
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          author_handle: surveySeed.authorHandle
+        })
+        .set('Accept', 'application/json')
+        .expect(200);  
+      
+      expect(res.body.messages).to.be.an('array')
+        .that.contains.something.like({
+          from: surveySeed.recipientHandle,
+          to: surveySeed.authorHandle,
+          survey: {
+            answers: ['1']
+          }
+        });
     });
 
     it.skip(`Should respond to an announce message`, async function () {
-      const seeder = require('../database/seeds/12_survey_1');
-      seeder.seed();
+      const seeder = require('../database/seeds/12_story_survey');
+      await seeder.seed(knex);
     });
   });
 
@@ -183,7 +194,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
-        organization_id,
+        organization_id: uuid(),
       };
 
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
@@ -238,7 +249,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
-        organization_id,
+        organization_id: uuid(),
       };
 
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
@@ -327,7 +338,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is a survey about trees',
-        organization_id,
+        organization_id: uuid(),
         survey: {
           questions: [
             {
@@ -369,7 +380,7 @@ describe('Message API tests.', () => {
         .that.contains.something.like({
           from: authorSeed.author_one_handle,
           to: null,
-          survey: { title: messageSendPostObject.survey.title },
+          survey: { title: messageSendPostObject.survey.title, questions: [ { prompt: 'What is the capital of atlantis?' } ]  },
         });
     });
 
@@ -378,7 +389,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
-        organization_id,
+        organization_id : uuid(),
         survey: {
           questions: [
             {
@@ -426,11 +437,16 @@ describe('Message API tests.', () => {
   });
 
   describe('Message GET', () => {
-    it(`Should get messages successfully`, async () => {
-      // run a knex seed here
-      // const seeder = require('database/seeds/02_conversation_1');
-      // seeder.seed();
 
+    let messagesSeed;
+
+    before(async function () {
+      messagesSeed = require('../database/seeds/13_story_messages');
+      await messagesSeed.seed(knex);
+    });
+
+
+    it(`Should get messages successfully`, async () => {
       const res = await request(server)
         .get(`/message`)
         .query({
@@ -441,11 +457,6 @@ describe('Message API tests.', () => {
 
       expect(res.body).to.have.keys(['messages', 'links']);
       expect(res.body.links).to.have.keys(['prev', 'next']);
-
-      // test if surveys were added successfully
-      // TODO: do not check for data inserted by previous tests
-      // TODO: tests should be atomic, not interdependent.
-      const messageSendPostObject = new MessageSendPostObject();
 
       // let survey_one_exists = false;
       // const survey_two_exists = false;
@@ -472,21 +483,8 @@ describe('Message API tests.', () => {
             'response',
             'answers',
           ]);
-          const { survey } = message;
-          if (survey.title === messageSendPostObject._object.survey.title) {
-            // survey_one_exists = true;
-            expect(survey.questions).eql(
-              messageSendPostObject._object.survey.questions,
-            );
-          }
-          log.debug(survey.title);
-          log.debug(res.body.messages.length);
-          // if (survey.title === survey_title) survey_two_exists = true;
         }
       });
-
-      // expect(survey_one_exists).to.be.true;
-      // expect(survey_two_exists).to.be.true;
     });
 
     it('Should get messages with limit, offset', async () => {
@@ -517,17 +515,13 @@ describe('Message API tests.', () => {
       // expect(res.body.links.next).to.contain("")
     });
 
-    it.skip('Get message by id', function (done) {
-      const messagePostObject = new MessagePostObject();
-      const messageId = messagePostObject._object.id;
-      request(server)
-        .get(`/message/${messageId}`)
+    it('Get message by id', async () => {
+      await request(server)
+        .get(`/message/${messagesSeed.messageId1}`)
+        .query({
+          author_handle: authorSeed.author_one_handle
+        })
         .expect(200)
-        .end(function (err, res) {
-          if (err) return done(err);
-          expect(res.body.id === messageId).to.equal(true);
-          return done();
-        });
     });
   });
 });

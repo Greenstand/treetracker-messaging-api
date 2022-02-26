@@ -90,7 +90,7 @@ describe('Message API Request Validation tests.', () => {
         .expect(422);
     });
 
-    it(`Should raise validation error with error code 422 -- body is required `, async () => {
+    it(`Should raise validation error with error code 422 -- body is required for regular message`, async () => {
       const messagePostObject = { ...MessagePostObject };
       delete messagePostObject.body;
       const _res = await request(server)

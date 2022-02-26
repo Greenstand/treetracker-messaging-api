@@ -4,3 +4,4 @@ CREATE TABLE author
     handle varchar NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now()
 );
+CREATE UNIQUE INDEX handle_unique ON author (handle);
