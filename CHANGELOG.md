@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.1...v1.8.2) (2022-02-26)
+
+
+### Bug Fixes
+
+* conform author service to pattern ([eb324cd](https://github.com/Greenstand/treetracker-messaging-api/commit/eb324cd0dfde5dde96226788d394e92088399a4d))
+
 ## [1.8.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.0...v1.8.1) (2022-02-26)
 
 
