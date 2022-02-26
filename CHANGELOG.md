@@ -1,3 +1,12 @@
+## [1.8.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.0...v1.8.1) (2022-02-26)
+
+
+### Bug Fixes
+
+* clean up seeds, set up for frontend seeding ([e140380](https://github.com/Greenstand/treetracker-messaging-api/commit/e140380570793d29bac7016c97b26811fe2b80b6))
+* remove title from announce, use subject ([d2cb3e0](https://github.com/Greenstand/treetracker-messaging-api/commit/d2cb3e061604bb7a32350fa6f0919812bae75e05))
+* remove unnecessary migration ([face41d](https://github.com/Greenstand/treetracker-messaging-api/commit/face41dbb73422dbbdf925790044f10838990bdc))
+
 # [1.8.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.7.14...v1.8.0) (2022-02-25)
 
 
