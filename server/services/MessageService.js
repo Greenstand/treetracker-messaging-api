@@ -12,7 +12,7 @@ const getMessages = async (filter) => {
   log.trace(messages);
   const messagesWithRecipientInfo = await Promise.all(
     messages.map(async (row) => {
-      const newRow = { ...row }
+      const newRow = { ...row };
       if (row.recipient_organization_id || row.region_id) {
         newRow.bulk_message_recipients = [];
       }
@@ -91,4 +91,16 @@ const createBulkMessage = async (body) => {
   }
 };
 
-module.exports = { getMessages, createMessage, createBulkMessage };
+const getMessagesCount = async (filter) => {
+  const session = new Session();
+  const messagesCount = await Message.getMessagesCount(session, filter);
+
+  return messagesCount;
+};
+
+module.exports = {
+  getMessages,
+  createMessage,
+  createBulkMessage,
+  getMessagesCount,
+};

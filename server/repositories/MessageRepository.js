@@ -107,6 +107,58 @@ class MessageRepository extends BaseRepository {
         .where((builder) => whereBuilder(filter, builder))
     );
   }
+
+  async getMessagesCount(filter) {
+    const whereBuilder = function (object, builder) {
+      let result = builder;
+      // for /message/:message_id
+      if (object.messageId) {
+        result.where({ 'message.id': object.messageId });
+      } else {
+        result.where('content.author_id', filter.author_id);
+        result.orWhere('message.recipient_id', filter.author_id);
+        if (object.since) {
+          result = result.andWhere('message.created_at', '>=', object.since);
+        }
+      }
+    };
+
+    const result = await this._session
+      .getDB()('content')
+      .innerJoin(
+        'author AS author_sender',
+        'content.author_id',
+        '=',
+        'author_sender.id',
+      )
+      .leftJoin('message', function () {
+        this.on('content.id', '=', 'message.content_id').andOn(function () {
+          this.onVal('content.type', '=', 'message').orOnVal(
+            'message.recipient_id',
+            '=',
+            filter.author_id,
+          );
+        });
+      })
+      .leftJoin('bulk_message', 'content.id', '=', 'bulk_message.content_id')
+      .leftJoin(
+        'author AS author_recipient',
+        'message.recipient_id',
+        '=',
+        'author_recipient.id',
+      )
+      .leftJoin('survey', 'survey.id', '=', 'content.survey_id')
+      .leftJoin(
+        'survey_question',
+        'survey.id',
+        '=',
+        'survey_question.survey_id',
+      )
+      .count('*')
+      .where((builder) => whereBuilder(filter, builder));
+
+    return +result[0].count;
+  }
 }
 
 module.exports = MessageRepository;
