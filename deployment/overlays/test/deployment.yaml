@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treetracker-messaging-api
+  labels:
+    app: treetracker-messaging-api
+spec:
+  template:
+    spec:
+      containers:
+        - name: treetracker-messaging-api
+          env:
+            - name: S3_ACCESS_KEY_ID
+              value: AKIAQ6ZTQQY3ZHNGQB7O 
