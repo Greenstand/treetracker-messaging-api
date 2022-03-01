@@ -1,3 +1,10 @@
+## [1.8.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.6...v1.8.7) (2022-03-01)
+
+
+### Bug Fixes
+
+* fix base mapping.yaml ([00e0993](https://github.com/Greenstand/treetracker-messaging-api/commit/00e0993703390c62df194d939e71b862c46138a1))
+
 ## [1.8.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.5...v1.8.6) (2022-03-01)
 
 
