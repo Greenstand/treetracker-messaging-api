@@ -1,3 +1,10 @@
+## [1.8.9](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.8...v1.8.9) (2022-03-01)
+
+
+### Bug Fixes
+
+* respect uuid in POST message ([73aa126](https://github.com/Greenstand/treetracker-messaging-api/commit/73aa126decbffeb017f42b967524e03d44e9c608))
+
 ## [1.8.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.7...v1.8.8) (2022-03-01)
 
 
