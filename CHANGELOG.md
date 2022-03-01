@@ -1,3 +1,11 @@
+## [1.8.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.7...v1.8.8) (2022-03-01)
+
+
+### Bug Fixes
+
+* next to respect totalCount of messages returned ([baa892c](https://github.com/Greenstand/treetracker-messaging-api/commit/baa892cedcc5436373cbae7f7b82a2f8020c0123))
+* refactor getMessages repository function ([21c13be](https://github.com/Greenstand/treetracker-messaging-api/commit/21c13bee24c9c430d242934d38563144d953062f))
+
 ## [1.8.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.6...v1.8.7) (2022-03-01)
 
 
