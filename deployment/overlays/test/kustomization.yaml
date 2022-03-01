@@ -3,5 +3,3 @@ bases:
 patchesStrategicMerge:
   - database-connection-sealed-secret.yaml
   - database-migration-connection-sealed-secret.yaml  
-  - treetracker-rabbitmq-connection-sealed-secret.yaml
-  - deployment.yaml
