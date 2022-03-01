@@ -5,6 +5,7 @@ const {
   getMessages,
   createMessage,
   createBulkMessage,
+  getMessagesCount,
 } = require('../services/MessageService');
 
 const HttpError = require('../utils/HttpError');
@@ -69,13 +70,21 @@ const messageGet = async (req, res, next) => {
     log.debug(filter);
 
     const messages = await getMessages(filter);
+    const messagesCount = await getMessagesCount(filter);
+
+    // offset starts from 0, hence the -1
+    const noOfIterations = messagesCount / filter.limit - 1;
+    const currentIteration = filter.offset / filter.limit;
 
     const url = `message?author_handle=${filter.author_handle}`;
     const urlWithLimitAndOffset = `${url}${
       filter.since ? `&since=${filter.since}` : ''
     }&limit=${filter.limit}&offset=`;
 
-    const nextUrl = `${urlWithLimitAndOffset}${+filter.offset + +filter.limit}`;
+    const nextUrl =
+      currentIteration < noOfIterations
+        ? `${urlWithLimitAndOffset}${+filter.offset + +filter.limit}`
+        : null;
     let prev = null;
     if (filter.offset - +filter.limit >= 0) {
       prev = `${urlWithLimitAndOffset}${+filter.offset - +filter.limit}`;
@@ -116,10 +125,7 @@ const messagePost = async (req, res, next) => {
   try {
     log.warn(req.body);
     if (!req.body.body && !req.body.survey_id) {
-      throw new HttpError(
-        422,
-        'Body is required',
-      );
+      throw new HttpError(422, 'Body is required');
     }
     await messagePostSchema.validateAsync(req.body, { abortEarly: false });
     await createMessage(req.body);

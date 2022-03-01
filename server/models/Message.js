@@ -11,7 +11,6 @@ const MessageRepository = require('../repositories/MessageRepository');
 const BulkMessageRepository = require('../repositories/BulkMessageRepository');
 const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
 
-
 const Message = async ({
   id,
   type,
@@ -203,15 +202,17 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
 
   await bulkMessageRepo.create(bulkMessageObject);
 
-  await Promise.all(recipientIds.map(async (recipientId) => {
-    const messageObject = MessageObject({
-      ...requestBody,
-      content_id: content.id,
-      sender_id: author_id,
-      recipient_id: recipientId,
-    });
-    await messageRepo.create(messageObject);
-  }));
+  await Promise.all(
+    recipientIds.map(async (recipientId) => {
+      const messageObject = MessageObject({
+        ...requestBody,
+        content_id: content.id,
+        sender_id: author_id,
+        recipient_id: recipientId,
+      });
+      await messageRepo.create(messageObject);
+    }),
+  );
 
   // if (region_id) {
   //   const regionRepo = new RegionRepository(session);
@@ -222,7 +223,7 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   //   // create message_delivery for each of them
   //   // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
   // }
-}
+};
 
 const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
   return {
@@ -239,7 +240,10 @@ const getMessages = async (session, filterCriteria = undefined) => {
   const messageRepo = new MessageRepository(session);
 
   let filter = {};
-  const options = { limit: filter.limit, offset: filter.offset };
+  const options = {
+    limit: filterCriteria.limit,
+    offset: filterCriteria.offset,
+  };
 
   let author_id;
   if (!filterCriteria.messageId) {
@@ -275,8 +279,28 @@ const getMessages = async (session, filterCriteria = undefined) => {
   );
 };
 
+const getMessagesCount = async (session, filterCriteria = undefined) => {
+  log.info('getMessagesCount');
+  const messageRepo = new MessageRepository(session);
+
+  let author_id;
+
+  if (!filterCriteria.messageId) {
+    author_id = await getAuthorId(filterCriteria.author_handle, session);
+  }
+
+  let filter = {};
+  filter = FilterCriteria({
+    ...filterCriteria,
+    author_id,
+  });
+
+  return messageRepo.getMessagesCount(filter);
+};
+
 module.exports = {
   createMessage,
   createBulkMessage,
   getMessages,
+  getMessagesCount,
 };
