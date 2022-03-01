@@ -9,7 +9,7 @@ const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
 const log = require('loglevel');
 
-describe.only("Survey get API", function () {
+describe("Survey get API", function () {
 
   this.beforeEach(async () => {
     await databaseCleaner.seed(knex);
