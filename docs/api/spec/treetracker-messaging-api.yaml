@@ -13,7 +13,7 @@ paths:
   /message:
     parameters: []
     get:
-      summary: Get messages for a ground user or author
+      summary: Get messages for an author
       tags: []
       operationId: get-users-userId
       description: 'Retreive messages for a handle since a specified date, with pagination.  Includes both messages too and from the handle.'

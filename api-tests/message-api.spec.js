@@ -183,7 +183,7 @@ describe('Message API tests.', () => {
     });
 
     it.skip(`Should respond to an announce message`, async function () {
-      const seeder = require('../database/seeds/12_story_survey');
+      const seeder = require('../database/seeds/11_story_announce');
       await seeder.seed(knex);
     });
   });

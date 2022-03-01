@@ -63,7 +63,6 @@ const Message = async ({
 };
 
 const ContentObject = ({
-  id = uuid(),
   type = 'message',
   subject,
   body,
@@ -75,7 +74,7 @@ const ContentObject = ({
   active = true,
 }) =>
   Object.freeze({
-    id,
+    id : uuid(),
     type,
     created_at: new Date().toISOString(),
     subject,
@@ -103,13 +102,14 @@ const BulkMessageObject = ({
   });
 
 const MessageObject = ({
+  id,
   parent_message_id = null,
   content_id,
   sender_id,
   recipient_id,
 }) =>
   Object.freeze({
-    id: uuid(),
+    id,
     content_id,
     created_at: new Date().toISOString(),
     parent_message_id,
