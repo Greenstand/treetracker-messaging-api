@@ -8,8 +8,6 @@ class AuthorRepository extends BaseRepository {
   }
 
   async getAuthorId(handle) {
-    console.log("handle");
-    console.log(handle);
     return this._session
       .getDB()
       .select('id')

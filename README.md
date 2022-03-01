@@ -1,6 +1,6 @@
 # Name of this microservice
 
-treetracker-messaging-api 
+treetracker-messaging-api
 
 Description of this microservice
 

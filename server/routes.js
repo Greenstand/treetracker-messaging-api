@@ -9,8 +9,8 @@ const {
 const {
   messagePost,
   messageGet,
-  messageSendPost,
   messageSingleGet,
+  bulkMessagePost,
 } = require('./handlers/messageHandler');
 const {
   get,
@@ -27,7 +27,7 @@ router.get('/region/:region_id', handlerWrapper(regionIdGet));
 router.post('/message', handlerWrapper(messagePost));
 router.get('/message', handlerWrapper(messageGet));
 router.get('/message/:message_id', handlerWrapper(messageSingleGet));
-router.post('/message/send', handlerWrapper(messageSendPost));
+router.post('/bulk_message', handlerWrapper(bulkMessagePost));
 
 router.get('/survey/:uuid', handlerWrapper(get));
 

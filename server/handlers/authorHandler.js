@@ -1,22 +1,22 @@
 const Joi = require('joi');
+const log = require('loglevel');
 
-const Session = require('../models/Session');
-const { getAuthors } = require('../models/Author');
-const AuthorRepository = require('../repositories/AuthorRepository');
+const { getAuthors } = require('../services/AuthorService');
 
 const authorGetQuerySchema = Joi.object({
   id: Joi.string().uuid(),
 }).unknown(false);
 
-const authorGet = async (req, res, next) => {
-  await authorGetQuerySchema.validateAsync(req.query, { abortEarly: false });
-  const session = new Session();
-  const authorRepo = new AuthorRepository(session);
-
-  const executeGetAuthors = getAuthors(authorRepo);
-  const result = await executeGetAuthors(req.query);
-  res.send(result);
-  res.end();
+const authorGet = async (req, res, _next) => {
+  try {
+    await authorGetQuerySchema.validateAsync(req.query, { abortEarly: false });
+    const result = await getAuthors(req.query);
+    res.send(result);
+    res.end();
+  } catch (e) {
+    log.error(e);
+    _next(e);
+  }
 };
 
 module.exports = {

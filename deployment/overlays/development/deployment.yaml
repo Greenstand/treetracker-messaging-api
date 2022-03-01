@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: treetracker-messaging-api
+  labels:
+    app: treetracker-messaging-api
+spec:
+  replicas: 1
+
+  

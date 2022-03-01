@@ -6,9 +6,9 @@ metadata:
 spec:
   cors:
     origins:
-    - '*'
+      - '*'
     headers:
-    - Content-Type
-    - Authorization
+      - Content-Type
+      - Authorization
     methods:
-    - 'GET, POST, PATCH, PUT, OPTIONS, DELETE'
+      - 'GET, POST, PATCH, PUT, OPTIONS, DELETE'

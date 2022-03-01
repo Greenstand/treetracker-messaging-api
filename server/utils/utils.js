@@ -32,8 +32,8 @@ exports.handlerWrapper = (fn) =>
     });
   };
 
-exports.errorHandler = (err, req, res, next) => {
-  log.warn('catch error:', err);
+exports.errorHandler = (err, req, res, _next) => {
+  log.debug('catch error:', err);
   if (err instanceof HttpError) {
     res.status(err.code).send({
       code: err.code,

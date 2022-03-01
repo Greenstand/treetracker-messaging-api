@@ -1,3 +1,4 @@
+const log = require('loglevel');
 const { expect } = require('chai');
 const mockKnex = require('mock-knex');
 const BaseRepository = require('./BaseRepository');
@@ -153,7 +154,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
-          console.log('sql:', query.sql);
+          log.info('sql:', query.sql);
           expect(query.sql).match(
             /select.*testTable.*where.*c1.*=.*or.*c2.*=.*or.*c3.*and.*c4.*/,
           );
@@ -187,7 +188,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
-          console.log('sql:', query.sql);
+          log.info('sql:', query.sql);
           expect(query.sql).match(
             /select.*testTable.*where.*c3.*=.*and.*c4.*=.*or.*c3.*and.*c4.*/,
           );

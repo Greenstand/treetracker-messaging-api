@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: treetracker-messaging-api
   labels:
-    app: treetracker-messaging-api 
+    app: treetracker-messaging-api
 spec:
   replicas: 1
   selector:
@@ -18,14 +18,14 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: doks.digitalocean.com/node-pool
-                operator: In
-                values:
-                - microservices-node-pool
+              - matchExpressions:
+                  - key: doks.digitalocean.com/node-pool
+                    operator: In
+                    values:
+                      - microservices-node-pool
       containers:
       - name: treetracker-messaging-api
-        image: greenstand/treetracker-messaging-api:TAG
+        image: greenstand/treetracker-messaging-api:VERSION
         ports:
         - containerPort: 80
         env:
@@ -36,3 +36,6 @@ spec:
                 key: db
           - name: DATABASE_SCHEMA
             value: messaging
+      imagePullSecrets:
+        - name: greenstand-docker-secret
+

@@ -1,19 +1,19 @@
+const log = require('loglevel');
 const { v4: uuid } = require('uuid');
-const axios = require('axios').default;
+const HttpError = require('../utils/HttpError');
 
-const HttpError = require('../utils/HttpError'); // Move to handler
-const { getAuthorId } = require('../handlers/helpers');
+const { getAuthorId } = require('./Author');
 
+const Survey = require('./Survey');
+
+const ContentRepository = require('../repositories/ContentRepository');
 const MessageRepository = require('../repositories/MessageRepository');
-const MessageDeliveryRepository = require('../repositories/MessageDeliveryRepository');
-const RegionRepository = require('../repositories/RegionRepository');
-const SurveyRepository = require('../repositories/SurveyRepository');
+const BulkMessageRepository = require('../repositories/BulkMessageRepository');
 const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
-
-const Session = require('./Session');
 
 const Message = async ({
   id,
+  type,
   parent_message_id,
   author_handle,
   recipient_handle,
@@ -43,66 +43,43 @@ const Message = async ({
     };
   }
 
-  const to = [];
-
-  if (recipient_handle) {
-    to.push({ recipient: recipient_handle, type: 'user' });
-  }
-
-  if (recipient_organization_id) {
-    // get organization name
-    const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
-    const organizationResponse = await axios.get(
-      `${stakeholderUrl}?id=${recipient_organization_id}`,
-    );
-
-    to.push({
-      recipient: organizationResponse.data.stakeholders[0]?.name,
-      type: 'organization',
-    });
-  }
-
-  if (recipient_region_id) {
-    // get region name
-    const session = new Session();
-    const regionRepo = new RegionRepository(session);
-    const regionInfo = await regionRepo.getById(recipient_region_id);
-
-    to.push({ recipient: regionInfo.name, type: 'region' });
-  }
-
-  return Object.freeze({
+  const rval = {
     id,
+    type,
     parent_message_id,
     title,
-    from: { author: author_handle, type: 'user' },
-    to,
+    from: author_handle,
+    to: recipient_handle,
+    recipient_organization_id,
+    recipient_region_id,
     subject,
     body,
     composed_at,
     video_link,
     survey,
-  });
+  };
+
+  return Object.freeze(rval);
 };
 
-const MessageObject = ({
+const ContentObject = ({
   id = uuid(),
+  type = 'message',
   subject,
   body,
   composed_at = new Date().toISOString(),
   survey_id = null,
   survey_response,
-  title = null,
   video_link = null,
   author_id,
   active = true,
 }) =>
   Object.freeze({
     id,
+    type,
     created_at: new Date().toISOString(),
     subject,
     body,
-    title,
     composed_at,
     survey_id,
     survey_response: survey_response ? { survey_response } : null,
@@ -111,63 +88,41 @@ const MessageObject = ({
     active,
   });
 
-const MessageRequestObject = ({
+const BulkMessageObject = ({
   author_handle,
-  recipient_handle = null,
-  parent_message_id = null,
-  message_id,
+  content_id,
   region_id = null,
   organization_id = null,
 }) =>
   Object.freeze({
     id: uuid(),
     author_handle,
-    recipient_handle,
-    message_id,
-    parent_message_id,
+    content_id,
     recipient_region_id: region_id,
     recipient_organization_id: organization_id,
   });
 
-const MessageDeliveryObject = ({
-  parent_message_delivery_id = null,
-  message_id,
+const MessageObject = ({
+  parent_message_id = null,
+  content_id,
+  sender_id,
   recipient_id,
 }) =>
   Object.freeze({
     id: uuid(),
+    content_id,
     created_at: new Date().toISOString(),
-    parent_message_id: parent_message_delivery_id,
+    parent_message_id,
+    sender_id,
     recipient_id,
-    message_id,
-  });
-
-const SurveyObject = ({ survey }) =>
-  Object.freeze({
-    id: uuid(),
-    title: survey.title,
-    created_at: new Date().toISOString(),
-    active: true,
-  });
-
-const SurveyQuestionObject = ({ rank, prompt, choices, survey_id }) =>
-  Object.freeze({
-    id: uuid(),
-    survey_id,
-    rank,
-    prompt,
-    choices,
-    created_at: new Date().toISOString(),
   });
 
 const createMessage = async (session, body) => {
+  log.debug(body);
+  const contentRepo = new ContentRepository(session);
   const messageRepo = new MessageRepository(session);
-  const messageDeliveryRepo = new MessageDeliveryRepository(session);
-  const surveyRepo = new SurveyRepository(session);
-  const surveyQuestionRepo = new SurveyQuestionRepository(session);
 
   if (body.id) {
-    console.log(`check for existing ${body.id}`);
     const existingMessageArray = await messageRepo.getByFilter({
       id: body.id,
     });
@@ -183,184 +138,91 @@ const createMessage = async (session, body) => {
   // Get recipient id using recipient handle
   const recipient_id = await getAuthorId(body.recipient_handle, session, true);
 
+  // add content resource
+  const contentObject = ContentObject({ ...body, author_id });
+  const content = await contentRepo.create(contentObject);
+
   // add message resource
-  const messageObject = MessageObject({ ...body, author_id });
-  const message = await messageRepo.create(messageObject);
-
-  // add message_delivery resource
-
-  // if parent_message_id exists get the message_delivery_id for the parent message
-  let parent_message_delivery_id = null;
-  if (body.parent_message_id) {
-    parent_message_delivery_id =
-      await messageDeliveryRepo.getParentMessageDeliveryId(
-        body.parent_message_id,
-      );
-  }
-
-  const messageDeliveryObject = MessageDeliveryObject({
+  const messageObject = MessageObject({
     ...body,
-    message_id: message.id,
+    content_id: content.id,
+    sender_id: author_id,
     recipient_id,
-    parent_message_delivery_id,
   });
 
-  messageDeliveryRepo.create(messageDeliveryObject);
-
-  if (body.survey) {
-    // not currently supported by POST /message
-    const surveyObject = SurveyObject({ ...body.survey });
-    const survey = surveyRepo.create(surveyObject);
-
-    const survey_id = survey.id;
-
-    let rank = 1;
-
-    for (const { prompt, choices } of body.survey.questions) {
-      const surveyQuestionObject = SurveyQuestionObject({
-        survey_id,
-        prompt,
-        choices,
-        rank,
-      });
-      rank++;
-      surveyQuestionRepo.create(surveyQuestionObject);
-    }
-  }
+  await messageRepo.create(messageObject);
 };
 
-const createMessageResourse = async (messageRepo, requestBody, session) => {
-  let { survey_id } = requestBody;
+const createBulkMessage = async (session, requestBody, recipientHandles) => {
+  const contentRepo = new ContentRepository(session);
+  const messageRepo = new MessageRepository(session);
+  const bulkMessageRepo = new BulkMessageRepository(session);
+
+  let recipientIds = await Promise.all(
+    recipientHandles.map(async (row) => {
+      return getAuthorId(row, session, false);
+    }),
+  );
+  recipientIds = recipientIds.filter((n) => n);
+
+  if (recipientIds.length < 1)
+    throw new HttpError(
+      404,
+      'No author handles found for any of the growers found in the specified organization',
+    );
+
+  // If this has a survey object, create the survey
+  let type = 'announce';
+  let survey_id = null;
+  if (requestBody.survey) {
+    type = 'survey';
+    const survey = await Survey.createSurvey(session, requestBody.survey);
+    survey_id = survey.id;
+  }
+
+  // Insert content object
+  const author_id = await getAuthorId(requestBody.author_handle, session);
+  const contentObject = ContentObject({
+    ...requestBody,
+    survey_id,
+    author_id,
+    type,
+  });
+  const content = await contentRepo.create(contentObject);
+
+  // Insert bulk messageobject
   const { organization_id, region_id } = requestBody;
 
-  const groundUserRecipientIds = [];
-  let regionInfo;
-  if (organization_id) {
-    const groundUsersUrl = `${process.env.TREETRACKER_API_URL}/ground_users`; // this moves to the service
-
-    // get ground_users in the specified organization from the treetracker-api
-    const response = await axios.get(
-      `${groundUsersUrl}?organization_id=${organization_id}`,
-    );
-    const { ground_users } = response.data;
-    if (ground_users.length < 1) {
-      throw new HttpError(
-        422,
-        'No ground users found in the specified organization',
-      );
-    }
-    for (const { email, phone } of ground_users) {
-      let recipient_id;
-      if (email) {
-        recipient_id = await getAuthorId(email, session, false);
-      }
-      if (!recipient_id && phone) {
-        recipient_id = await getAuthorId(phone, session, false);
-      }
-      if (recipient_id) {
-        groundUserRecipientIds.push(recipient_id);
-      }
-    }
-
-    if (groundUserRecipientIds.length < 1)
-      throw new HttpError(
-        422,
-        'No author handles found for any of the ground users found in the specified organization',
-      );
-  }
-
-  if (region_id) {
-    const regionRepo = new RegionRepository(session);
-    regionInfo = await regionRepo.getById(region_id);
-  }
-
-  // IF this has a survey object, a message/send POST request
-  if (requestBody.survey) {
-    const surveyObject = SurveyObject({ ...requestBody });
-    const survey = await messageRepo.createForOtherTables(
-      surveyObject,
-      'survey',
-    );
-
-    survey_id = survey.id;
-
-    let rank = 1;
-
-    for (const { prompt, choices } of requestBody.survey.questions) {
-      const surveyQuestionObject = SurveyQuestionObject({
-        survey_id,
-        prompt,
-        choices,
-        rank,
-      });
-      rank++;
-      await messageRepo.createForOtherTables(
-        surveyQuestionObject,
-        'survey_question',
-      );
-    }
-  }
-
-  const messageObject = MessageObject({ ...requestBody, survey_id });
-  const message = await messageRepo.create(messageObject);
-
-  const messageRequestObject = MessageRequestObject({
+  const bulkMessageObject = BulkMessageObject({
     ...requestBody,
     organization_id,
     region_id,
-    message_id: message.id,
+    content_id: content.id,
   });
 
-  await messageRepo.createForOtherTables(
-    messageRequestObject,
-    'message_request',
-  );
+  await bulkMessageRepo.create(bulkMessageObject);
 
-  let parent_message_delivery_id = null;
-
-  // if parent_message_id exists get the message_delivery_id for the parent message
-  const messageDeliveryRepo = new MessageDeliveryRepository(session); // TODO: move to service
-  if (requestBody.parent_message_id) {
-    parent_message_delivery_id =
-      await messageDeliveryRepo.getParentMessageDeliveryId(
-        requestBody.parent_message_id,
-      );
-  }
-
-  if (requestBody.recipient_id) {
-    const messageDeliveryObject = MessageDeliveryObject({
-      ...requestBody,
-      message_id: message.id,
-      parent_message_delivery_id,
-    });
-    await messageRepo.createForOtherTables(
-      messageDeliveryObject,
-      'message_delivery',
-    );
-    return;
-  }
-
-  if (organization_id) {
-    // create message_delivery for each of the ground users' recipientIds
-    for (const recipientId of groundUserRecipientIds) {
-      const messageDeliveryObject = MessageDeliveryObject({
+  await Promise.all(
+    recipientIds.map(async (recipientId) => {
+      const messageObject = MessageObject({
         ...requestBody,
-        message_id: message.id,
-        parent_message_delivery_id,
+        content_id: content.id,
+        sender_id: author_id,
         recipient_id: recipientId,
       });
-      await messageRepo.createForOtherTables(
-        messageDeliveryObject,
-        'message_delivery',
-      );
-    }
-  }
+      await messageRepo.create(messageObject);
+    }),
+  );
 
-  if (region_id) {
-    // Get all recipients by region_id
-    // create message_delivery for each of them
-    // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
-  }
+  // if (region_id) {
+  //   const regionRepo = new RegionRepository(session);
+  //   regionInfo = await regionRepo.getById(region_id);
+  // }
+  // if (region_id) {
+  //   // Get all recipients by region_id
+  //   // create message_delivery for each of them
+  //   // add return statement to prevent message_delivery being created for recipient_id, since that wasn't initially defined
+  // }
 };
 
 const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
@@ -372,13 +234,49 @@ const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
   };
 };
 
-const QueryOptions = ({ limit = undefined, offset = undefined }) => {
-  return Object.entries({ limit, offset })
-    .filter((entry) => entry[1] !== undefined)
-    .reduce((result, item) => {
-      result[item[0]] = item[1];
-      return result;
-    }, {});
+const getMessages = async (session, filterCriteria = undefined) => {
+  log.info('getMessages');
+
+  const messageRepo = new MessageRepository(session);
+
+  let filter = {};
+  const options = {
+    limit: filterCriteria.limit,
+    offset: filterCriteria.offset,
+  };
+
+  let author_id;
+  if (!filterCriteria.messageId) {
+    author_id = await getAuthorId(filterCriteria.author_handle, session);
+  }
+  filter = FilterCriteria({
+    ...filterCriteria,
+    author_id,
+  });
+
+  log.info('getMessages');
+  const messages = await messageRepo.getMessages(filter, options);
+  return Promise.all(
+    messages.map(async (row) => {
+      let questionsArray = null;
+      if (row.survey_id != null) {
+        const surveyQuesetionRepo = new SurveyQuestionRepository(session);
+        const questions = await surveyQuesetionRepo.getQuestionsForSurvey(
+          row.survey_id,
+        );
+        questionsArray = await Promise.all(
+          questions.map(async (question) => {
+            return {
+              prompt: question.prompt,
+              choices: question.choices,
+            };
+          }),
+        );
+      }
+
+      return Message({ ...row, questions: questionsArray });
+    }),
+  );
 };
 
 const getMessages =
@@ -433,11 +331,30 @@ const getSurveyReport = async (messageRepository, surveyId) => {
     });
 
   return surveyReports;
+
+const getMessagesCount = async (session, filterCriteria = undefined) => {
+  log.info('getMessagesCount');
+  const messageRepo = new MessageRepository(session);
+
+  let author_id;
+
+  if (!filterCriteria.messageId) {
+    author_id = await getAuthorId(filterCriteria.author_handle, session);
+  }
+
+  let filter = {};
+  filter = FilterCriteria({
+    ...filterCriteria,
+    author_id,
+  });
+
+  return messageRepo.getMessagesCount(filter);
 };
 
 module.exports = {
   createMessage,
-  createMessageResourse,
+  createBulkMessage,
   getMessages,
   getSurveyReport,
+  getMessagesCount,
 };
