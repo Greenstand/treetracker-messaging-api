@@ -98,23 +98,6 @@ class MessageRepository extends BaseRepository {
     return +result[0].count;
   }
 
-  async getSurveyResponse(surveyId) {
-    const result = await this._session
-      .getDB()
-      .raw(`
-        SELECT
-          survey_id,
-          survey_response
-        FROM
-          message
-        WHERE
-          message.survey_id = ?
-          `
-        , [surveyId]
-      );
-    log.warn("result:", result);
-    return result.rows;
-  }
 }
 
 module.exports = MessageRepository;

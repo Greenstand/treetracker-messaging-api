@@ -43,6 +43,39 @@ const createSurvey = async (session, body) => {
   return survey;
 };
 
+const getSurveyReport = async (surveyRepository, surveyQuestionRepository, surveyId) => {
+  const surveyResponses = await surveyRepository.getSurveyResponse(surveyId);
+  const survey = await surveyRepository.getById(surveyId);
+  const questions = await surveyQuestionRepository.getQuestionsForSurvey(surveyId);
+  const responses = surveyResponses.reduce((a, c) => {
+    for (let i = 0; i < c.survey_response.length; i++) {
+      const e = c.survey_response[i];
+      if (a[i] === undefined) { a[i] = {}; }
+      if (a[i][e] === undefined) { a[i][e] = 0; }
+      a[i][e] += 1;
+    };
+    return a;
+  }, [])
+    .map(counter => {
+      return {
+        labels: [...Object.keys(counter)],
+        datasets: [{
+          label: "-",
+          data: [...Object.values(counter)],
+        }]
+      }
+    });
+
+  const result = {
+    ...survey,
+    questions,
+    responses,
+  }
+
+  return result;
+}
+
 module.exports = {
   createSurvey,
+  getSurveyReport,
 };

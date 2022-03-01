@@ -5,12 +5,13 @@ const recipientId = authorSeed.author_two_id;
 const authorId = authorSeed.author_one_id;
 const messageId = uuid();
 const surveyId = uuid();
+const title = 'Number of trees planted today';
 
 const seed = async function (knex) {
   
   const survey = {
     id: surveyId,
-    title: 'Number of trees planted today',
+    title,
   }
   await knex('survey').insert(survey).returning('id');
 
@@ -27,6 +28,7 @@ const seed = async function (knex) {
     author_id: authorId,
     subject: 'Number of trees planted today',
     survey_id: surveyId,
+    survey_response: JSON.stringify(['1']),
     composed_at: '2022-01-22',
   };
   const contentId = (await knex('content')
@@ -48,5 +50,6 @@ module.exports = {
   authorHandle: authorSeed.author_one_handle,
   recipientHandle: authorSeed.author_two_handle,
   messageId,
-  surveyId
+  surveyId,
+  title,
 }

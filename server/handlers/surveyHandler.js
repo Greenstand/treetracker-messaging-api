@@ -1,24 +1,27 @@
 const Joi = require('joi');
 
+const log = require('loglevel');
 const Session = require('../models/Session');
-const MessageRepository = require('../repositories/MessageRepository');
-const model = require("../models/Message");
-
-
-
+const SurveyRepository = require('../repositories/SurveyRepository');
+const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
+const model = require('../models/Survey');
 
 const get = async (req, res, next) => {
   await Joi.object({
     uuid: Joi.string().required(),
   }).unknown(false).validateAsync(req.params, { abortEarly: false });
   const session = new Session();
-  const messageRepository = new MessageRepository(session);
+  const surveyRepository = new SurveyRepository(session);
+  const surveyQuestionRepository = new SurveyQuestionRepository(session);
 
   try {
-    const result = await model.getSurveyReport(messageRepository, req.params.uuid);
+    const result = await model.getSurveyReport(
+      surveyRepository, 
+      surveyQuestionRepository, 
+      req.params.uuid);
     res.status(200).send(result);
   } catch (e) {
-    console.log(e);
+    log.log(e);
     if (session.isTransactionInProgress()) {
       await session.rollbackTransaction();
     }

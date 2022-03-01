@@ -5,94 +5,105 @@ const { expect } = require('chai');
 const request = require('supertest');
 const { v4: uuid } = require('uuid');
 const jestExpect = require('expect');
+const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
+const authorSeed = require('../database/seeds/01_table_author');
+const log = require('loglevel');
 
-describe("Survey get API", function () {
+describe.only("Survey get API", function () {
 
   this.beforeEach(async () => {
-    await knex.raw('TRUNCATE TABLE message, survey_question, survey, author CASCADE');
+    await databaseCleaner.seed(knex);
+    await authorSeed.seed(knex);
   });
 
   it("Get /survey/:uuid", async () => {
 
     // prepare the data
-    const authorId = uuid();
-    const surveyId = uuid();
-    const response1 = {
-      "survey_response": ["My House", "10 Trees"],
-    }
-    const response2 = {
-      "survey_response": ["My House", "11 Trees"],
-    }
-    await knex.raw(`
-      INSERT INTO "author" (id, handle, created_at)
-      VALUES ('${authorId}', 'handler', now()) 
-      RETURNING id
-      `);
-    await knex.raw(`
-      INSERT INTO "survey" (id, title, created_at, active)
-      VALUES ('${surveyId}', 'title', now(), true) 
-      RETURNING id
-      `);
-    await knex.raw(`
-      INSERT INTO "message" (
-        "id",
-        "author_id",
-        "subject",
-        "body",
-        "survey_id",
-        "survey_response",
-        "composed_at",
-        "created_at",
-        "active",
-        "title"
-      )
-      VALUES 
-      (
-        uuid_generate_v4(),
-        '${authorId}',
-        'subject',
-        'body',
-        '${surveyId}',
-        '${JSON.stringify(response1)}',
-        now(),
-        now(),
-        true,
-        'title'
-      ),(
-        uuid_generate_v4(),
-        '${authorId}',
-        'subject',
-        'body',
-        '${surveyId}',
-        '${JSON.stringify(response2)}',
-        now(),
-        now(),
-        true,
-        'title'
-      );
-          `);
+    const surveySeed = require('../database/seeds/12_story_survey');
+    await surveySeed.seed(knex);
+
+    // const authorId = uuid();
+    // const surveyId = uuid();
+    // const response1 = {
+    //   "survey_response": ["My House", "10 Trees"],
+    // }
+    // const response2 = {
+    //   "survey_response": ["My House", "11 Trees"],
+    // }
+    // await knex.raw(`
+    //   INSERT INTO "author" (id, handle, created_at)
+    //   VALUES ('${authorId}', 'handler', now()) 
+    //   RETURNING id
+    //   `);
+    // await knex.raw(`
+    //   INSERT INTO "survey" (id, title, created_at, active)
+    //   VALUES ('${surveyId}', 'title', now(), true) 
+    //   RETURNING id
+    //   `);
+    // await knex.raw(`
+    //   INSERT INTO "message" (
+    //     "id",
+    //     "author_id",
+    //     "subject",
+    //     "body",
+    //     "survey_id",
+    //     "survey_response",
+    //     "composed_at",
+    //     "created_at",
+    //     "active",
+    //     "title"
+    //   )
+    //   VALUES 
+    //   (
+    //     uuid_generate_v4(),
+    //     '${authorId}',
+    //     'subject',
+    //     'body',
+    //     '${surveyId}',
+    //     '${JSON.stringify(response1)}',
+    //     now(),
+    //     now(),
+    //     true,
+    //     'title'
+    //   ),(
+    //     uuid_generate_v4(),
+    //     '${authorId}',
+    //     'subject',
+    //     'body',
+    //     '${surveyId}',
+    //     '${JSON.stringify(response2)}',
+    //     now(),
+    //     now(),
+    //     true,
+    //     'title'
+    //   );
+    //       `);
 
     await request(server)
-      .get(`/survey/${surveyId}`)
+      .get(`/survey/${surveySeed.surveyId}`)
       .set('Accept', 'application/json')
       .expect(200)
       .then(res => {
-        console.warn("res.body :", res.body);
-        jestExpect(res.body).toMatchObject([
+        log.warn("res.body :", res.body);
+        jestExpect(res.body).toMatchObject({
+          id: surveySeed.surveyId,
+          title: surveySeed.title,
+          questions: [
+            {
+              prompt: "How many trees did you plant today?",
+              choices: ['1', '10', '1000'],
+            }
+          ],
+          responses: [
           {
-            labels: ["My House"],
+            labels: ["1"],
             datasets: [{
               label: "-",
-              data: [2]
+              data: [1]
             }]
           },
-          {
-            labels: ["10 Trees", "11 Trees"],
-            datasets: [{
-              label: "-",
-              data: [1, 1]
-            }]
-          }]);
+        ]
+      });
       });
 
   });

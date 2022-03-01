@@ -279,59 +279,6 @@ const getMessages = async (session, filterCriteria = undefined) => {
   );
 };
 
-const getMessages =
-  (session) =>
-    async (filterCriteria = undefined) => {
-      const messageRepo = new MessageRepository(session);
-
-      let filter = {};
-      let options = { limit: 100, offset: 0 };
-
-      let author_id;
-      if (!filterCriteria.messageId) {
-        author_id = await getAuthorId(filterCriteria.author_handle, session);
-      }
-      filter = FilterCriteria({
-        ...filterCriteria,
-        author_id,
-      });
-      options = { ...options, ...QueryOptions({ ...filterCriteria }) };
-
-      const messages = await messageRepo.getMessages(filter, options);
-      return {
-        messages: await Promise.all(
-          messages.map(async (row) => {
-            return Message({ ...row });
-          }),
-        ),
-        options,
-      };
-    };
-
-const getSurveyReport = async (messageRepository, surveyId) => {
-  const surveyResponses = await messageRepository.getSurveyResponse(surveyId);
-  const surveyReports = surveyResponses.reduce((a, c) => {
-    const { survey_response } = c.survey_response;
-    for (let i = 0; i < survey_response.length; i++) {
-      const e = survey_response[i];
-      if (a[i] === undefined) { a[i] = {}; }
-      if (a[i][e] === undefined) { a[i][e] = 0; }
-      a[i][e] += 1;
-    };
-    return a;
-  }, [])
-    .map(counter => {
-      return {
-        labels: [...Object.keys(counter)],
-        datasets: [{
-          label: "-",
-          data: [...Object.values(counter)],
-        }]
-      }
-    });
-
-  return surveyReports;
-
 const getMessagesCount = async (session, filterCriteria = undefined) => {
   log.info('getMessagesCount');
   const messageRepo = new MessageRepository(session);
@@ -351,10 +298,11 @@ const getMessagesCount = async (session, filterCriteria = undefined) => {
   return messageRepo.getMessagesCount(filter);
 };
 
+
+
 module.exports = {
   createMessage,
   createBulkMessage,
   getMessages,
-  getSurveyReport,
   getMessagesCount,
 };
