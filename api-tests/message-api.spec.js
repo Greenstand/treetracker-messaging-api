@@ -18,6 +18,16 @@ const knex = require('../server/database/knex');
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
 
+const stubStakeholder = (stakeholderPayload) => {
+  return sinon.stub(axios, 'get').callsFake(async (_url) => {
+    return {
+      data: {
+        stakeholders: [stakeholderPayload],
+      },
+    };
+  });
+};
+
 
 describe('Message API tests.', () => {
   before(async function () {
@@ -107,7 +117,7 @@ describe('Message API tests.', () => {
         recipient_handle: authorSeed.author_one_handle,
         author_handle: authorSeed.author_two_handle,
         subject: uuid(),
-        type: 'survey',
+        type: 'message',
         body: 'Check in to get your trees',
         // composed_at: new Date().toISOString(),
       };
@@ -125,21 +135,13 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(200);
       log.debug(res.body);
-      console.log(
-        'THIS IS IT -----------------------> ',
-        {
-          subject: messagePostObject.subject,
-          from: authorSeed.author_two_handle,
-          to: authorSeed.author_one_handle,
-        },
-        res.body[0],
-      );
+
       expect(res.body.messages).to.be.an('array').that.contains.something.like({
         subject: messagePostObject.subject,
         from: authorSeed.author_two_handle,
         to: authorSeed.author_one_handle,
       });
-
+      
       const res2 = await request(server)
         .get(`/message`)
         .query({
@@ -154,6 +156,7 @@ describe('Message API tests.', () => {
           from: authorSeed.author_two_handle,
           to: authorSeed.author_one_handle,
         });
+
     });
 
     it(`Should respond to a survey`, async function () {
@@ -195,7 +198,7 @@ describe('Message API tests.', () => {
         });
     });
 
-    it(`Should  get an announce message`, async function () {
+    it(`Should get an announce message`, async function () {
       const announceSeed = require('../database/seeds/11_story_announce');
       await announceSeed.seed(knex);
 

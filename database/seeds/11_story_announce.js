@@ -2,7 +2,7 @@ const { v4: uuid } = require('uuid');
 const authorSeed = require('./01_table_author');
 
 const authorId = authorSeed.author_one_id;
-const recipient_organization_id = '8b2628b3-733b-4962-943d-95ebea918c9d'; // for 'test1' organization
+const recipientId = authorSeed.author_two_id;
 const messageId = uuid();
 const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakeholder-api seed
 const organizationName = 'Greenstance';
@@ -29,8 +29,7 @@ const seed = async function (knex) {
     id: messageId,
     content_id: contentId,
     sender_id: authorId,
-    recipient_region_id: undefined,
-    recipient_organization_id,
+    recipient_id: recipientId
   };
   await knex('message').insert(message).returning('id');
 };
