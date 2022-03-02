@@ -1,3 +1,10 @@
+## [1.8.16](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.15...v1.8.16) (2022-03-02)
+
+
+### Bug Fixes
+
+* add api dependencies to deployment ([b5d1fb6](https://github.com/Greenstand/treetracker-messaging-api/commit/b5d1fb6f753302ff4934941668a4806dc7575c63))
+
 ## [1.8.15](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.14...v1.8.15) (2022-03-02)
 
 
