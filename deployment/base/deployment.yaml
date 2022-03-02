@@ -36,6 +36,10 @@ spec:
                 key: db
           - name: DATABASE_SCHEMA
             value: messaging
+          - name: TREETRACKER_STAKEHOLDER_API_URL
+            value: http://treetracker-stakeholder-api.stakeholder-api:80
+          - name: TREETRACKER_API_URL
+            value: http://treetracker-api.treetracker-api:80
       imagePullSecrets:
         - name: greenstand-docker-secret
 
