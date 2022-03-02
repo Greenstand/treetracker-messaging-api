@@ -1,3 +1,10 @@
+## [1.8.17](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.16...v1.8.17) (2022-03-02)
+
+
+### Bug Fixes
+
+* allow composed_at ([172503f](https://github.com/Greenstand/treetracker-messaging-api/commit/172503fa3f475ae8b93a7d1cde2395a3ce3ffd34))
+
 ## [1.8.16](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.15...v1.8.16) (2022-03-02)
 
 
