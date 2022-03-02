@@ -1,3 +1,10 @@
+## [1.8.13](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.12...v1.8.13) (2022-03-02)
+
+
+### Bug Fixes
+
+* annouce message recipients detail ([df6f8c6](https://github.com/Greenstand/treetracker-messaging-api/commit/df6f8c605db0935da47de8a3bd2e1a3b5a4405a4))
+
 ## [1.8.12](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.11...v1.8.12) (2022-03-02)
 
 
