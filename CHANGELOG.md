@@ -1,3 +1,10 @@
+## [1.8.12](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.11...v1.8.12) (2022-03-02)
+
+
+### Bug Fixes
+
+* move prod to production ([97e196c](https://github.com/Greenstand/treetracker-messaging-api/commit/97e196c0a2a7e884e7227af0c39472bf2ed1f2f3))
+
 ## [1.8.11](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.10...v1.8.11) (2022-03-02)
 
 
