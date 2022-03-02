@@ -1,3 +1,24 @@
+## [1.8.12](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.11...v1.8.12) (2022-03-02)
+
+
+### Bug Fixes
+
+* move prod to production ([97e196c](https://github.com/Greenstand/treetracker-messaging-api/commit/97e196c0a2a7e884e7227af0c39472bf2ed1f2f3))
+
+## [1.8.11](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.10...v1.8.11) (2022-03-02)
+
+
+### Bug Fixes
+
+* setup overlay for production deployment ([5464b36](https://github.com/Greenstand/treetracker-messaging-api/commit/5464b366085d8b7dc891293de2027525b75419a1))
+
+## [1.8.10](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.9...v1.8.10) (2022-03-02)
+
+
+### Bug Fixes
+
+* update sealed secret ([025f2df](https://github.com/Greenstand/treetracker-messaging-api/commit/025f2df2aadaed6e3675bc90284c43cc60b3c346))
+
 ## [1.8.9](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.8...v1.8.9) (2022-03-01)
 
 
