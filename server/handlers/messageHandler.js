@@ -17,6 +17,7 @@ const bulkMessagePostSchema = Joi.object({
   author_handle: Joi.string().required(),
   subject: Joi.string().required(),
   body: Joi.string(),
+  type: Joi.string().required(),
   video_link: Joi.string().allow(null, '').uri(),
   survey: Joi.object({
     questions: Joi.array()
@@ -36,13 +37,12 @@ const bulkMessagePostSchema = Joi.object({
   .oxor('recipient_handle', 'organization_id');
 
 const messagePostSchema = Joi.object({
-  id: Joi.string().uuid(),
   parent_message_id: Joi.string().uuid(),
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
-  subject: Joi.string().required(),
+  subject: Joi.string().allow(null, '').required(),
+  type: Joi.string().required(),
   body: Joi.string(),
-  composed_at: Joi.date().iso().required(),
   survey_id: Joi.string().uuid(),
   survey_response: Joi.array().items(Joi.string()),
   video_link: Joi.string().allow(null, '').uri(),
@@ -150,6 +150,8 @@ const bulkMessagePost = async (req, res, next) => {
     }
 
     await createBulkMessage(req.body);
+    // No author handles found for any of the growers found in the specified organization
+
     res.status(204).send();
     res.end();
   } catch (e) {
