@@ -17,8 +17,9 @@ const getMessages = async (filter) => {
         newRow.bulk_message_recipients = [];
       }
 
-      if (row.organization_id) {
-        const orgName = StakeholderService.getOrganizationName(
+      if (row.recipient_organization_id) {
+        log.debug("contacting stakeholder");
+        const orgName = await StakeholderService.getOrganizationName(
           row.recipient_organization_id,
         );
         newRow.bulk_message_recipients.push({
@@ -37,7 +38,7 @@ const getMessages = async (filter) => {
       //   bulk_message_recipients.push({ recipient: regionInfo.name, type: 'region' });
       // }
 
-      return row;
+      return newRow;
     }),
   );
   log.trace(messagesWithRecipientInfo);
