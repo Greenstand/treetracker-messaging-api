@@ -28,7 +28,6 @@ const stubStakeholder = (stakeholderPayload) => {
   });
 };
 
-
 describe('Message API tests.', () => {
   before(async function () {
     await databaseCleaner.seed(knex);
@@ -130,7 +129,7 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -141,11 +140,11 @@ describe('Message API tests.', () => {
         from: authorSeed.author_two_handle,
         to: authorSeed.author_one_handle,
       });
-      
+
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -156,7 +155,6 @@ describe('Message API tests.', () => {
           from: authorSeed.author_two_handle,
           to: authorSeed.author_one_handle,
         });
-
     });
 
     it(`Should respond to a survey`, async function () {
@@ -182,7 +180,7 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: surveySeed.authorHandle,
+          handle: surveySeed.authorHandle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -202,35 +200,38 @@ describe('Message API tests.', () => {
       const announceSeed = require('../database/seeds/11_story_announce');
       await announceSeed.seed(knex);
 
-      const axiosStub = stubStakeholder({ org_name: announceSeed.organizationName });
+      const axiosStub = stubStakeholder({
+        org_name: announceSeed.organizationName,
+      });
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: announceSeed.recipientHandle
+          handle: announceSeed.recipientHandle,
         })
         .set('Accept', 'application/json')
-        .expect(200);  
-    
+        .expect(200);
+
       log.debug(res.body.messages);
-      res.body.messages.forEach( it => {
-        log.debug(it.bulk_message_recipients)
-      })
+      res.body.messages.forEach((it) => {
+        log.debug(it.bulk_message_recipients);
+      });
 
       axiosStub.restore();
 
-      expect(res.body.messages).to.be.an('array')
-      .that.contains.something.like({
-        from: announceSeed.authorHandle,
-        to: announceSeed.recipientHandle,
-        recipient_organization_id: announceSeed.organizationId,
-        bulk_message_recipients: [
-          {
-            recipient: announceSeed.organizationName,
-            type: 'organization',
-          }
-        ]
-      });
+      expect(res.body.messages)
+        .to.be.an('array')
+        .that.contains.something.like({
+          from: announceSeed.authorHandle,
+          to: announceSeed.recipientHandle,
+          recipient_organization_id: announceSeed.organizationId,
+          bulk_message_recipients: [
+            {
+              recipient: announceSeed.organizationName,
+              type: 'organization',
+            },
+          ],
+        });
     });
   });
 
@@ -260,12 +261,12 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand" });
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -278,20 +279,18 @@ describe('Message API tests.', () => {
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
 
       stakeholderStub.restore();
 
-      expect(res.body.messages)
-        .to.be.an('array')
-        .that.contains.something.like({
-          subject: messageSendPostObject.subject,
-          from: authorSeed.author_one_handle,
-          to: null,
-        });
+      expect(res.body.messages).to.be.an('array').that.contains.something.like({
+        subject: messageSendPostObject.subject,
+        from: authorSeed.author_one_handle,
+        to: null,
+      });
 
       expect(res2.body.messages)
         .to.be.an('array')
@@ -300,7 +299,6 @@ describe('Message API tests.', () => {
           from: authorSeed.author_one_handle,
           to: authorSeed.author_two_handle,
         });
-
     });
 
     it(`Should send an announce message to multiple recipients in an organization`, async function () {
@@ -332,12 +330,12 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand" });
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -350,7 +348,7 @@ describe('Message API tests.', () => {
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -365,7 +363,7 @@ describe('Message API tests.', () => {
       const res3 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_three_handle,
+          handle: authorSeed.author_three_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -380,7 +378,7 @@ describe('Message API tests.', () => {
       const res4 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_four_handle,
+          handle: authorSeed.author_four_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -429,13 +427,12 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand" });
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -489,14 +486,12 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-
-
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand"})
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -509,8 +504,8 @@ describe('Message API tests.', () => {
           to: authorSeed.author_two_handle,
           survey: { title: messageSendPostObject.survey.title },
         });
-      
-        stakeholderStub.restore();
+
+      stakeholderStub.restore();
     });
   });
 
@@ -523,13 +518,12 @@ describe('Message API tests.', () => {
     });
 
     it(`Should get messages successfully`, async () => {
-
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand"})
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -569,13 +563,12 @@ describe('Message API tests.', () => {
     });
 
     it('Should get messages with limit, offset', async () => {
-
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand"})
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
           limit: 1,
           offset: 1,
         })
@@ -588,13 +581,12 @@ describe('Message API tests.', () => {
     });
 
     it('Should get messages without limit', async () => {
-
-      const stakeholderStub = stubStakeholder({ org_name: "Greenstand"})
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -606,7 +598,7 @@ describe('Message API tests.', () => {
       await request(server)
         .get(`/message/${messagesSeed.messageId1}`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .expect(200);
     });

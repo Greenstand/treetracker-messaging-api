@@ -388,7 +388,7 @@ describe('Message API Request Validation tests.', () => {
       const _res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: 'author_handle@!@#@!@#@',
+          handle: 'author_handle@!@#@!@#@',
         })
         .set('Accept', 'application/json')
         .expect(404);

@@ -49,7 +49,7 @@ const messagePostSchema = Joi.object({
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({
-  author_handle: Joi.string().required(),
+  handle: Joi.string().required(),
   limit: Joi.number().integer().greater(0).less(501),
   offset: Joi.number().integer().greater(-1),
   since: Joi.date().iso(),
