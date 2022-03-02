@@ -1,3 +1,12 @@
+## [1.8.15](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.14...v1.8.15) (2022-03-02)
+
+
+### Bug Fixes
+
+* change author_handle query parameter to handle ([992024c](https://github.com/Greenstand/treetracker-messaging-api/commit/992024c5ccc435214e3d525ae81d6e99a07d5f51))
+* merge conflicts ([733e111](https://github.com/Greenstand/treetracker-messaging-api/commit/733e111fc52393c49026eb2dfc2a8d92c940f981))
+* merge conflicts ([d626747](https://github.com/Greenstand/treetracker-messaging-api/commit/d6267477e411ec8e5b2d289091c528f29c5fa38b))
+
 ## [1.8.14](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.13...v1.8.14) (2022-03-02)
 
 
