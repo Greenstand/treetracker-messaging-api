@@ -18,6 +18,16 @@ const knex = require('../server/database/knex');
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
 
+const stubStakeholder = (stakeholderPayload) => {
+  return sinon.stub(axios, 'get').callsFake(async (_url) => {
+    return {
+      data: {
+        stakeholders: [stakeholderPayload],
+      },
+    };
+  });
+};
+
 describe('Message API tests.', () => {
   before(async function () {
     await databaseCleaner.seed(knex);
@@ -180,9 +190,42 @@ describe('Message API tests.', () => {
         });
     });
 
-    it.skip(`Should respond to an announce message`, async function () {
-      const seeder = require('../database/seeds/11_story_announce');
-      await seeder.seed(knex);
+    it(`Should  get an announce message`, async function () {
+      const announceSeed = require('../database/seeds/11_story_announce');
+      await announceSeed.seed(knex);
+
+      const axiosStub = stubStakeholder({
+        org_name: announceSeed.organizationName,
+      });
+
+      const res = await request(server)
+        .get(`/message`)
+        .query({
+          handle: announceSeed.recipientHandle,
+        })
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      log.debug(res.body.messages);
+      res.body.messages.forEach((it) => {
+        log.debug(it.bulk_message_recipients);
+      });
+
+      axiosStub.restore();
+
+      expect(res.body.messages)
+        .to.be.an('array')
+        .that.contains.something.like({
+          from: announceSeed.authorHandle,
+          to: announceSeed.recipientHandle,
+          recipient_organization_id: announceSeed.organizationId,
+          bulk_message_recipients: [
+            {
+              recipient: announceSeed.organizationName,
+              type: 'organization',
+            },
+          ],
+        });
     });
   });
 
@@ -211,6 +254,8 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+
       const res = await request(server)
         .get(`/message`)
         .query({
@@ -218,11 +263,6 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(200);
-      expect(res.body.messages).to.be.an('array').that.contains.something.like({
-        subject: messageSendPostObject.subject,
-        from: authorSeed.author_one_handle,
-        to: null,
-      });
 
       const res2 = await request(server)
         .get(`/message`)
@@ -231,6 +271,15 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(200);
+
+      stakeholderStub.restore();
+
+      expect(res.body.messages).to.be.an('array').that.contains.something.like({
+        subject: messageSendPostObject.subject,
+        from: authorSeed.author_one_handle,
+        to: null,
+      });
+
       expect(res2.body.messages)
         .to.be.an('array')
         .that.contains.something.like({
@@ -267,6 +316,8 @@ describe('Message API tests.', () => {
         .expect(204);
 
       axiosStub.restore();
+
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
@@ -325,6 +376,8 @@ describe('Message API tests.', () => {
           from: authorSeed.author_one_handle,
           to: authorSeed.author_four_handle,
         });
+
+      stakeholderStub.restore();
     });
 
     it(`Should send a survey message`, async function () {
@@ -360,6 +413,8 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+
       const res = await request(server)
         .get(`/message`)
         .query({
@@ -379,6 +434,8 @@ describe('Message API tests.', () => {
             questions: [{ prompt: 'What is the capital of atlantis?' }],
           },
         });
+
+      stakeholderStub.restore();
     });
 
     it(`Send a survey message and recipient should recieve it`, async function () {
@@ -414,6 +471,8 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+
       const res = await request(server)
         .get(`/message`)
         .query({
@@ -430,6 +489,8 @@ describe('Message API tests.', () => {
           to: authorSeed.author_two_handle,
           survey: { title: messageSendPostObject.survey.title },
         });
+
+      stakeholderStub.restore();
     });
   });
 
@@ -442,6 +503,8 @@ describe('Message API tests.', () => {
     });
 
     it(`Should get messages successfully`, async () => {
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+
       const res = await request(server)
         .get(`/message`)
         .query({
@@ -480,9 +543,13 @@ describe('Message API tests.', () => {
           ]);
         }
       });
+
+      stakeholderStub.restore();
     });
 
     it('Should get messages with limit, offset', async () => {
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+
       await request(server)
         .get(`/message`)
         .query({
@@ -495,9 +562,12 @@ describe('Message API tests.', () => {
 
       // expect(res.body.links.prev).to.equal("")
       // expect(res.body.links.next).to.equal("")
+      stakeholderStub.restore();
     });
 
-    it('Should get messages without', async () => {
+    it('Should get messages without limit', async () => {
+      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+
       await request(server)
         .get(`/message`)
         .query({
@@ -506,8 +576,7 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(200);
 
-      // expect(res.body.links.prev).to.equal("")
-      // expect(res.body.links.next).to.contain("")
+      stakeholderStub.restore();
     });
 
     it('Get message by id', async () => {
