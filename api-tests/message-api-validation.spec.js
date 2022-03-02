@@ -16,14 +16,15 @@ const author_one_handle = 'handle1';
 const author_two_handle = 'handle2';
 
 const MessagePostObject = {
-  id: 'd3b05f1b-c765-43f8-870d-4a3bb2ef277e',
+  // id: 'd3b05f1b-c765-43f8-870d-4a3bb2ef277e',
   // parent_message_id: existing_message.id,
   recipient_handle: author_two_handle,
   author_handle: author_one_handle,
   subject: 'Subject',
   body: 'Bodyyy',
+  type: 'message',
   // survey_id,
-  composed_at: new Date().toISOString(),
+  // composed_at: new Date().toISOString(),
   survey_response: ['answer 1'],
   video_link: 'https://www.string.com',
 };
@@ -32,6 +33,7 @@ const MessageSendPostObject = {
   author_handle: author_two_handle,
   subject: 'Subject of the message',
   body: 'Body of the message',
+  type: 'survey',
   survey: {
     questions: [
       {
@@ -100,7 +102,17 @@ describe('Message API Request Validation tests.', () => {
         .expect(422);
     });
 
-    it(`Should raise validation error with error code 422 -- composed_at is required `, async () => {
+    it(`Should raise validation error with error code 422 -- type is required `, async () => {
+      const messagePostObject = { ...MessagePostObject };
+      delete messagePostObject.type;
+      const _res = await request(server)
+        .post(`/message`)
+        .send(messagePostObject)
+        .set('Accept', 'application/json')
+        .expect(422);
+    });
+
+    it.skip(`Should raise validation error with error code 422 -- composed_at is required `, async () => {
       const messagePostObject = { ...MessagePostObject };
       delete messagePostObject.composed_at;
       const _res = await request(server)
@@ -110,7 +122,7 @@ describe('Message API Request Validation tests.', () => {
         .expect(422);
     });
 
-    it(`Should raise validation error with error code 422 -- composed_at should be date in iso format`, async () => {
+    it.skip(`Should raise validation error with error code 422 -- composed_at should be date in iso format`, async () => {
       const messagePostObject = { ...MessagePostObject };
       messagePostObject.composed_at = 'asdfasdfasdf';
       const _res = await request(server)
