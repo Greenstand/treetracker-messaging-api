@@ -1,3 +1,12 @@
+## [1.8.14](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.13...v1.8.14) (2022-03-02)
+
+
+### Bug Fixes
+
+* integration test working ([c9c265f](https://github.com/Greenstand/treetracker-messaging-api/commit/c9c265fb26144c3e877bbe69a6310525744f48ea))
+* Joi validation, dev script, announce seed, update tests ([7e59040](https://github.com/Greenstand/treetracker-messaging-api/commit/7e59040616e1dae3fb2ac325707b68f312ae466d))
+* update tests ([61b8774](https://github.com/Greenstand/treetracker-messaging-api/commit/61b87743d1b2a798bbdae80514cdf34f5a18d9e2))
+
 ## [1.8.13](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.12...v1.8.13) (2022-03-02)
 
 

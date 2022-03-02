@@ -1,6 +1,6 @@
 {
   "name": "treetracker",
-  "version": "1.8.13",
+  "version": "1.8.14",
   "private": true,
   "engines": {
     "node": ">=16.0.0 < 17",
@@ -18,7 +18,7 @@
     "test-integration-working": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit --timeout 30000 ./api-tests/${npm_config_test}.spec.js",
     "test-repository": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --exit --require co-mocha  ./server/repositories/**/*.spec.js",
     "server-test": "DEBUG=express:* NODE_LOG_LEVEL=debug nodemon server/serverTest.js",
-    "server": "NODE_ENV=dev nodemon server/server.js",
+    "server": "NODE_ENV=development nodemon server/server.js",
     "test-seedDB": "NODE_ENV=test mocha -r dotenv/config --env dotenv_config_path=.env.test --timeout 10000 --require co-mocha './**/*.spec.js'",
     "test-watch": "NODE_ENV=test NODE_LOG_LEVEL=info mocha -r dotenv/config --env dotenv_config_path=.env.test --timeout 10000 --require co-mocha -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed.spec.js' './__tests__/supertest.js'",
     "test-watch-debug": "NODE_ENV=test NODE_LOG_LEVEL=debug mocha -r dotenv/config --env dotenv_config_path=.env.test --timeout 10000 --require co-mocha -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed.spec.js' './__tests__/supertest.js'",

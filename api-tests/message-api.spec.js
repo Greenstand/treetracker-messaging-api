@@ -41,7 +41,8 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'Bodyyy',
-        composed_at: new Date().toISOString(),
+        type: 'message',
+        // composed_at: new Date().toISOString(),
       };
       await request(server)
         .post(`/message`)
@@ -69,7 +70,8 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'Body',
-        composed_at: new Date().toISOString(),
+        type: 'message',
+        // composed_at: new Date().toISOString(),
       };
       await request(server)
         .post(`/message`)
@@ -89,7 +91,8 @@ describe('Message API tests.', () => {
         parent_message_id: message[0].message_id,
         subject: uuid(),
         body: 'Body',
-        composed_at: new Date().toISOString(),
+        type: 'survey',
+        // composed_at: new Date().toISOString(),
         video_link: 'https://www.string.com',
       };
 
@@ -113,8 +116,9 @@ describe('Message API tests.', () => {
         recipient_handle: authorSeed.author_one_handle,
         author_handle: authorSeed.author_two_handle,
         subject: uuid(),
+        type: 'message',
         body: 'Check in to get your trees',
-        composed_at: new Date().toISOString(),
+        // composed_at: new Date().toISOString(),
       };
       await request(server)
         .post(`/message`)
@@ -130,6 +134,7 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(200);
       log.debug(res.body);
+
       expect(res.body.messages).to.be.an('array').that.contains.something.like({
         subject: messagePostObject.subject,
         from: authorSeed.author_two_handle,
@@ -161,9 +166,10 @@ describe('Message API tests.', () => {
         recipient_handle: surveySeed.authorHandle,
         parent_message_id: surveySeed.messageId,
         subject: 'Survey response',
+        type: 'survey',
         survey_id: surveySeed.surveyId,
         survey_response: ['1'],
-        composed_at: new Date().toISOString(),
+        // composed_at: new Date().toISOString(),
       };
       await request(server)
         .post(`/message`)
@@ -190,7 +196,7 @@ describe('Message API tests.', () => {
         });
     });
 
-    it(`Should  get an announce message`, async function () {
+    it(`Should get an announce message`, async function () {
       const announceSeed = require('../database/seeds/11_story_announce');
       await announceSeed.seed(knex);
 
@@ -235,6 +241,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
+        type: 'announce',
         organization_id: uuid(),
       };
 
@@ -263,6 +270,11 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(200);
+      expect(res.body.messages).to.be.an('array').that.contains.something.like({
+        subject: messageSendPostObject.subject,
+        from: authorSeed.author_one_handle,
+        to: null,
+      });
 
       const res2 = await request(server)
         .get(`/message`)
@@ -294,6 +306,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
+        type: 'announce',
         organization_id: uuid(),
       };
 
@@ -386,6 +399,7 @@ describe('Message API tests.', () => {
         subject: uuid(),
         body: 'This is a survey about trees',
         organization_id: uuid(),
+        type: 'survey',
         survey: {
           questions: [
             {
@@ -444,6 +458,7 @@ describe('Message API tests.', () => {
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
         organization_id: uuid(),
+        type: 'survey',
         survey: {
           questions: [
             {

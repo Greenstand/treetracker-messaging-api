@@ -1,15 +1,13 @@
 const { v4: uuid } = require('uuid');
 const authorSeed = require('./01_table_author');
 
-const recipientId = authorSeed.author_two_id;
 const authorId = authorSeed.author_one_id;
+const recipientId = authorSeed.author_two_id;
 const messageId = uuid();
 const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakeholder-api seed
 const organizationName = 'Greenstance';
 
 const seed = async function (knex) {
-
-
   const content = {
     type: 'announce',
     author_id: authorId,
@@ -17,9 +15,7 @@ const seed = async function (knex) {
     body: 'Reply to learn more',
     composed_at: '2022-01-22',
   };
-  const contentId = (await knex('content')
-    .insert(content)
-    .returning('id'))[0];
+  const contentId = (await knex('content').insert(content).returning('id'))[0];
 
   const bulkMessage = {
     author_handle: authorSeed.author_one_handle,
@@ -33,11 +29,10 @@ const seed = async function (knex) {
     id: messageId,
     content_id: contentId,
     sender_id: authorId,
-    recipient_id: recipientId,
+    recipient_id: recipientId
   };
   await knex('message').insert(message).returning('id');
-
-}
+};
 
 module.exports = {
   seed,
