@@ -7,7 +7,7 @@ const getOrganizationName = async (organizationId) => {
   const organizationResponse = await axios.get(
     `${stakeholderUrl}?id=${organizationId}`,
   );
-  return organizationResponse.data.stakeholders[0]?.name ?? organizationId;
+  return organizationResponse.data.stakeholders[0]?.org_name ?? organizationId;
 };
 
 module.exports = {
