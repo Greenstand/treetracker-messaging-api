@@ -18,7 +18,6 @@ const knex = require('../server/database/knex');
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
 
-
 describe('Message API tests.', () => {
   before(async function () {
     await databaseCleaner.seed(knex);
@@ -116,23 +115,21 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
       log.debug(res.body);
-      expect(res.body.messages)
-        .to.be.an('array')
-        .that.contains.something.like({
-          subject: messagePostObject.subject,
-          from: authorSeed.author_two_handle,
-          to: authorSeed.author_one_handle,
-        });
+      expect(res.body.messages).to.be.an('array').that.contains.something.like({
+        subject: messagePostObject.subject,
+        from: authorSeed.author_two_handle,
+        to: authorSeed.author_one_handle,
+      });
 
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -153,9 +150,9 @@ describe('Message API tests.', () => {
         author_handle: surveySeed.recipientHandle,
         recipient_handle: surveySeed.authorHandle,
         parent_message_id: surveySeed.messageId,
-        subject: "Survey response",
+        subject: 'Survey response',
         survey_id: surveySeed.surveyId,
-        survey_response: ["1"],
+        survey_response: ['1'],
         composed_at: new Date().toISOString(),
       };
       await request(server)
@@ -167,18 +164,19 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: surveySeed.authorHandle
+          handle: surveySeed.authorHandle,
         })
         .set('Accept', 'application/json')
-        .expect(200);  
-      
-      expect(res.body.messages).to.be.an('array')
+        .expect(200);
+
+      expect(res.body.messages)
+        .to.be.an('array')
         .that.contains.something.like({
           from: surveySeed.recipientHandle,
           to: surveySeed.authorHandle,
           survey: {
-            answers: ['1']
-          }
+            answers: ['1'],
+          },
         });
     });
 
@@ -216,22 +214,20 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
-      expect(res.body.messages)
-        .to.be.an('array')
-        .that.contains.something.like({
-          subject: messageSendPostObject.subject,
-          from: authorSeed.author_one_handle,
-          to: null,
-        });
+      expect(res.body.messages).to.be.an('array').that.contains.something.like({
+        subject: messageSendPostObject.subject,
+        from: authorSeed.author_one_handle,
+        to: null,
+      });
 
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -275,22 +271,20 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
-      expect(res.body.messages)
-        .to.be.an('array')
-        .that.contains.something.like({
-          subject: messageSendPostObject.subject,
-          from: authorSeed.author_one_handle,
-          to: null,
-        });
+      expect(res.body.messages).to.be.an('array').that.contains.something.like({
+        subject: messageSendPostObject.subject,
+        from: authorSeed.author_one_handle,
+        to: null,
+      });
 
       const res2 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -305,7 +299,7 @@ describe('Message API tests.', () => {
       const res3 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_three_handle,
+          handle: authorSeed.author_three_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -320,7 +314,7 @@ describe('Message API tests.', () => {
       const res4 = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_four_handle,
+          handle: authorSeed.author_four_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -369,7 +363,7 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -380,7 +374,10 @@ describe('Message API tests.', () => {
         .that.contains.something.like({
           from: authorSeed.author_one_handle,
           to: null,
-          survey: { title: messageSendPostObject.survey.title, questions: [ { prompt: 'What is the capital of atlantis?' } ]  },
+          survey: {
+            title: messageSendPostObject.survey.title,
+            questions: [{ prompt: 'What is the capital of atlantis?' }],
+          },
         });
     });
 
@@ -389,7 +386,7 @@ describe('Message API tests.', () => {
         author_handle: authorSeed.author_one_handle,
         subject: uuid(),
         body: 'This is an announcement to come pick up some trees',
-        organization_id : uuid(),
+        organization_id: uuid(),
         survey: {
           questions: [
             {
@@ -420,7 +417,7 @@ describe('Message API tests.', () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_two_handle,
+          handle: authorSeed.author_two_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -437,7 +434,6 @@ describe('Message API tests.', () => {
   });
 
   describe('Message GET', () => {
-
     let messagesSeed;
 
     before(async function () {
@@ -445,12 +441,11 @@ describe('Message API tests.', () => {
       await messagesSeed.seed(knex);
     });
 
-
     it(`Should get messages successfully`, async () => {
       const res = await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -460,7 +455,7 @@ describe('Message API tests.', () => {
 
       // let survey_one_exists = false;
       // const survey_two_exists = false;
-      res.body.messages.forEach( message => {
+      res.body.messages.forEach((message) => {
         // log.debug("returned message");
         log.debug(message);
         expect(message).to.include.keys([
@@ -491,7 +486,7 @@ describe('Message API tests.', () => {
       await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
           limit: 1,
           offset: 1,
         })
@@ -506,7 +501,7 @@ describe('Message API tests.', () => {
       await request(server)
         .get(`/message`)
         .query({
-          author_handle: authorSeed.author_one_handle,
+          handle: authorSeed.author_one_handle,
         })
         .set('Accept', 'application/json')
         .expect(200);
@@ -519,9 +514,9 @@ describe('Message API tests.', () => {
       await request(server)
         .get(`/message/${messagesSeed.messageId1}`)
         .query({
-          author_handle: authorSeed.author_one_handle
+          handle: authorSeed.author_one_handle,
         })
-        .expect(200)
+        .expect(200);
     });
   });
 });

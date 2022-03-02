@@ -21,7 +21,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: author_handle
+          name: handle
           required: true
         - schema:
             type: integer

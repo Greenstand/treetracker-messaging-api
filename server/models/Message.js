@@ -74,7 +74,7 @@ const ContentObject = ({
   active = true,
 }) =>
   Object.freeze({
-    id : uuid(),
+    id: uuid(),
     type,
     created_at: new Date().toISOString(),
     subject,
@@ -225,9 +225,9 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   // }
 };
 
-const FilterCriteria = ({ author_handle, since, author_id, messageId }) => {
+const FilterCriteria = ({ handle, since, author_id, messageId }) => {
   return {
-    author_handle,
+    handle,
     author_id,
     since: since ? new Date(since).toISOString() : since,
     messageId,
@@ -247,7 +247,7 @@ const getMessages = async (session, filterCriteria = undefined) => {
 
   let author_id;
   if (!filterCriteria.messageId) {
-    author_id = await getAuthorId(filterCriteria.author_handle, session);
+    author_id = await getAuthorId(filterCriteria.handle, session);
   }
   filter = FilterCriteria({
     ...filterCriteria,
@@ -286,7 +286,7 @@ const getMessagesCount = async (session, filterCriteria = undefined) => {
   let author_id;
 
   if (!filterCriteria.messageId) {
-    author_id = await getAuthorId(filterCriteria.author_handle, session);
+    author_id = await getAuthorId(filterCriteria.handle, session);
   }
 
   let filter = {};
