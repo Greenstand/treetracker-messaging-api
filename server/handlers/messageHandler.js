@@ -37,6 +37,7 @@ const bulkMessagePostSchema = Joi.object({
   .oxor('recipient_handle', 'organization_id');
 
 const messagePostSchema = Joi.object({
+  id: Joi.string().uuid(),
   parent_message_id: Joi.string().uuid(),
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
@@ -46,7 +47,7 @@ const messagePostSchema = Joi.object({
   survey_id: Joi.string().uuid(),
   survey_response: Joi.array().items(Joi.string()),
   video_link: Joi.string().allow(null, '').uri(),
-  composed_at: Joi.date().iso().allow(null)
+  composed_at: Joi.date().iso().allow(null),
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({
