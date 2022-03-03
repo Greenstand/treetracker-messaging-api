@@ -298,6 +298,8 @@ const getMessagesCount = async (session, filterCriteria = undefined) => {
   return messageRepo.getMessagesCount(filter);
 };
 
+
+
 module.exports = {
   createMessage,
   createBulkMessage,
