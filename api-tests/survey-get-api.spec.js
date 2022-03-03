@@ -16,7 +16,7 @@ describe("Survey get API", function () {
     await authorSeed.seed(knex);
   });
 
-  it("Get /survey/:uuid", async () => {
+  it.only("Get /survey/:uuid", async () => {
 
     // prepare the data
     const surveySeed = require('../database/seeds/12_story_survey');
@@ -79,32 +79,31 @@ describe("Survey get API", function () {
     //   );
     //       `);
 
-    await request(server)
+    const res = await request(server)
       .get(`/survey/${surveySeed.surveyId}`)
       .set('Accept', 'application/json')
-      .expect(200)
-      .then(res => {
-        log.warn("res.body :", res.body);
-        jestExpect(res.body).toMatchObject({
-          id: surveySeed.surveyId,
-          title: surveySeed.title,
-          questions: [
-            {
-              prompt: "How many trees did you plant today?",
-              choices: ['1', '10', '1000'],
-            }
-          ],
-          responses: [
-          {
-            labels: ["1"],
-            datasets: [{
-              label: "-",
-              data: [1]
-            }]
-          },
-        ]
-      });
-      });
+      .expect(200);
+
+    log.warn("res.body :", res.body);
+    jestExpect(res.body).toMatchObject({
+      id: surveySeed.surveyId,
+      title: surveySeed.title,
+      questions: [
+        {
+          prompt: "How many trees did you plant today?",
+          choices: ['1', '10', '1000'],
+        }
+      ],
+      responses: [
+        {
+          labels: ["1"],
+          datasets: [{
+            label: "-",
+            data: [1]
+          }]
+        },
+      ]
+    });
 
   });
 
