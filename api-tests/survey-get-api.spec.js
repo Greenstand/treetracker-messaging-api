@@ -16,7 +16,7 @@ describe("Survey get API", function () {
     await authorSeed.seed(knex);
   });
 
-  it.only("Get /survey/:uuid", async () => {
+  it("Get /survey/:uuid", async () => {
 
     // prepare the data
     const surveySeed = require('../database/seeds/12_story_survey');
