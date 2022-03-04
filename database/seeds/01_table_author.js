@@ -38,7 +38,7 @@ const seed = async function (knex) {
 
 module.exports = {
   seed,
-  author_one_id,
+author_one_id,
   author_two_id,
   author_three_id,
   author_four_id,

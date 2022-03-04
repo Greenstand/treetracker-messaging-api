@@ -2,8 +2,8 @@ const { v4: uuid } = require('uuid');
 const authorSeed = require('./01_table_author');
 
 const recipientId = authorSeed.author_two_id;
-const recipientId2 = authorSeed.author_two_id;
-const recipientId3 = authorSeed.author_two_id;
+const recipientId2 = authorSeed.author_three_id;
+const recipientId3 = authorSeed.author_four_id;
 const authorId = authorSeed.author_one_id;
 const messageId = uuid();
 const surveyId = uuid();
@@ -84,8 +84,8 @@ const seed = async function (knex) {
     const message = {
       id: uuid(),
       content_id: contentId,
-      sender_id: authorId,
-      recipient_id: recipientId,
+      sender_id: recipientId,
+      recipient_id: authorId,
     };
     await knex('message').insert(message).returning('id');
   }
@@ -106,8 +106,8 @@ const seed = async function (knex) {
     const message = {
       id: uuid(),
       content_id: contentId,
-      sender_id: authorId,
-      recipient_id: recipientId,
+      sender_id: recipientId2,
+      recipient_id: authorId,
     };
     await knex('message').insert(message).returning('id');
   }
@@ -128,8 +128,8 @@ const seed = async function (knex) {
     const message = {
       id: uuid(),
       content_id: contentId,
-      sender_id: authorId,
-      recipient_id: recipientId,
+      sender_id: recipientId3,
+      recipient_id: authorId,
     };
     await knex('message').insert(message).returning('id');
   }
