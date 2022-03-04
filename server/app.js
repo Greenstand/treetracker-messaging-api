@@ -44,14 +44,6 @@ app.use(express.urlencoded({ extended: false })); // parse application/x-www-for
 app.use(express.json()); // parse application/json
 
 // routers
-// app.use('/entity', entityRouter);
-
-// paths
-// app.get('/entity', asyncHandler(async (req, res, next) => {
-//
-// }));
-
-// routers
 app.use('/', router);
 
 // Global error handler

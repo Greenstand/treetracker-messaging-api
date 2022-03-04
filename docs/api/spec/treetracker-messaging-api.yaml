@@ -93,6 +93,8 @@ paths:
                         body:
                           type: string
                           minLength: 1
+                        type:
+                          type: string
                         composed_at:
                           type: string
                           format: ISO 8601
