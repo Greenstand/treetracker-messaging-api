@@ -1,5 +1,5 @@
-const BaseRepository = require('./BaseRepository');
 const log = require("loglevel");
+const BaseRepository = require('./BaseRepository');
 
 class SurveyRepository extends BaseRepository {
   constructor(session) {

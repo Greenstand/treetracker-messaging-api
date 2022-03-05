@@ -1,13 +1,13 @@
 require('dotenv').config();
-const knex = require('../server/database/knex');
-const server = require('../server/app');
 const { expect } = require('chai');
 const request = require('supertest');
 const { v4: uuid } = require('uuid');
 const jestExpect = require('expect');
+const log = require('loglevel');
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
-const log = require('loglevel');
+const server = require('../server/app');
+const knex = require('../server/database/knex');
 
 describe("Survey get API", function () {
 

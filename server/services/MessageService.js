@@ -18,7 +18,7 @@ const getMessages = async (filter) => {
       }
 
       if (row.recipient_organization_id) {
-        log.debug("contacting stakeholder");
+        log.debug('contacting stakeholder');
         const orgName = await StakeholderService.getOrganizationName(
           row.recipient_organization_id,
         );
@@ -66,21 +66,40 @@ const createBulkMessage = async (body) => {
   const session = new Session();
   try {
     await session.beginTransaction();
-    let recipientHandles = [];
+    let orgRecipientHandles = [];
     if (body.organization_id) {
-      recipientHandles =
+      orgRecipientHandles =
         await GrowerAccountService.getGrowerAccountWalletsForOrganization(
           body.organization_id,
         );
-    }
-    if (recipientHandles.length < 1) {
-      throw new HttpError(
-        422,
-        'No grower accounts found in the specified organization',
-      );
+
+      if (orgRecipientHandles.length < 1) {
+        throw new HttpError(
+          422,
+          'No author handle found in the specified organization',
+        );
+      }
     }
 
-    await Message.createBulkMessage(session, body, recipientHandles);
+    let regionRecipientHandles = [];
+    if (body.region_id) {
+      regionRecipientHandles =
+        await GrowerAccountService.getGrowerAccountWalletsForRegion(
+          body.region_id,
+        );
+
+      if (regionRecipientHandles.length < 1) {
+        throw new HttpError(
+          422,
+          'No author handle found in the specified region',
+        );
+      }
+    }
+
+    await Message.createBulkMessage(session, body, [
+      ...orgRecipientHandles,
+      ...regionRecipientHandles,
+    ]);
     await session.commitTransaction();
   } catch (e) {
     log.info('Error:');

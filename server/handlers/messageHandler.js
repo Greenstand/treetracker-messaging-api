@@ -152,7 +152,6 @@ const bulkMessagePost = async (req, res, next) => {
     }
 
     await createBulkMessage(req.body);
-    // No author handles found for any of the growers found in the specified organization
 
     res.status(204).send();
     res.end();
