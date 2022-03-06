@@ -9,15 +9,13 @@ const authorSeed = require('../database/seeds/01_table_author');
 const server = require('../server/app');
 const knex = require('../server/database/knex');
 
-describe("Survey get API", function () {
-
+describe('Survey get API', function () {
   this.beforeEach(async () => {
     await databaseCleaner.seed(knex);
     await authorSeed.seed(knex);
   });
 
-  it("Get /survey/:uuid", async () => {
-
+  it('Get /survey/:uuid', async () => {
     // prepare the data
     const surveySeed = require('../database/seeds/12_story_survey');
     await surveySeed.seed(knex);
@@ -32,12 +30,12 @@ describe("Survey get API", function () {
     // }
     // await knex.raw(`
     //   INSERT INTO "author" (id, handle, created_at)
-    //   VALUES ('${authorId}', 'handler', now()) 
+    //   VALUES ('${authorId}', 'handler', now())
     //   RETURNING id
     //   `);
     // await knex.raw(`
     //   INSERT INTO "survey" (id, title, created_at, active)
-    //   VALUES ('${surveyId}', 'title', now(), true) 
+    //   VALUES ('${surveyId}', 'title', now(), true)
     //   RETURNING id
     //   `);
     // await knex.raw(`
@@ -53,7 +51,7 @@ describe("Survey get API", function () {
     //     "active",
     //     "title"
     //   )
-    //   VALUES 
+    //   VALUES
     //   (
     //     uuid_generate_v4(),
     //     '${authorId}',
@@ -84,27 +82,27 @@ describe("Survey get API", function () {
       .set('Accept', 'application/json')
       .expect(200);
 
-    log.warn("res.body :", res.body);
+    log.warn('res.body :', res.body);
     jestExpect(res.body).toMatchObject({
       id: surveySeed.surveyId,
       title: surveySeed.title,
       questions: [
         {
-          prompt: "How many trees did you plant today?",
+          prompt: 'How many trees did you plant today?',
           choices: ['1', '10', '1000'],
-        }
+        },
       ],
       responses: [
         {
-          labels: ["1"],
-          datasets: [{
-            label: "-",
-            data: [1]
-          }]
+          labels: ['1', '10', '1000'],
+          datasets: [
+            {
+              label: '-',
+              data: [1, 1, 1],
+            },
+          ],
         },
-      ]
+      ],
     });
-
   });
-
 });

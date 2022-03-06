@@ -178,7 +178,7 @@ describe('Message API Request Validation tests.', () => {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
-            grower_accounts: [{ wallet: 'another_wallet' }],
+            growerAccounts: [{ handle: 'another_wallet' }],
           },
         };
       });
@@ -331,7 +331,7 @@ describe('Message API Request Validation tests.', () => {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
-            grower_accounts: [],
+            growerAccounts: [],
           },
         };
       });
@@ -343,33 +343,7 @@ describe('Message API Request Validation tests.', () => {
       // .expect(422)
 
       expect(_res.body.message).to.eql(
-        'No grower accounts found in the specified organization',
-      );
-
-      axiosStub.restore();
-    });
-
-    it(`Message to an organization should error out -- growers found for specified organization_id but no author_handles were associated with them `, async function () {
-      const messageSendPostObject = { ...MessageSendPostObject };
-      messageSendPostObject.organization_id = uuid();
-      const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
-        return {
-          data: {
-            grower_accounts: [{ wallet: 'another_wallet' }],
-          },
-        };
-      });
-      const _res = await request(server)
-        .post(`/bulk_message`)
-        .send(messageSendPostObject)
-        .set('Accept', 'application/json');
-      // .expect(422)
-      if (_res.error) {
-        // eslint-disable-next-line no-console
-        console.log(_res.error);
-      }
-      expect(_res.body.message).to.eql(
-        'No author handles found for any of the growers found in the specified organization',
+        'No author handle found in the specified organization',
       );
 
       axiosStub.restore();
