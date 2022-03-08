@@ -29,7 +29,7 @@ const Message = async ({
   survey_title,
   questions,
 }) => {
-  const answer = survey_response?.survey_response;
+  const answer = survey_response;
   let survey;
   if (!survey_id) {
     survey = null;
@@ -158,18 +158,11 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   const messageRepo = new MessageRepository(session);
   const bulkMessageRepo = new BulkMessageRepository(session);
 
-  let recipientIds = await Promise.all(
+  const recipientIds = await Promise.all(
     recipientHandles.map(async (row) => {
       return getAuthorId(row, session, false);
     }),
   );
-  recipientIds = recipientIds.filter((n) => n);
-
-  if (recipientIds.length < 1)
-    throw new HttpError(
-      404,
-      'No author handles found for any of the growers found in the specified organization',
-    );
 
   // If this has a survey object, create the survey
   let type = 'announce';
@@ -297,8 +290,6 @@ const getMessagesCount = async (session, filterCriteria = undefined) => {
 
   return messageRepo.getMessagesCount(filter);
 };
-
-
 
 module.exports = {
   createMessage,

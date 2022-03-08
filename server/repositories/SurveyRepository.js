@@ -1,5 +1,5 @@
+const log = require('loglevel');
 const BaseRepository = require('./BaseRepository');
-const log = require("loglevel");
 
 class SurveyRepository extends BaseRepository {
   constructor(session) {
@@ -9,9 +9,8 @@ class SurveyRepository extends BaseRepository {
   }
 
   async getSurveyResponse(surveyId) {
-    const result = await this._session
-      .getDB()
-      .raw(`
+    const result = await this._session.getDB().raw(
+      `
         SELECT
           survey_id,
           survey_response
@@ -20,10 +19,10 @@ class SurveyRepository extends BaseRepository {
         WHERE
           content.survey_id = ?
           and content.survey_response is not null
-          `
-        , [surveyId]
-      );
-    log.warn("result:", result);
+          `,
+      [surveyId],
+    );
+    log.warn('result:', result.rows);
     return result.rows;
   }
 }

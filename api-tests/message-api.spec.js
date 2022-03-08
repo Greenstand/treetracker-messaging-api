@@ -248,7 +248,7 @@ describe('Message API tests.', () => {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
-            grower_accounts: [{ wallet: authorSeed.author_two_handle }],
+            growerAccounts: [{ handle: authorSeed.author_two_handle }],
           },
         };
       });
@@ -313,10 +313,10 @@ describe('Message API tests.', () => {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
-            grower_accounts: [
-              { wallet: authorSeed.author_two_handle },
-              { wallet: authorSeed.author_three_handle },
-              { wallet: authorSeed.author_four_handle },
+            growerAccounts: [
+              { handle: authorSeed.author_two_handle },
+              { handle: authorSeed.author_three_handle },
+              { handle: authorSeed.author_four_handle },
             ],
           },
         };
@@ -414,7 +414,7 @@ describe('Message API tests.', () => {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
-            grower_accounts: [{ wallet: authorSeed.author_two_handle }],
+            growerAccounts: [{ handle: authorSeed.author_two_handle }],
           },
         };
       });
@@ -473,7 +473,7 @@ describe('Message API tests.', () => {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
-            grower_accounts: [{ wallet: authorSeed.author_two_handle }],
+            growerAccounts: [{ handle: authorSeed.author_two_handle }],
           },
         };
       });

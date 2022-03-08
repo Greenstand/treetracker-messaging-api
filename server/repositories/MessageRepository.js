@@ -1,5 +1,4 @@
 const BaseRepository = require('./BaseRepository');
-const log = require("loglevel");
 
 class MessageRepository extends BaseRepository {
   constructor(session) {
@@ -97,7 +96,6 @@ class MessageRepository extends BaseRepository {
 
     return +result[0].count;
   }
-
 }
 
 module.exports = MessageRepository;
