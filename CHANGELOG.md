@@ -1,3 +1,15 @@
+## [1.9.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.9.0...v1.9.1) (2022-03-08)
+
+
+### Bug Fixes
+
+* change allow to valid fot message type validation ([0aec64c](https://github.com/Greenstand/treetracker-messaging-api/commit/0aec64c5faa74cfaeff8d3120348e86c668b302c))
+* configure production database passwords ([20245ef](https://github.com/Greenstand/treetracker-messaging-api/commit/20245efb7d9a143e82aded413d6eaf2c20dd8fbd))
+* does not work to create postgis extension here ([378e199](https://github.com/Greenstand/treetracker-messaging-api/commit/378e1993828db114a9ee1e044d773bdd9e5f229b))
+* make use of grower-account query api ([ff45dea](https://github.com/Greenstand/treetracker-messaging-api/commit/ff45dea15e86b4fbb92a09cacf832f2e1eac8a58))
+* tests ([0be7fc9](https://github.com/Greenstand/treetracker-messaging-api/commit/0be7fc9030583b5512618725b937c1ab22c9f852))
+* update message type enums ([8c4f0a9](https://github.com/Greenstand/treetracker-messaging-api/commit/8c4f0a93e4f356e18ecbd611ffa472ad74610709))
+
 # [1.9.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.8.17...v1.9.0) (2022-03-03)
 
 
