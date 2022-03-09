@@ -1,6 +1,9 @@
 const axios = require('axios').default;
 
-const growerAccountUrl = `${process.env.TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
+const TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL =
+  'http://treetracker-grower-account-query.query/';
+
+const growerAccountUrl = `${TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
 
 const getGrowerAccountWalletsForOrganization = async (organization_id) => {
   // get grower_accounts in the specified organization from the treetracker-api
