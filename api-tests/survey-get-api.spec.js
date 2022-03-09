@@ -1,7 +1,5 @@
 require('dotenv').config();
-const { expect } = require('chai');
 const request = require('supertest');
-const { v4: uuid } = require('uuid');
 const jestExpect = require('expect');
 const log = require('loglevel');
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
@@ -19,63 +17,6 @@ describe('Survey get API', function () {
     // prepare the data
     const surveySeed = require('../database/seeds/12_story_survey');
     await surveySeed.seed(knex);
-
-    // const authorId = uuid();
-    // const surveyId = uuid();
-    // const response1 = {
-    //   "survey_response": ["My House", "10 Trees"],
-    // }
-    // const response2 = {
-    //   "survey_response": ["My House", "11 Trees"],
-    // }
-    // await knex.raw(`
-    //   INSERT INTO "author" (id, handle, created_at)
-    //   VALUES ('${authorId}', 'handler', now())
-    //   RETURNING id
-    //   `);
-    // await knex.raw(`
-    //   INSERT INTO "survey" (id, title, created_at, active)
-    //   VALUES ('${surveyId}', 'title', now(), true)
-    //   RETURNING id
-    //   `);
-    // await knex.raw(`
-    //   INSERT INTO "message" (
-    //     "id",
-    //     "author_id",
-    //     "subject",
-    //     "body",
-    //     "survey_id",
-    //     "survey_response",
-    //     "composed_at",
-    //     "created_at",
-    //     "active",
-    //     "title"
-    //   )
-    //   VALUES
-    //   (
-    //     uuid_generate_v4(),
-    //     '${authorId}',
-    //     'subject',
-    //     'body',
-    //     '${surveyId}',
-    //     '${JSON.stringify(response1)}',
-    //     now(),
-    //     now(),
-    //     true,
-    //     'title'
-    //   ),(
-    //     uuid_generate_v4(),
-    //     '${authorId}',
-    //     'subject',
-    //     'body',
-    //     '${surveyId}',
-    //     '${JSON.stringify(response2)}',
-    //     now(),
-    //     now(),
-    //     true,
-    //     'title'
-    //   );
-    //       `);
 
     const res = await request(server)
       .get(`/survey/${surveySeed.surveyId}`)
