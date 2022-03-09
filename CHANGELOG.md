@@ -1,3 +1,17 @@
+# [1.10.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.9.1...v1.10.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* fix test ([46ab530](https://github.com/Greenstand/treetracker-messaging-api/commit/46ab530fb1e1dff0c8250fe9b5dc2b9124dc5289))
+* linting ([9dab0b8](https://github.com/Greenstand/treetracker-messaging-api/commit/9dab0b8c617a48a7d776e6167a6900ddfb641699))
+* use internal endpoints for external servoces ([f69d673](https://github.com/Greenstand/treetracker-messaging-api/commit/f69d6738b03f4cc3f62d10b6fa0f30e460148aa3))
+
+
+### Features
+
+* clean up api for message object ([9b1feb6](https://github.com/Greenstand/treetracker-messaging-api/commit/9b1feb6ab6a2fed4b9c376e5ff6ae80a3edc4d3f))
+
 ## [1.9.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.9.0...v1.9.1) (2022-03-08)
 
 
