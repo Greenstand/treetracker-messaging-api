@@ -1,3 +1,11 @@
+## [1.11.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.0...v1.11.1) (2022-03-09)
+
+
+### Bug Fixes
+
+* add debug message ([203954a](https://github.com/Greenstand/treetracker-messaging-api/commit/203954a63b511318b5214925d74301558ad67abe))
+* add logging to dev deployment ([2c3df8b](https://github.com/Greenstand/treetracker-messaging-api/commit/2c3df8b45997084f708a24c663713e64a81945dc))
+
 # [1.11.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.10.0...v1.11.0) (2022-03-09)
 
 
