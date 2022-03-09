@@ -64,6 +64,9 @@ paths:
                     items:
                       type: object
                       properties:
+                        id:
+                          type: string
+                          format: uuid
                         parent_message_id:
                           type: string
                           format: uuid
@@ -123,14 +126,7 @@ paths:
                                     type: array
                                     items:
                                       type: string
-                            answers:
-                              type: array
-                              items:
-                                type: string
-                        id:
-                          type: string
-                          format: uuid
-                        title:
+                        survey_response:
                           type: string
                         bulk_message_recipients:
                           type: object
@@ -218,6 +214,7 @@ paths:
                 - subject
                 - body
                 - composed_at
+        description: ''
   /bulk_message:
     post:
       summary: Author an message to a group
