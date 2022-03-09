@@ -41,11 +41,14 @@ class MessageRepository extends BaseRepository {
       )
       .leftJoin('message', function () {
         this.on('content.id', '=', 'message.content_id').andOn(function () {
-          this.onVal('content.type', '=', 'message').orOnVal(
-            'message.recipient_id',
-            '=',
-            filter.author_id,
-          );
+          this.onVal('content.type', '=', 'message')
+            .orOnVal('content.type', '=', 'survey_response')
+            .orOnVal(
+              'message.recipient_id',
+              '=',
+              filter.author_id,
+            )
+  
         });
       })
       .leftJoin('bulk_message', 'content.id', '=', 'bulk_message.content_id')

@@ -70,7 +70,7 @@ const seed = async function (knex) {
 
   {
     const content = {
-      type: 'survey',
+      type: 'survey_response',
       author_id: recipientId,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
@@ -92,7 +92,7 @@ const seed = async function (knex) {
 
   {
     const content = {
-      type: 'survey',
+      type: 'survey_response',
       author_id: recipientId2,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
@@ -114,7 +114,7 @@ const seed = async function (knex) {
 
   {
     const content = {
-      type: 'survey',
+      type: 'survey_response',
       author_id: recipientId3,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
