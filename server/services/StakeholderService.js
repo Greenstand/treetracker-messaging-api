@@ -1,9 +1,12 @@
 const log = require('loglevel');
 const axios = require('axios').default;
 
+const TREETRACKER_STAKEHOLDER_API_URL =
+  'http://treetracker-stakeholder-api.stakeholder-api/';
+
 const getOrganizationName = async (organizationId) => {
   log.info('get org name');
-  const stakeholderUrl = `${process.env.TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
+  const stakeholderUrl = `${TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
   const organizationResponse = await axios.get(
     `${stakeholderUrl}?id=${organizationId}`,
   );
