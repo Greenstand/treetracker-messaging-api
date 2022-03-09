@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.10.0...v1.11.0) (2022-03-09)
+
+
+### Features
+
+* message type of survey_response ([928f822](https://github.com/Greenstand/treetracker-messaging-api/commit/928f822897a9f30ca5977232db0a922f5f30992a))
+
 # [1.10.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.9.1...v1.10.0) (2022-03-09)
 
 
