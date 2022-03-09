@@ -6,5 +6,10 @@ metadata:
     app: treetracker-messaging-api
 spec:
   replicas: 1
+  containers:
+    - name: treetracker-messaging-api
+      env:
+        - name: NODE_LOG_LEVEL
+          value: debug
 
   
