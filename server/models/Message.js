@@ -28,7 +28,6 @@ const Message = async ({
   survey_title,
   questions,
 }) => {
-  const answer = survey_response;
   let survey;
   if (!survey_id) {
     survey = null;
@@ -36,9 +35,8 @@ const Message = async ({
     survey = {
       id: survey_id,
       title: survey_title,
-      response: !!answer,
       questions,
-      answers: answer?.length > 0 ? answer : null,
+      response: !!survey_response
     };
   }
 
@@ -55,6 +53,7 @@ const Message = async ({
     body,
     composed_at,
     video_link,
+    survey_response: survey_response?.length > 0 ? survey_response : null,
     survey,
   };
 

@@ -57,17 +57,18 @@ const getSurveyReport = async (
   );
   const responses = surveyResponses
     .reduce((a, c) => {
-      for (let i = 0; i < c.survey_response.length; i++) {
+      const aa = a;
+      for (let i = 0; i < c.survey_response.length; i += 1) {
         const e = c.survey_response[i];
-        if (a[i] === undefined) {
-          a[i] = {};
+        if (aa[i] === undefined) {
+          aa[i] = {};
         }
-        if (a[i][e] === undefined) {
-          a[i][e] = 0;
+        if (aa[i][e] === undefined) {
+          aa[i][e] = 0;
         }
-        a[i][e] += 1;
+        aa[i][e] += 1;
       }
-      return a;
+      return aa;
     }, [])
     .map((counter) => {
       return {

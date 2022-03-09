@@ -190,9 +190,7 @@ describe('Message API tests.', () => {
         .that.contains.something.like({
           from: surveySeed.recipientHandle,
           to: surveySeed.authorHandle,
-          survey: {
-            answers: ['1'],
-          },
+          survey_response: ['1']
         });
     });
 
@@ -547,14 +545,14 @@ describe('Message API tests.', () => {
           'composed_at',
           'video_link',
           'survey',
+          'survey_response'
         ]);
         if (message.survey) {
           expect(message.survey).to.have.keys([
             'id',
             'title',
             'questions',
-            'response',
-            'answers',
+            'response'
           ]);
         }
       });
