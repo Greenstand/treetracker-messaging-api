@@ -3,7 +3,7 @@ const axios = require('axios').default;
 
 const TREETRACKER_STAKEHOLDER_API_URL =
   process.env.TREETRACKER_STAKEHOLDER_API_URL ||
-  'http://treetracker-stakeholder-api.stakeholder-api/';
+  'http://treetracker-stakeholder-api.stakeholder-api';
 
 const getOrganizationName = async (organizationId) => {
   log.info('get org name');
