@@ -39,8 +39,7 @@ describe('Message API tests.', () => {
       const messagePostObject = {
         recipient_handle: authorSeed.author_two_handle,
         author_handle: authorSeed.author_one_handle,
-        subject: uuid(),
-        body: 'Bodyyy',
+        body: uuid(),
         type: 'message',
         // composed_at: new Date().toISOString(),
       };
@@ -53,7 +52,7 @@ describe('Message API tests.', () => {
       const content = await knex
         .select('*')
         .table('content')
-        .where('subject', messagePostObject.subject);
+        .where('body', messagePostObject.body);
 
       expect(content).have.lengthOf(1);
 
@@ -68,9 +67,9 @@ describe('Message API tests.', () => {
       const messagePostObject = {
         recipient_handle: authorSeed.author_two_handle,
         author_handle: authorSeed.author_one_handle,
-        subject: uuid(),
-        body: 'Body',
+        body: uuid(),
         type: 'message',
+        video_link: 'https://www.string.com',
         // composed_at: new Date().toISOString(),
       };
       await request(server)
@@ -83,17 +82,15 @@ describe('Message API tests.', () => {
         .select(['message.id as message_id', '*'])
         .table('message')
         .join('content', 'message.content_id', '=', 'content.id')
-        .where('subject', messagePostObject.subject);
+        .where('body', messagePostObject.body);
 
       const messageReplyObject = {
         recipient_handle: authorSeed.author_one_handle,
         author_handle: authorSeed.author_two_handle,
         parent_message_id: message[0].message_id,
-        subject: uuid(),
-        body: 'Body',
-        type: 'survey',
+        body: uuid(),
+        type: 'message',
         // composed_at: new Date().toISOString(),
-        video_link: 'https://www.string.com',
       };
 
       await request(server)
@@ -106,7 +103,7 @@ describe('Message API tests.', () => {
         .select(['message.id as message_id', '*'])
         .table('message')
         .join('content', 'message.content_id', '=', 'content.id')
-        .where('subject', messageReplyObject.subject);
+        .where('body', messageReplyObject.body);
       expect(messageReply).have.lengthOf(1);
       expect(messageReply[0].parent_message_id).to.equal(message[0].message_id);
     });
@@ -115,7 +112,6 @@ describe('Message API tests.', () => {
       const messagePostObject = {
         recipient_handle: authorSeed.author_one_handle,
         author_handle: authorSeed.author_two_handle,
-        subject: uuid(),
         type: 'message',
         body: 'Check in to get your trees',
         // composed_at: new Date().toISOString(),
@@ -136,7 +132,7 @@ describe('Message API tests.', () => {
       log.debug(res.body);
 
       expect(res.body.messages).to.be.an('array').that.contains.something.like({
-        subject: messagePostObject.subject,
+        body: messagePostObject.body,
         from: authorSeed.author_two_handle,
         to: authorSeed.author_one_handle,
       });
@@ -151,7 +147,7 @@ describe('Message API tests.', () => {
       expect(res2.body.messages)
         .to.be.an('array')
         .that.contains.something.like({
-          subject: messagePostObject.subject,
+          body: messagePostObject.body,
           from: authorSeed.author_two_handle,
           to: authorSeed.author_one_handle,
         });
@@ -165,8 +161,7 @@ describe('Message API tests.', () => {
         author_handle: surveySeed.recipientHandle,
         recipient_handle: surveySeed.authorHandle,
         parent_message_id: surveySeed.messageId,
-        subject: 'Survey response',
-        type: 'survey',
+        type: 'survey_response',
         survey_id: surveySeed.surveyId,
         survey_response: ['1'],
         // composed_at: new Date().toISOString(),
@@ -270,6 +265,7 @@ describe('Message API tests.', () => {
         .expect(200);
       expect(res.body.messages).to.be.an('array').that.contains.something.like({
         subject: messageSendPostObject.subject,
+        body: messageSendPostObject.body,
         from: authorSeed.author_one_handle,
         to: null,
       });

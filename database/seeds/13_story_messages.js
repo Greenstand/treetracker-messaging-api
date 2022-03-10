@@ -14,7 +14,6 @@ const fakeMessageContent = function (authorId) {
   return {
     type: 'message',
     author_id: authorId,
-    subject: '',
     body: chance.sentence(),
     composed_at: '2022-01-22',
   }

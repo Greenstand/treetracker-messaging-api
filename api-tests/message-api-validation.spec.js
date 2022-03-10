@@ -20,7 +20,6 @@ const MessagePostObject = {
   // parent_message_id: existing_message.id,
   recipient_handle: author_two_handle,
   author_handle: author_one_handle,
-  subject: 'Subject',
   body: 'Bodyyy',
   type: 'message',
   // survey_id,
@@ -81,16 +80,6 @@ describe('Message API Request Validation tests.', () => {
     //       return done();
     //     });
     // });
-
-    it(`Should raise validation error with error code 422 -- subject is required `, async () => {
-      const messagePostObject = { ...MessagePostObject };
-      delete messagePostObject.subject;
-      const _res = await request(server)
-        .post(`/message`)
-        .send(messagePostObject)
-        .set('Accept', 'application/json')
-        .expect(422);
-    });
 
     it(`Should raise validation error with error code 422 -- body is required for regular message`, async () => {
       const messagePostObject = { ...MessagePostObject };

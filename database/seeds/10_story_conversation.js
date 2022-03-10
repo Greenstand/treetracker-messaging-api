@@ -5,7 +5,6 @@ exports.seed = async function (knex) {
   const contentOfFirstMessage = {
     type: 'message',
     author_id: authorSeed.author_one_id,
-    subject: '',
     body: 'Greetings, can you confirm that you have uploaded?',
     composed_at: '2022-01-22',
   };
@@ -23,7 +22,6 @@ exports.seed = async function (knex) {
   const contentOfSecondMessage = {
     type: 'message',
     author_id: authorSeed.author_two_id,
-    subject: '',
     body: 'I have, I have?',
     composed_at: '2022-01-22',
   };
