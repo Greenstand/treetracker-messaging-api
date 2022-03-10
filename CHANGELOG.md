@@ -1,3 +1,10 @@
+## [1.11.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.4...v1.11.5) (2022-03-10)
+
+
+### Bug Fixes
+
+* remove extra / ([ea5ec5b](https://github.com/Greenstand/treetracker-messaging-api/commit/ea5ec5b9d39f5dcdd12c0aa110655bd3970b4120))
+
 ## [1.11.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.3...v1.11.4) (2022-03-10)
 
 
