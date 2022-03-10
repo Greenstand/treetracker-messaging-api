@@ -1,3 +1,10 @@
+## [1.11.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.3...v1.11.4) (2022-03-10)
+
+
+### Bug Fixes
+
+* allow local dev with env var for stakeholder-api ([abc0b42](https://github.com/Greenstand/treetracker-messaging-api/commit/abc0b4270a82d1d1425ebaa98879b0715956a3cc))
+
 ## [1.11.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.2...v1.11.3) (2022-03-10)
 
 
