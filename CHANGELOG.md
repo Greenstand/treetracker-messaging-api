@@ -1,3 +1,11 @@
+## [1.11.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.2...v1.11.3) (2022-03-10)
+
+
+### Bug Fixes
+
+* allow subject to be null ([ec7a87f](https://github.com/Greenstand/treetracker-messaging-api/commit/ec7a87f3c798f045aad8626b8a60aae0074e0c55))
+* make tests work for null subject and suvery_response message type' ([bd176ba](https://github.com/Greenstand/treetracker-messaging-api/commit/bd176ba76fed2e8faf77e0b84ced21b3fc03a162))
+
 ## [1.11.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.1...v1.11.2) (2022-03-09)
 
 
