@@ -1,0 +1,1 @@
+ALTER TABLE content ALTER COLUMN subject DROP NOT NULL;
