@@ -163,7 +163,7 @@ describe('Message API Request Validation tests.', () => {
         .expect(422);
     });
 
-    it(`Should raise validation error with error code 404 -- author_handle should exist `, async function () {
+    it(`Should raise validation error with error code 422 -- author_handle should exist `, async function () {
       const axiosStub = sinon.stub(axios, 'get').callsFake(async (_url) => {
         return {
           data: {
@@ -179,7 +179,7 @@ describe('Message API Request Validation tests.', () => {
         .post(`/bulk_message`)
         .send(messageSendPostObject)
         .set('Accept', 'application/json')
-        .expect(404);
+        .expect(422);
 
       axiosStub.restore();
     });
