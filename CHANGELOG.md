@@ -1,3 +1,10 @@
+## [1.11.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.5...v1.11.6) (2022-03-11)
+
+
+### Bug Fixes
+
+* get rid of unnecessary config files ([8f4a7b5](https://github.com/Greenstand/treetracker-messaging-api/commit/8f4a7b516951e7e446ec6fbfd939872ca6a9c22d))
+
 ## [1.11.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.4...v1.11.5) (2022-03-10)
 
 
