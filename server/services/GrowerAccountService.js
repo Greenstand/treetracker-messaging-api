@@ -1,7 +1,12 @@
 const axios = require('axios').default;
 
 const TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL =
+<<<<<<< HEAD
   'http://treetracker-grower-account-query.query';
+=======
+  process.env.TREETRACKER_API_URL ||
+  'http://treetracker-grower-account-query.query/';
+>>>>>>> fix: allow local dev with env var for treetracker-api
 
 const growerAccountUrl = `${TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
 
