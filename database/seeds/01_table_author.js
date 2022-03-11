@@ -33,6 +33,10 @@ const seed = async function (knex) {
   authors.push({ id: author_three_id, handle: author_three_handle });
   authors.push({ id: author_four_id, handle: author_four_handle });
 
+  for(let i=0; i<50; i += 1){
+    authors.push({ handle: `wallet${i}` });
+  }
+
   await knex('author').insert(authors);
 };
 
