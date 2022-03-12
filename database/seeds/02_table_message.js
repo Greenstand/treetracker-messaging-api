@@ -13,7 +13,7 @@ const seed = async function (knex) {
       type: 'message',
       author_id: authorSeed.author_one_id,
       body: chance.sentence({ words: 5 }),
-      composed_at: chance.date({ year: 2022 }).toISOString(),
+      composed_at: chance.date({ year: 2021 }).toISOString(),
     };
     const firstContentId = (await knex('content')
       .insert(contentOfFirstMessage)
