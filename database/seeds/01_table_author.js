@@ -1,16 +1,15 @@
 const Chance = require('chance');
 
 const chance = new Chance();
-const { v4: uuid } = require('uuid');
 
 //
 // These constants can be exported to support other seeds and APIs
 // Do not edit!
 //
-const author_one_id = uuid();
-const author_two_id = uuid();
-const author_three_id = uuid();
-const author_four_id = uuid();
+const author_one_id = '4395ce86-17b6-46de-a814-842f818d18ce';
+const author_two_id = '4763f101-a915-4b86-871b-86714d45a889';
+const author_three_id = '8356456a-1900-4089-98f0-d3565d71acff';
+const author_four_id = 'e4938dc8-fea9-49a7-a143-8e21c1cbf597';
 const author_one_handle = 'admin';
 const author_two_handle = 'handle2';
 const author_three_handle = 'handle3';
