@@ -11,9 +11,10 @@ const getGrowerAccountWalletsForOrganization = async (organization_id) => {
   const response = await axios.get(
     `${growerAccountUrl}?organization_id=${organization_id}`,
   );
+
   const { grower_accounts } = response.data;
   return grower_accounts
-    ? grower_accounts.filter((row) => row.wallet).map((row) => row.wallet)
+    ? grower_accounts.filter((row) => row.handle).map((row) => row.handle)
     : [];
 };
 
