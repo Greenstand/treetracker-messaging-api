@@ -25,7 +25,7 @@ describe('Author API tests.', () => {
         .set('Accept', 'application/json')
         .expect(200);
       expect(res.body).to.have.keys(['authors']);
-      expect(res.body.authors).to.have.length(14);
+      expect(res.body.authors).to.have.length(64);
       expect(res.body.authors)
         .to.be.an('array')
         .that.contains.something.like({ handle: authorSeed.author_one_handle });

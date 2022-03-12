@@ -522,7 +522,7 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(200);
 
-      expect(res.body).to.have.keys(['messages', 'links']);
+      expect(res.body).to.have.keys(['messages', 'links', 'query']);
       expect(res.body.links).to.have.keys(['prev', 'next']);
 
       // let survey_one_exists = false;
