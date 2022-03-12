@@ -38,6 +38,19 @@ paths:
           in: query
           name: since
           description: IS0 8601 DateTime
+        - schema:
+            type: string
+            enum:
+              - composed_at
+          in: query
+          name: sort_by
+        - schema:
+            type: string
+            enum:
+              - desc
+              - asc
+          in: query
+          name: order
       responses:
         '200':
           description: OK
