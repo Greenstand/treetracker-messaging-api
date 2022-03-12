@@ -1,3 +1,14 @@
+## [1.11.11](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.10...v1.11.11) (2022-03-12)
+
+
+### Bug Fixes
+
+* allow local dev with env var for treetracker-api ([d92449d](https://github.com/Greenstand/treetracker-messaging-api/commit/d92449d0fca152bd7c829c4c0d400e7e30ae7132))
+* prevent errors if no authors found and we get undefined for grower_accounts ([df17e55](https://github.com/Greenstand/treetracker-messaging-api/commit/df17e5534034c191e60afebe6e28e9e419b01e9d))
+* resolve incorrect stub, filter by handle not wallet ([9e82536](https://github.com/Greenstand/treetracker-messaging-api/commit/9e82536e78ef56a5c3cba77811936db9318e9dde))
+* return messages in ascending order ([ff1988c](https://github.com/Greenstand/treetracker-messaging-api/commit/ff1988c9e555a6d89d77615d447a569766e51a7c))
+* test errors ([a76f6bb](https://github.com/Greenstand/treetracker-messaging-api/commit/a76f6bb300dd8122f4cea3a0907a547cc2e3d4e4))
+
 ## [1.11.10](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.9...v1.11.10) (2022-03-12)
 
 
