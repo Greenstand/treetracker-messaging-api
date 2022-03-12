@@ -1,7 +1,8 @@
 const axios = require('axios').default;
 
 const TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL =
-  'http://treetracker-grower-account-query.query';
+  process.env.TREETRACKER_API_URL ||
+  'http://treetracker-grower-account-query.query/';
 
 const growerAccountUrl = `${TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
 
@@ -10,16 +11,19 @@ const getGrowerAccountWalletsForOrganization = async (organization_id) => {
   const response = await axios.get(
     `${growerAccountUrl}?organization_id=${organization_id}`,
   );
-  const { growerAccounts } = response.data;
-  return growerAccounts.filter((row) => row.handle).map((row) => row.handle);
+
+  const { grower_accounts } = response.data;
+  return grower_accounts
+    ? grower_accounts.filter((row) => row.handle).map((row) => row.handle)
+    : [];
 };
 
 const getGrowerAccountWalletsForRegion = async (region_id) => {
   const response = await axios.get(
     `${growerAccountUrl}?region_id=${region_id}`,
   );
-  const { growerAccounts } = response.data;
-  return growerAccounts.filter((row) => row.handle).map((row) => row.handle);
+  const { grower_accounts } = response.data;
+  return grower_accounts.filter((row) => row.wallet).map((row) => row.wallet);
 };
 
 module.exports = {
