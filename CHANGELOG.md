@@ -1,3 +1,12 @@
+## [1.11.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.7...v1.11.8) (2022-03-12)
+
+
+### Bug Fixes
+
+* bug in and/or where ([f347829](https://github.com/Greenstand/treetracker-messaging-api/commit/f347829ae4c15756f90ef9214c8e257586a58006))
+* fix and improve limit,offset ([5d62134](https://github.com/Greenstand/treetracker-messaging-api/commit/5d62134305d77ddf393a7e4d29c7336326c6b5b5))
+* fix integration tests ([a5e01ca](https://github.com/Greenstand/treetracker-messaging-api/commit/a5e01ca9ad3240ff1c1e19e36d5ea68816715c88))
+
 ## [1.11.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.6...v1.11.7) (2022-03-11)
 
 
