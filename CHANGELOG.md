@@ -1,3 +1,10 @@
+## [1.11.10](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.9...v1.11.10) (2022-03-12)
+
+
+### Bug Fixes
+
+* return messages in ascending order ([c017c8e](https://github.com/Greenstand/treetracker-messaging-api/commit/c017c8e1e52a5152b8e92f7c46ef0d8c2193f958))
+
 ## [1.11.9](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.8...v1.11.9) (2022-03-12)
 
 
