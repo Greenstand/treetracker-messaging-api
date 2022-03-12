@@ -96,7 +96,7 @@ class MessageRepository extends BaseRepository {
       )
       .limit(limit)
       .offset(offset)
-      .orderBy('composed_at', 'desc');
+      .orderBy('composed_at', 'asc');
   }
 
   async getMessagesCount(filter) {
