@@ -77,7 +77,7 @@ const messageGet = async (req, res, next) => {
     const noOfIterations = messagesCount / filter.limit - 1;
     const currentIteration = filter.offset / filter.limit;
 
-    const url = `message?author_handle=${filter.author_handle}`;
+    const url = `message?handle=${filter.handle}`;
     const urlWithLimitAndOffset = `${url}${
       filter.since ? `&since=${filter.since}` : ''
     }&limit=${filter.limit}&offset=`;
@@ -91,12 +91,20 @@ const messageGet = async (req, res, next) => {
       prev = `${urlWithLimitAndOffset}${+filter.offset - +filter.limit}`;
     }
 
+    const query =  {
+      total: messagesCount,
+      ...filter
+    }
+    query.limit = parseInt(query.limit)
+    query.offset = parseInt(query.offset)
+
     res.send({
       messages,
       links: {
         prev,
         next: nextUrl,
       },
+      query
     });
     res.end();
   } catch (e) {
