@@ -24,12 +24,16 @@ class MessageRepository extends BaseRepository {
       if (object.messageId) {
         result.where({ 'message.id': object.messageId });
       } else {
-        result.where('content.author_id', object.author_id);
-        result.orWhere('message.recipient_id', object.author_id);
         if (object.since) {
-          result = result.andWhere('message.created_at', '>=', object.since);
+          result = result.where('content.composed_at', '>=', object.since);
         }
+        result.where( function() {
+          this.where('content.author_id', object.author_id);
+          this.orWhere('message.recipient_id', object.author_id);
+        });
+      
       }
+      return result;
     };
     const baseQuery = this._session
       .getDB()('content')
@@ -71,9 +75,10 @@ class MessageRepository extends BaseRepository {
   }
 
   async getMessages(filter, { limit, offset }) {
+    
     return this.getMessagesBaseQuery(filter)
       .select(
-        'bulk_message.id',
+        'bulk_message.id as bulk_message_id',
         'message.id',
         'message.parent_message_id',
         'author_sender.handle as author_handle',
