@@ -129,7 +129,7 @@ const seed = async function (knex) {
     const surveyId = uuid();
     const survey = {
       id: surveyId,
-      title: "Kinds of trees survey",
+      title: "Another kinds of trees survey",
     }
     await knex('survey').insert(survey).returning('id');
 
@@ -159,7 +159,7 @@ const seed = async function (knex) {
       const content = {
         type: 'survey',
         author_id: admin_author_id,
-        subject: 'Kinds of trees planted today',
+        subject: 'More kinds of trees planted today',
         survey_id: surveyId,
         composed_at: '2022-01-22',
       };
@@ -195,7 +195,7 @@ const seed = async function (knex) {
       const content = {
         type: 'survey_response',
         author_id: mobile_author_2_id,
-        subject: 'Number of trees planted today',
+        subject: 'More kinds of trees planted today',
         survey_id: surveyId,
         survey_response: JSON.stringify(['Pine', 'At the market', 'Sometimes']),
         composed_at: '2022-01-22',
@@ -238,7 +238,7 @@ const seed = async function (knex) {
       const content = {
         type: 'survey',
         author_id: admin_author_id,
-        subject: 'Kinds of trees planted today',
+        subject: 'Shorter Survey',
         survey_id: surveyId,
         composed_at: '2022-01-22',
       };
