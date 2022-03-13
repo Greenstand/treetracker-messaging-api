@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.11...v1.12.0) (2022-03-13)
+
+
+### Features
+
+* add sorting query params ([6d040fb](https://github.com/Greenstand/treetracker-messaging-api/commit/6d040fbc98e4a14d2bbe867a8165c3e22a3fd5ff))
+
 ## [1.11.11](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.10...v1.11.11) (2022-03-12)
 
 
