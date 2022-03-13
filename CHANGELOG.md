@@ -1,3 +1,11 @@
+## [1.12.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.0...v1.12.1) (2022-03-13)
+
+
+### Bug Fixes
+
+* remove extra join ([c87d629](https://github.com/Greenstand/treetracker-messaging-api/commit/c87d6298f4a695b36bc68f0fb9da73bcfbbb7330))
+* since should be > not >= ([1421e26](https://github.com/Greenstand/treetracker-messaging-api/commit/1421e26b0f79097700fc5d76c726e5a1c4cac34e))
+
 # [1.12.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.11.11...v1.12.0) (2022-03-13)
 
 
