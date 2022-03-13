@@ -25,7 +25,7 @@ class MessageRepository extends BaseRepository {
         result.where({ 'message.id': object.messageId });
       } else {
         if (object.since) {
-          result = result.where('content.composed_at', '>=', object.since);
+          result = result.where('content.composed_at', '>', object.since);
         }
         result.where(function () {
           this.where('content.author_id', object.author_id);
