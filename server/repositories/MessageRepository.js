@@ -57,12 +57,6 @@ class MessageRepository extends BaseRepository {
         'author_recipient.id',
       )
       .leftJoin('survey', 'survey.id', '=', 'content.survey_id')
-      .leftJoin(
-        'survey_question',
-        'survey.id',
-        '=',
-        'survey_question.survey_id',
-      )
       .where((builder) => whereBuilder(filter, builder));
 
     return baseQuery;
