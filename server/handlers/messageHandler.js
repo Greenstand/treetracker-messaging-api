@@ -54,6 +54,8 @@ const messageGetQuerySchema = Joi.object({
   limit: Joi.number().integer().greater(0).less(501),
   offset: Joi.number().integer().greater(-1),
   since: Joi.date().iso(),
+  sort_by: Joi.string().allow('composed_at'),
+  order: Joi.string().allow('desc', 'asc'),
 }).unknown(false);
 
 const messageSingleGetQuerySchema = Joi.object({
@@ -91,12 +93,12 @@ const messageGet = async (req, res, next) => {
       prev = `${urlWithLimitAndOffset}${+filter.offset - +filter.limit}`;
     }
 
-    const query =  {
+    const query = {
       total: messagesCount,
-      ...filter
-    }
-    query.limit = parseInt(query.limit)
-    query.offset = parseInt(query.offset)
+      ...filter,
+    };
+    query.limit = parseInt(query.limit);
+    query.offset = parseInt(query.offset);
 
     res.send({
       messages,
@@ -104,7 +106,7 @@ const messageGet = async (req, res, next) => {
         prev,
         next: nextUrl,
       },
-      query
+      query,
     });
     res.end();
   } catch (e) {

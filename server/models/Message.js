@@ -36,7 +36,7 @@ const Message = async ({
       id: survey_id,
       title: survey_title,
       questions,
-      response: !!survey_response
+      response: !!survey_response,
     };
   }
 
@@ -216,12 +216,21 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   // }
 };
 
-const FilterCriteria = ({ handle, since, author_id, messageId }) => {
+const FilterCriteria = ({
+  handle,
+  since,
+  author_id,
+  messageId,
+  sort_by,
+  order = 'asc',
+}) => {
   return {
     handle,
     author_id,
     since: since ? new Date(since).toISOString() : since,
     messageId,
+    sort_by,
+    order,
   };
 };
 

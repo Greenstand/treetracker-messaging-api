@@ -27,11 +27,10 @@ class MessageRepository extends BaseRepository {
         if (object.since) {
           result = result.where('content.composed_at', '>=', object.since);
         }
-        result.where( function() {
+        result.where(function () {
           this.where('content.author_id', object.author_id);
           this.orWhere('message.recipient_id', object.author_id);
         });
-      
       }
       return result;
     };
@@ -47,12 +46,7 @@ class MessageRepository extends BaseRepository {
         this.on('content.id', '=', 'message.content_id').andOn(function () {
           this.onVal('content.type', '=', 'message')
             .orOnVal('content.type', '=', 'survey_response')
-            .orOnVal(
-              'message.recipient_id',
-              '=',
-              filter.author_id,
-            )
-  
+            .orOnVal('message.recipient_id', '=', filter.author_id);
         });
       })
       .leftJoin('bulk_message', 'content.id', '=', 'bulk_message.content_id')
@@ -75,8 +69,7 @@ class MessageRepository extends BaseRepository {
   }
 
   async getMessages(filter, { limit, offset }) {
-    
-    return this.getMessagesBaseQuery(filter)
+    const promise = this.getMessagesBaseQuery(filter)
       .select(
         'bulk_message.id as bulk_message_id',
         'message.id',
@@ -95,8 +88,15 @@ class MessageRepository extends BaseRepository {
         'survey.title as survey_title',
       )
       .limit(limit)
-      .offset(offset)
-      .orderBy('composed_at', 'asc');
+      .offset(offset);
+
+    if (filter.sort_by) {
+      promise.orderBy(filter.sort_by, filter.order);
+    } else {
+      promise.orderBy('composed_at', 'asc');
+    }
+
+    return promise;
   }
 
   async getMessagesCount(filter) {
