@@ -7,8 +7,8 @@ const authorSeed = require('./01_table_author');
 const admin_author_id = authorSeed.author_one_id;
 const mobile_author_1_id = uuid();
 const mobile_author_2_id = uuid();
-const mobile_author_1 = 'mobile1';
-const mobile_author_2 = 'mobile2';
+const mobile_author_1 = 'mobile1@test';
+const mobile_author_2 = 'mobile2@test';
 
 
 const fakeMessageContent = function () {

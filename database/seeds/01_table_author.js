@@ -11,9 +11,9 @@ const author_two_id = '4763f101-a915-4b86-871b-86714d45a889';
 const author_three_id = '8356456a-1900-4089-98f0-d3565d71acff';
 const author_four_id = 'e4938dc8-fea9-49a7-a143-8e21c1cbf597';
 const author_one_handle = 'admin';
-const author_two_handle = 'handle2';
-const author_three_handle = 'handle3';
-const author_four_handle = 'handle4';
+const author_two_handle = 'handle2@test';
+const author_three_handle = 'handle3@test';
+const author_four_handle = 'handle4@test';
 
 //
 // Create author data in the database
