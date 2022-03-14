@@ -16,7 +16,7 @@ const fakeMessageContent = function () {
     type: 'message',
     author_id: admin_author_id,
     body: chance.sentence({ words: 12 }),
-    composed_at: chance.date({ year: 2022 }).toISOString(),
+    composed_at: chance.date({ year: 2021 }).toISOString(),
   };
 }
 
