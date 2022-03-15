@@ -38,7 +38,7 @@ const bulkMessagePostSchema = Joi.object({
 
 const messagePostSchema = Joi.object({
   id: Joi.string().uuid(),
-  parent_message_id: Joi.string().uuid(),
+  parent_message_id: Joi.string().uuid().allow(null),
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
   type: Joi.string().required().valid('message', 'survey_response'),
@@ -115,7 +115,7 @@ const messageGet = async (req, res, next) => {
   }
 };
 
-const messageSingleGet = async (req, res, _next) => {
+const messageSingleGet = async (req, res, next) => {
   try {
     await messageSingleGetQuerySchema.validateAsync(req.params, {
       abortEarly: false,
@@ -127,7 +127,7 @@ const messageSingleGet = async (req, res, _next) => {
     res.end();
   } catch (e) {
     log.error(e);
-    _next(e);
+    next(e);
   }
 };
 

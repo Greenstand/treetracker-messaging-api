@@ -161,7 +161,7 @@ const seed = async function (knex) {
         author_id: admin_author_id,
         subject: 'More kinds of trees planted today',
         survey_id: surveyId,
-        composed_at: '2022-01-22',
+        composed_at: '2022-01-22T00:00:00.000Z',
       };
       const contentId = (await knex('content')
         .insert(content)
@@ -198,7 +198,7 @@ const seed = async function (knex) {
         subject: 'More kinds of trees planted today',
         survey_id: surveyId,
         survey_response: JSON.stringify(['Pine', 'At the market', 'Sometimes']),
-        composed_at: '2022-01-22',
+        composed_at: '2022-01-22T00:10:00.000Z',
       };
       const contentId = (await knex('content')
         .insert(content)
