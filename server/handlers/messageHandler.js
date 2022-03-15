@@ -115,7 +115,7 @@ const messageGet = async (req, res, next) => {
   }
 };
 
-const messageSingleGet = async (req, res, _next) => {
+const messageSingleGet = async (req, res, next) => {
   try {
     await messageSingleGetQuerySchema.validateAsync(req.params, {
       abortEarly: false,
@@ -127,7 +127,7 @@ const messageSingleGet = async (req, res, _next) => {
     res.end();
   } catch (e) {
     log.error(e);
-    _next(e);
+    next(e);
   }
 };
 
