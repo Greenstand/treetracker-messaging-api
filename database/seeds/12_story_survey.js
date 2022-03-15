@@ -31,7 +31,7 @@ const seed = async function (knex) {
       author_id: authorId,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
-      composed_at: '2022-01-22',
+      composed_at: '2022-01-22T00:00:00.000Z',
     };
     const contentId = (await knex('content')
       .insert(content)
@@ -75,7 +75,7 @@ const seed = async function (knex) {
       subject: 'Number of trees planted today',
       survey_id: surveyId,
       survey_response: JSON.stringify(['1']),
-      composed_at: '2022-01-22',
+      composed_at: '2022-01-22T00:00:01.000Z',
     };
     const contentId = (await knex('content')
       .insert(content)
@@ -97,7 +97,7 @@ const seed = async function (knex) {
       subject: 'Number of trees planted today',
       survey_id: surveyId,
       survey_response: JSON.stringify(['10']),
-      composed_at: '2022-01-22',
+      composed_at: '2022-01-22T00:10:01.000Z',
     };
     const contentId = (await knex('content')
       .insert(content)
@@ -119,7 +119,7 @@ const seed = async function (knex) {
       subject: 'Number of trees planted today',
       survey_id: surveyId,
       survey_response: JSON.stringify(['1000']),
-      composed_at: '2022-01-22',
+      composed_at: '2022-01-22T00:30:01.000Z',
     };
     const contentId = (await knex('content')
       .insert(content)
