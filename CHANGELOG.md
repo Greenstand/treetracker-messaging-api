@@ -1,3 +1,12 @@
+## [1.12.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.1...v1.12.2) (2022-03-15)
+
+
+### Bug Fixes
+
+* allow null parent message id ([a47f8b7](https://github.com/Greenstand/treetracker-messaging-api/commit/a47f8b7aa24477888da5a840558ee6a84d14a170))
+* lint ([f50423c](https://github.com/Greenstand/treetracker-messaging-api/commit/f50423c156f30868ed3805b80137190daff31e37))
+* seeded surveys had same composed at dates ([e992d80](https://github.com/Greenstand/treetracker-messaging-api/commit/e992d8001395cd4a77ee79c4f0ac9a72003b8815))
+
 ## [1.12.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.0...v1.12.1) (2022-03-13)
 
 
