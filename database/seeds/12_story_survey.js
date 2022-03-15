@@ -10,20 +10,19 @@ const surveyId = uuid();
 const title = 'Number of trees planted today';
 
 const seed = async function (knex) {
-
   const survey = {
     id: surveyId,
     title,
-  }
+  };
   await knex('survey').insert(survey).returning('id');
 
   const surveyQuesetion1 = {
     survey_id: surveyId,
     prompt: 'How many trees did you plant today?',
     rank: 1,
-    choices: ['1', '10', '1000']
-  }
-  await knex('survey_question').insert(surveyQuesetion1)
+    choices: ['1', '10', '1000'],
+  };
+  await knex('survey_question').insert(surveyQuesetion1);
 
   {
     const content = {
@@ -33,9 +32,19 @@ const seed = async function (knex) {
       survey_id: surveyId,
       composed_at: '2022-01-22',
     };
-    const contentId = (await knex('content')
-      .insert(content)
-      .returning('id'))[0];
+    const contentId = (
+      await knex('content').insert(content).returning('id')
+    )[0];
+
+    {
+      const message = {
+        id: uuid(),
+        content_id: contentId,
+        sender_id: authorId,
+        recipient_id: authorId,
+      };
+      await knex('message').insert(message).returning('id');
+    }
 
     {
       const message = {
@@ -77,9 +86,9 @@ const seed = async function (knex) {
       survey_response: JSON.stringify(['1']),
       composed_at: '2022-01-22',
     };
-    const contentId = (await knex('content')
-      .insert(content)
-      .returning('id'))[0];
+    const contentId = (
+      await knex('content').insert(content).returning('id')
+    )[0];
 
     const message = {
       id: uuid(),
@@ -99,9 +108,9 @@ const seed = async function (knex) {
       survey_response: JSON.stringify(['10']),
       composed_at: '2022-01-22',
     };
-    const contentId = (await knex('content')
-      .insert(content)
-      .returning('id'))[0];
+    const contentId = (
+      await knex('content').insert(content).returning('id')
+    )[0];
 
     const message = {
       id: uuid(),
@@ -121,9 +130,9 @@ const seed = async function (knex) {
       survey_response: JSON.stringify(['1000']),
       composed_at: '2022-01-22',
     };
-    const contentId = (await knex('content')
-      .insert(content)
-      .returning('id'))[0];
+    const contentId = (
+      await knex('content').insert(content).returning('id')
+    )[0];
 
     const message = {
       id: uuid(),
@@ -133,7 +142,7 @@ const seed = async function (knex) {
     };
     await knex('message').insert(message).returning('id');
   }
-}
+};
 
 module.exports = {
   seed,
@@ -142,4 +151,4 @@ module.exports = {
   messageId,
   surveyId,
   title,
-}
+};
