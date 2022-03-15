@@ -38,7 +38,7 @@ const bulkMessagePostSchema = Joi.object({
 
 const messagePostSchema = Joi.object({
   id: Joi.string().uuid(),
-  parent_message_id: Joi.string().uuid(),
+  parent_message_id: Joi.string().uuid().allow(null),
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
   type: Joi.string().required().valid('message', 'survey_response'),
