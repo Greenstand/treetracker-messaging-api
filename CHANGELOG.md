@@ -1,3 +1,11 @@
+## [1.12.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.3...v1.12.4) (2022-03-16)
+
+
+### Bug Fixes
+
+* force deployment ([c454cf9](https://github.com/Greenstand/treetracker-messaging-api/commit/c454cf984b576be33528d36ebcc8089ef99e8729))
+* remove extra / ([647ef3a](https://github.com/Greenstand/treetracker-messaging-api/commit/647ef3adad8abfabfd9800c1eec6bd8e1c1ff9f6))
+
 ## [1.12.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.2...v1.12.3) (2022-03-16)
 
 
