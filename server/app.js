@@ -9,7 +9,7 @@ const router = require('./routes');
 
 const app = express();
 
-if (process.env.NODE_ENV === 'development') {
+if ( ['development', 'local'].includes(process.env.NODE_ENV) ) {
   log.info('disable cors');
   app.use(cors());
 }

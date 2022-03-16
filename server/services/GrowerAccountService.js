@@ -1,15 +1,17 @@
 const axios = require('axios').default;
+const log = require('loglevel');
 
 const TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL =
-  process.env.TREETRACKER_API_URL ||
+  process.env.TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL ||
   'http://treetracker-grower-account-query.query/';
 
 const growerAccountUrl = `${TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
 
 const getGrowerAccountWalletsForOrganization = async (organization_id) => {
-  // get grower_accounts in the specified organization from the treetracker-api
+  const url = `${growerAccountUrl}?organization_id=${organization_id}`;
+  log.info(url);
   const response = await axios.get(
-    `${growerAccountUrl}?organization_id=${organization_id}`,
+    url
   );
 
   const { grower_accounts } = response.data;
