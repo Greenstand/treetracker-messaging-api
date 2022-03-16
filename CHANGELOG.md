@@ -1,3 +1,10 @@
+## [1.12.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.5...v1.12.6) (2022-03-16)
+
+
+### Bug Fixes
+
+* open cors for test and prod admin panel ([54d8bc5](https://github.com/Greenstand/treetracker-messaging-api/commit/54d8bc544a7052e967e29ae0cb0985fabdaf8e4b))
+
 ## [1.12.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.4...v1.12.5) (2022-03-16)
 
 
