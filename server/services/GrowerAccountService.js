@@ -3,7 +3,7 @@ const log = require('loglevel');
 
 const TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL =
   process.env.TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL ||
-  'http://treetracker-grower-account-query.query/';
+  'http://treetracker-grower-account-query.query';
 
 const growerAccountUrl = `${TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
 
