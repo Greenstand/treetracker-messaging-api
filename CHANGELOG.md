@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.6...v1.13.0) (2022-03-17)
+
+
+### Features
+
+* add region to bulk recipients, improve api ([eeefe56](https://github.com/Greenstand/treetracker-messaging-api/commit/eeefe562a1979a5ee6bc6000379ea5e5f88e7442))
+
 ## [1.12.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.5...v1.12.6) (2022-03-16)
 
 
