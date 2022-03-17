@@ -8,7 +8,7 @@ const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakehold
 const organizationName = 'Greenstance';
 
 const regionId = '9a8fa051-d8b8-44ff-96eb-cfce4d07bc8c';
-const regionName = 'City';
+const regionName = 'Palcil';
 
 
 const seed = async function (knex) {
