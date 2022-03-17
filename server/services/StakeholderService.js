@@ -8,7 +8,7 @@ const TREETRACKER_STAKEHOLDER_API_URL =
 const getOrganizationName = async (organizationId) => {
   log.info('get org name');
   const stakeholderUrl = `${TREETRACKER_STAKEHOLDER_API_URL}/stakeholders`;
-  const queryUrl = `${stakeholderUrl}/${organizationId}`;
+  const queryUrl = `${stakeholderUrl}?id=${organizationId}`;
   const organizationResponse = await axios.get(queryUrl);
   return organizationResponse.data.stakeholders[0]?.org_name ?? organizationId;
 };
