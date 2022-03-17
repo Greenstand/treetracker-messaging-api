@@ -30,7 +30,7 @@ const stubStakeholderAndRegion = (stakeholderPayload, regionPayload) => {
     } else if (_url.includes('region')) {
       rval = {
         data: {
-          regions: [regionPayload],
+          region: regionPayload,
         },
       };
     }
@@ -223,9 +223,9 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(200);
 
-      log.debug(res.body.messages);
+      log.info(res.body.messages);
       res.body.messages.forEach((it) => {
-        log.debug(it.bulk_message_recipients);
+        log.info(it.bulk_message_recipients);
       });
 
       axiosStub.restore();

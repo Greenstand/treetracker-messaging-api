@@ -12,7 +12,7 @@ const getRegionName = async (regionId) => {
   log.info(regionsUrl);
   const regionResponse = await axios.get(regionsUrl);
   log.info(regionResponse.data);
-  return regionResponse.data.region.name ?? regionId;
+  return regionResponse.data.region?.name ?? regionId;
 };
 
 module.exports = {
