@@ -1,3 +1,11 @@
+## [1.13.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.0...v1.13.1) (2022-03-17)
+
+
+### Bug Fixes
+
+* use correct path ([47a49a4](https://github.com/Greenstand/treetracker-messaging-api/commit/47a49a48fee9327325d9c8918e061ef3740fd408))
+* use correct region api ([cc70e17](https://github.com/Greenstand/treetracker-messaging-api/commit/cc70e177d22962a3c153e1add13ef7ebd92984e3))
+
 # [1.13.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.12.6...v1.13.0) (2022-03-17)
 
 
