@@ -8,7 +8,7 @@ const TREETRACKER_REGION_API_URL =
 const getRegionName = async (regionId) => {
   log.info('get org name');
   let regionsUrl = `${TREETRACKER_REGION_API_URL}/region`;
-  regionsUrl = `${regionsUrl}?id=${regionId}`;
+  regionsUrl = `${regionsUrl}/${regionId}`;
   const regionResponse = await axios.get(regionsUrl);
   return regionResponse.data.regions[0]?.name ?? regionId;
 };
