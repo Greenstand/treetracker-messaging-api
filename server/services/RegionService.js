@@ -9,8 +9,10 @@ const getRegionName = async (regionId) => {
   log.info('get org name');
   let regionsUrl = `${TREETRACKER_REGION_API_URL}/region`;
   regionsUrl = `${regionsUrl}/${regionId}`;
+  log.info(regionsUrl);
   const regionResponse = await axios.get(regionsUrl);
-  return regionResponse.data.regions[0]?.name ?? regionId;
+  log.info(regionResponse.data);
+  return regionResponse.data.region.name ?? regionId;
 };
 
 module.exports = {
