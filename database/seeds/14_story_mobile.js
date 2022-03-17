@@ -9,6 +9,8 @@ const mobile_author_1_id = uuid();
 const mobile_author_2_id = uuid();
 const mobile_author_1 = 'mobile1@test';
 const mobile_author_2 = 'mobile2@test';
+const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakeholder-api seed
+const regionId  = '9a8fa051-d8b8-44ff-96eb-cfce4d07bc8c'; // from region-api seed
 
 
 const fakeMessageContent = function () {
@@ -19,8 +21,6 @@ const fakeMessageContent = function () {
     composed_at: chance.date({ year: 2021 }).toISOString(),
   };
 }
-
-const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakeholder-api seed
 
 const seed = async function (knex) {
 
@@ -166,6 +166,15 @@ const seed = async function (knex) {
       const contentId = (await knex('content')
         .insert(content)
         .returning('id'))[0];
+      
+      const bulkMessage = {
+        author_handle: authorSeed.author_one_handle,
+        content_id: contentId,
+        recipient_organization_id: organizationId,
+        recipient_region_id: regionId
+      }
+      await knex('bulk_message')
+        .insert(bulkMessage);
 
       {
         const message = {
@@ -245,6 +254,15 @@ const seed = async function (knex) {
       const contentId = (await knex('content')
         .insert(content)
         .returning('id'))[0];
+
+      const bulkMessage = {
+        author_handle: authorSeed.author_one_handle,
+        content_id: contentId,
+        recipient_organization_id: organizationId,
+        recipient_region_id: regionId
+      }
+      await knex('bulk_message')
+      .insert(bulkMessage);
 
       {
         const message = {

@@ -5,6 +5,7 @@ const HttpError = require('../utils/HttpError');
 
 const GrowerAccountService = require('./GrowerAccountService');
 const StakeholderService = require('./StakeholderService');
+const RegionService = require('./RegionService');
 
 const getMessages = async (filter) => {
   const session = new Session();
@@ -15,29 +16,26 @@ const getMessages = async (filter) => {
       const newRow = { ...row };
       if (row.recipient_organization_id || row.region_id) {
         newRow.bulk_message_recipients = [];
+        const recipient = {};
+
+        if (row.recipient_organization_id) {
+          log.debug('contacting stakeholder');
+          const orgName = await StakeholderService.getOrganizationName(
+            row.recipient_organization_id,
+          );
+          recipient.organization = orgName;
+        }
+
+        if (row.recipient_region_id) {
+          log.debug('contacting regions');
+          const regionName = await RegionService.getRegionName(
+            row.recipient_region_id
+          );
+          recipient.region = regionName;
+        }
+
+        newRow.bulk_message_recipients.push(recipient);
       }
-
-      if (row.recipient_organization_id) {
-        log.debug('contacting stakeholder');
-        const orgName = await StakeholderService.getOrganizationName(
-          row.recipient_organization_id,
-        );
-        newRow.bulk_message_recipients.push({
-          recipient: orgName,
-          type: 'organization',
-        });
-      }
-
-      // TODO: look up region name
-      // if (row.recipient_region_id) {
-      //   // get region name
-      //   const session = new Session();
-      //   const regionRepo = new RegionRepository(session);
-      //   const regionInfo = await regionRepo.getById(row.recipient_region_id);
-
-      //   bulk_message_recipients.push({ recipient: regionInfo.name, type: 'region' });
-      // }
-
       return newRow;
     }),
   );
