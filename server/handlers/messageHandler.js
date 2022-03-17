@@ -42,7 +42,7 @@ const messagePostSchema = Joi.object({
   recipient_handle: Joi.string(),
   author_handle: Joi.string().required(),
   type: Joi.string().required().valid('message', 'survey_response'),
-  body: Joi.string(),
+  body: Joi.string().allow(null),
   survey_id: Joi.string().uuid().allow(null),
   survey_response: Joi.array().items(Joi.string().allow(null)),
   video_link: Joi.string().allow(null, '').uri(),
