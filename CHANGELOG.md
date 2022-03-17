@@ -1,3 +1,10 @@
+## [1.13.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.4...v1.13.5) (2022-03-17)
+
+
+### Bug Fixes
+
+* allow body to be null ([0f0821d](https://github.com/Greenstand/treetracker-messaging-api/commit/0f0821d9c2a0f3692f74833821d92387be3d68c8))
+
 ## [1.13.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.3...v1.13.4) (2022-03-17)
 
 
