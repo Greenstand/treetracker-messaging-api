@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.1...v1.13.2) (2022-03-17)
+
+
+### Bug Fixes
+
+* revert fix to stakeholders/:id path, since this path is broken ([c90b8ad](https://github.com/Greenstand/treetracker-messaging-api/commit/c90b8ad8ba79729f63355e9497c2aa92d5668015))
+
 ## [1.13.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.0...v1.13.1) (2022-03-17)
 
 
