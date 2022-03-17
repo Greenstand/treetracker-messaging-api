@@ -7,6 +7,10 @@ const messageId = uuid();
 const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakeholder-api seed
 const organizationName = 'Greenstance';
 
+const regionId = '9a8fa051-d8b8-44ff-96eb-cfce4d07bc8c';
+const regionName = 'City';
+
+
 const seed = async function (knex) {
   const content = {
     type: 'announce',
@@ -20,7 +24,8 @@ const seed = async function (knex) {
   const bulkMessage = {
     author_handle: authorSeed.author_one_handle,
     content_id: contentId,
-    recipient_organization_id: organizationId
+    recipient_organization_id: organizationId,
+    recipient_region_id: regionId
   }
   await knex('bulk_message')
     .insert(bulkMessage);
@@ -40,5 +45,7 @@ module.exports = {
   recipientHandle: authorSeed.author_two_handle,
   organizationId,
   organizationName,
+  regionId,
+  regionName,
   messageId
 }

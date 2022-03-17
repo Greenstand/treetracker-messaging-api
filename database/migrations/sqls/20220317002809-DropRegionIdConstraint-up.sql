@@ -1,0 +1,1 @@
+ALTER TABLE bulk_message DROP CONSTRAINT bulk_message_recipient_region_id_fkey;

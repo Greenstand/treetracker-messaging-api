@@ -18,13 +18,23 @@ const knex = require('../server/database/knex');
 const databaseCleaner = require('../database/seeds/00_job_database_cleaner');
 const authorSeed = require('../database/seeds/01_table_author');
 
-const stubStakeholder = (stakeholderPayload) => {
+const stubStakeholderAndRegion = (stakeholderPayload, regionPayload) => {
   return sinon.stub(axios, 'get').callsFake(async (_url) => {
-    return {
-      data: {
-        stakeholders: [stakeholderPayload],
-      },
-    };
+    let rval = {}
+    if (_url.includes('stakeholder')) {
+      rval = {
+        data: {
+          stakeholders: [stakeholderPayload],
+        },
+      };
+    } else if (_url.includes('region')) {
+      rval = {
+        data: {
+          regions: [regionPayload],
+        },
+      };
+    }
+    return rval;
   });
 };
 
@@ -172,6 +182,11 @@ describe('Message API tests.', () => {
         .set('Accept', 'application/json')
         .expect(204);
 
+      const axiosStub = stubStakeholderAndRegion(
+        { org_name: null },
+        { name: null}
+      );
+
       const res = await request(server)
         .get(`/message`)
         .query({
@@ -179,6 +194,8 @@ describe('Message API tests.', () => {
         })
         .set('Accept', 'application/json')
         .expect(200);
+
+      axiosStub.restore();
 
       expect(res.body.messages)
         .to.be.an('array')
@@ -193,9 +210,10 @@ describe('Message API tests.', () => {
       const announceSeed = require('../database/seeds/11_story_announce');
       await announceSeed.seed(knex);
 
-      const axiosStub = stubStakeholder({
-        org_name: announceSeed.organizationName,
-      });
+      const axiosStub = stubStakeholderAndRegion(
+        { org_name: announceSeed.organizationName },
+        { name: announceSeed.regionName }
+      );
 
       const res = await request(server)
         .get(`/message`)
@@ -211,22 +229,26 @@ describe('Message API tests.', () => {
       });
 
       axiosStub.restore();
-
       expect(res.body.messages)
         .to.be.an('array')
         .that.contains.something.like({
           from: announceSeed.authorHandle,
           to: announceSeed.recipientHandle,
           recipient_organization_id: announceSeed.organizationId,
+          recipient_region_id: announceSeed.regionId,
           bulk_message_recipients: [
             {
-              recipient: announceSeed.organizationName,
-              type: 'organization',
-            },
+              organization: announceSeed.organizationName,
+              region: announceSeed.regionName
+            }
           ],
         });
     });
+
+    
   });
+
+  
 
   describe('Bulk Message POST resource creation', () => {
     it(`Should send an announce message to an organization`, async function () {
@@ -254,7 +276,7 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
@@ -324,7 +346,7 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
@@ -421,7 +443,7 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
@@ -480,7 +502,7 @@ describe('Message API tests.', () => {
 
       axiosStub.restore();
 
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
@@ -512,7 +534,7 @@ describe('Message API tests.', () => {
     });
 
     it(`Should get messages successfully`, async () => {
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       const res = await request(server)
         .get(`/message`)
@@ -557,7 +579,7 @@ describe('Message API tests.', () => {
     });
 
     it('Should get messages with limit, offset', async () => {
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       await request(server)
         .get(`/message`)
@@ -575,7 +597,7 @@ describe('Message API tests.', () => {
     });
 
     it('Should get messages without limit', async () => {
-      const stakeholderStub = stubStakeholder({ org_name: 'Greenstand' });
+      const stakeholderStub = stubStakeholderAndRegion({ org_name: 'Greenstand' });
 
       await request(server)
         .get(`/message`)
