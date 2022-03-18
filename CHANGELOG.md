@@ -1,3 +1,10 @@
+## [1.13.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.6...v1.13.7) (2022-03-18)
+
+
+### Bug Fixes
+
+* survey_response storage format ([b0ea553](https://github.com/Greenstand/treetracker-messaging-api/commit/b0ea55317114b1c5c04ae4d6094498a3335b8b7a))
+
 ## [1.13.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.5...v1.13.6) (2022-03-18)
 
 
