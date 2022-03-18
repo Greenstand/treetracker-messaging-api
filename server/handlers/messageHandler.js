@@ -44,7 +44,7 @@ const messagePostSchema = Joi.object({
   type: Joi.string().required().valid('message', 'survey_response'),
   body: Joi.string().allow(null),
   survey_id: Joi.string().uuid().allow(null),
-  survey_response: Joi.array().items(Joi.string().allow(null)),
+  survey_response: Joi.array().items(Joi.string().allow(null)).allow(null),
   video_link: Joi.string().allow(null, '').uri(),
   composed_at: Joi.date().iso().allow(null),
 }).unknown(false);
