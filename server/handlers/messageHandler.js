@@ -120,10 +120,16 @@ const messageSingleGet = async (req, res, next) => {
     await messageSingleGetQuerySchema.validateAsync(req.params, {
       abortEarly: false,
     });
-    const messages = await getMessages({
+    const [message] = await getMessages({
       messageId: req.params.message_id,
     });
-    res.send(messages[0]);
+    if (!message) {
+      throw new HttpError(
+        404,
+        `message with ${req.params.message_id} not found`,
+      );
+    }
+    res.send(message);
     res.end();
   } catch (e) {
     log.error(e);
