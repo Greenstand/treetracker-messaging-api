@@ -58,8 +58,8 @@ const getSurveyReport = async (
   const responses = surveyResponses
     .reduce((a, c) => {
       const aa = a;
-      for (let i = 0; i < c.survey_response.length; i += 1) {
-        const e = c.survey_response[i];
+      for (let i = 0; i < c.survey_response.survey_response.length; i += 1) {
+        const e = c.survey_response.survey_response[i];
         if (aa[i] === undefined) {
           aa[i] = {};
         }

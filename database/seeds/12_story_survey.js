@@ -85,7 +85,7 @@ const seed = async function (knex) {
       author_id: recipientId,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
-      survey_response: JSON.stringify(['1']),
+      survey_response: JSON.stringify({survey_response: ['1']}),
       composed_at: '2022-01-22T00:00:01.000Z',
     };
     const contentId = (await knex('content')
@@ -107,7 +107,7 @@ const seed = async function (knex) {
       author_id: recipientId2,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
-      survey_response: JSON.stringify(['10']),
+      survey_response: JSON.stringify({survey_response: ['10']}),
       composed_at: '2022-01-22T00:10:01.000Z',
     };
     const contentId = (await knex('content')
@@ -129,7 +129,7 @@ const seed = async function (knex) {
       author_id: recipientId3,
       subject: 'Number of trees planted today',
       survey_id: surveyId,
-      survey_response: JSON.stringify(['1000']),
+      survey_response: JSON.stringify({survey_response: ['1000']}),
       composed_at: '2022-01-22T00:30:01.000Z',
     };
     const contentId = (await knex('content')

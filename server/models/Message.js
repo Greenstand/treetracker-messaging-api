@@ -36,7 +36,7 @@ const Message = async ({
       id: survey_id,
       title: survey_title,
       questions,
-      response: !!survey_response,
+      response: !!survey_response
     };
   }
 
@@ -53,7 +53,7 @@ const Message = async ({
     body,
     composed_at,
     video_link,
-    survey_response: survey_response?.length > 0 ? survey_response : null,
+    survey_response: survey_response?.survey_response > 0 ? survey_response.survey_response : null,
     survey,
   };
 
@@ -216,21 +216,12 @@ const createBulkMessage = async (session, requestBody, recipientHandles) => {
   // }
 };
 
-const FilterCriteria = ({
-  handle,
-  since,
-  author_id,
-  messageId,
-  sort_by,
-  order = 'asc',
-}) => {
+const FilterCriteria = ({ handle, since, author_id, messageId }) => {
   return {
     handle,
     author_id,
     since: since ? new Date(since).toISOString() : since,
     messageId,
-    sort_by,
-    order,
   };
 };
 

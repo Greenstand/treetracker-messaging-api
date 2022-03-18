@@ -23,7 +23,8 @@
     "prettier-fix": "prettier ./ --write",
     "db-migrate-ci": "cd database; db-migrate up",
     "db-migrate-dev": "cd database; echo \"Migrating dev\"; db-migrate --env dev up; echo \"Migrating integration\";  db-migrate --env integration up",
-    "seed-dev": "NODE_ENV=development knex seed:run"
+    "seed-dev": "NODE_ENV=development knex seed:run",
+    "seed-usertest": "NODE_ENV=usertest knex seed:run"
   },
   "keywords": [
     "ecology"

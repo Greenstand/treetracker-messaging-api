@@ -206,7 +206,7 @@ const seed = async function (knex) {
         author_id: mobile_author_2_id,
         subject: 'More kinds of trees planted today',
         survey_id: surveyId,
-        survey_response: JSON.stringify(['Pine', 'At the market', 'Sometimes']),
+        survey_response: JSON.stringify({survey_response: ['Pine', 'At the market', 'Sometimes']}),
         composed_at: '2022-01-22T00:10:00.000Z',
       };
       const contentId = (await knex('content')
