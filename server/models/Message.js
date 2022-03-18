@@ -53,7 +53,7 @@ const Message = async ({
     body,
     composed_at,
     video_link,
-    survey_response: survey_response?.survey_response > 0 ? survey_response.survey_response : null,
+    survey_response: survey_response?.survey_response.length > 0 ? survey_response.survey_response : null,
     survey,
   };
 
