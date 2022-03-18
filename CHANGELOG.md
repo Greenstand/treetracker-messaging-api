@@ -1,3 +1,10 @@
+## [1.13.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.5...v1.13.6) (2022-03-18)
+
+
+### Bug Fixes
+
+* allow null survey response ([4e7db7e](https://github.com/Greenstand/treetracker-messaging-api/commit/4e7db7ee1f1a8859c4ae748da08dcf72c653560f))
+
 ## [1.13.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.4...v1.13.5) (2022-03-17)
 
 
