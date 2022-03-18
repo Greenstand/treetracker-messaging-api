@@ -1,3 +1,10 @@
+## [1.13.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.7...v1.13.8) (2022-03-18)
+
+
+### Bug Fixes
+
+* missing length property ([6edb7b2](https://github.com/Greenstand/treetracker-messaging-api/commit/6edb7b26598b481070a96f051800f8f76722ded8))
+
 ## [1.13.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.6...v1.13.7) (2022-03-18)
 
 
