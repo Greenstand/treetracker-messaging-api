@@ -39,10 +39,12 @@ exports.errorHandler = (err, req, res, _next) => {
       code: err.code,
       message: err.message,
     });
-  } else if (err instanceof ValidationError) {
+  } else if (err instanceof ValidationError || err.response.status === 422) {
     res.status(422).send({
       code: 422,
-      message: err.details.map((m) => m.message).join(';'),
+      message: err.details
+        ? err.details.map((m) => m.message).join(';')
+        : err.response.data.message,
     });
   } else {
     res.status(500).send({
