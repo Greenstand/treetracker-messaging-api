@@ -14,7 +14,7 @@ const getMessages = async (filter) => {
   const messagesWithRecipientInfo = await Promise.all(
     messages.map(async (row) => {
       const newRow = { ...row };
-      if (row.recipient_organization_id || row.region_id) {
+      if (row.recipient_organization_id || row.recipient_region_id) {
         newRow.bulk_message_recipients = [];
         const recipient = {};
 
