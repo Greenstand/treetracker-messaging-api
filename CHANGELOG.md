@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.8...v1.14.0) (2022-03-19)
+
+
+### Features
+
+* add examples of env vars needed for local dev & pass along error messages ([75976ee](https://github.com/Greenstand/treetracker-messaging-api/commit/75976eea7d6077a80653f68aff8c32a271269a98))
+
 ## [1.13.8](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.7...v1.13.8) (2022-03-18)
 
 
