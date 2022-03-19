@@ -1,3 +1,11 @@
+## [1.14.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.2...v1.14.3) (2022-03-19)
+
+
+### Bug Fixes
+
+* messageId returning empty response ([7aaf42c](https://github.com/Greenstand/treetracker-messaging-api/commit/7aaf42cda7631b5eeeba71f8bba703bfa498c0f7))
+* remove region endpoints ([ebe52c3](https://github.com/Greenstand/treetracker-messaging-api/commit/ebe52c31dccac1f8dd416d0cd12307a5dfd24c00))
+
 ## [1.14.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.1...v1.14.2) (2022-03-19)
 
 
