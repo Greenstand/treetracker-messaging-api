@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.0...v1.14.1) (2022-03-19)
+
+
+### Bug Fixes
+
+* correctly combine organization and region query to grower account query service ([a64ad6f](https://github.com/Greenstand/treetracker-messaging-api/commit/a64ad6f6a54774fe136c1ee13e5cb80fbbfa7059))
+
 # [1.14.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.13.8...v1.14.0) (2022-03-19)
 
 
