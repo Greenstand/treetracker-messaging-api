@@ -10,7 +10,7 @@ const mobile_author_2_id = uuid();
 const mobile_author_1 = 'mobile1@test';
 const mobile_author_2 = 'mobile2@test';
 const organizationId = 'a8567323-88b1-4870-8c48-68d2da3ab356'; // from stakeholder-api seed
-const regionId  = '9a8fa051-d8b8-44ff-96eb-cfce4d07bc8c'; // from region-api seed
+const regionId = '9a8fa051-d8b8-44ff-96eb-cfce4d07bc8c'; // from region-api seed
 
 
 const fakeMessageContent = function () {
@@ -155,18 +155,115 @@ const seed = async function (knex) {
     await knex('survey_question').insert(surveyQuesetion2)
     await knex('survey_question').insert(surveyQuesetion3)
 
+
+    const content = {
+      type: 'survey',
+      author_id: admin_author_id,
+      subject: 'More kinds of trees planted today',
+      survey_id: surveyId,
+      composed_at: '2022-01-22T00:00:00.000Z',
+    };
+    const contentId = (await knex('content')
+      .insert(content)
+      .returning('id'))[0];
+
+    const bulkMessage = {
+      author_handle: authorSeed.author_one_handle,
+      content_id: contentId,
+      recipient_organization_id: organizationId,
+      recipient_region_id: regionId
+    }
+    await knex('bulk_message')
+      .insert(bulkMessage);
+
+    {
+      const message = {
+        id: uuid(),
+        content_id: contentId,
+        sender_id: admin_author_id,
+        recipient_id: mobile_author_1_id,
+      };
+      await knex('message').insert(message).returning('id');
+    }
+
+    {
+      const message = {
+        id: uuid(),
+        content_id: contentId,
+        sender_id: admin_author_id,
+        recipient_id: mobile_author_2_id,
+      };
+      await knex('message').insert(message).returning('id');
+    }
+
+    // one survey response
+
+    {
+      const contentResponse = {
+        type: 'survey_response',
+        author_id: mobile_author_2_id,
+        subject: 'More kinds of trees planted today',
+        survey_id: surveyId,
+        survey_response: JSON.stringify({ survey_response: ['Pine', 'At the market', 'Sometimes'] }),
+        composed_at: '2022-01-22T00:10:00.000Z',
+      };
+      const contentResponseId = (await knex('content')
+        .insert(contentResponse)
+        .returning('id'))[0];
+
+      const message = {
+        id: uuid(),
+        content_id: contentResponseId,
+        sender_id: mobile_author_2_id,
+        recipient_id: admin_author_id,
+      };
+      await knex('message').insert(message).returning('id');
+    }
+  }
+
+  {
+    const surveyId = uuid();
+    const survey = {
+      id: surveyId,
+      title: "Another kinds of trees survey",
+    }
+    await knex('survey').insert(survey).returning('id');
+
+    const surveyQuesetion1 = {
+      survey_id: surveyId,
+      prompt: 'What kinds of trees did you plant today?',
+      rank: 1,
+      choices: ['Pine', 'Oak', 'Apple']
+    }
+    const surveyQuesetion2 = {
+      survey_id: surveyId,
+      prompt: 'Where did you plant today?',
+      rank: 1,
+      choices: ['At home', 'At the market', 'At the school']
+    }
+    const surveyQuesetion3 = {
+      survey_id: surveyId,
+      prompt: 'Did you plant alone?',
+      rank: 1,
+      choices: ['Yes', 'No', 'Sometimes']
+    }
+    await knex('survey_question').insert(surveyQuesetion1)
+    await knex('survey_question').insert(surveyQuesetion2)
+    await knex('survey_question').insert(surveyQuesetion3)
+
+
     {
       const content = {
         type: 'survey',
         author_id: admin_author_id,
-        subject: 'More kinds of trees planted today',
+        subject: 'Another kind of trees planted today',
         survey_id: surveyId,
         composed_at: '2022-01-22T00:00:00.000Z',
       };
       const contentId = (await knex('content')
         .insert(content)
         .returning('id'))[0];
-      
+
       const bulkMessage = {
         author_handle: authorSeed.author_one_handle,
         content_id: contentId,
@@ -185,43 +282,73 @@ const seed = async function (knex) {
         };
         await knex('message').insert(message).returning('id');
       }
-
-      {
-        const message = {
-          id: uuid(),
-          content_id: contentId,
-          sender_id: admin_author_id,
-          recipient_id: mobile_author_2_id,
-        };
-        await knex('message').insert(message).returning('id');
-      }
     }
+  }
 
+  {
 
-    // one survey response
+    const surveyId = uuid();
+    const survey = {
+      id: surveyId,
+      title: "Another kinds of trees survey",
+    }
+    await knex('survey').insert(survey).returning('id');
+
+    const surveyQuesetion1 = {
+      survey_id: surveyId,
+      prompt: 'What kinds of trees did you plant today?',
+      rank: 1,
+      choices: ['Pine', 'Oak', 'Apple']
+    }
+    const surveyQuesetion2 = {
+      survey_id: surveyId,
+      prompt: 'Where did you plant today?',
+      rank: 1,
+      choices: ['At home', 'At the market', 'At the school']
+    }
+    const surveyQuesetion3 = {
+      survey_id: surveyId,
+      prompt: 'Did you plant alone?',
+      rank: 1,
+      choices: ['Yes', 'No', 'Sometimes']
+    }
+    await knex('survey_question').insert(surveyQuesetion1)
+    await knex('survey_question').insert(surveyQuesetion2)
+    await knex('survey_question').insert(surveyQuesetion3)
+    const content = {
+      type: 'survey',
+      author_id: admin_author_id,
+      subject: 'Yet another kind of trees planted today',
+      survey_id: surveyId,
+      composed_at: '2022-01-22T00:00:00.000Z',
+    };
+    const contentId = (await knex('content')
+      .insert(content)
+      .returning('id'))[0];
+
+    const bulkMessage = {
+      author_handle: authorSeed.author_one_handle,
+      content_id: contentId,
+      recipient_organization_id: organizationId,
+      recipient_region_id: regionId
+    }
+    await knex('bulk_message')
+      .insert(bulkMessage);
 
     {
-      const content = {
-        type: 'survey_response',
-        author_id: mobile_author_2_id,
-        subject: 'More kinds of trees planted today',
-        survey_id: surveyId,
-        survey_response: JSON.stringify({survey_response: ['Pine', 'At the market', 'Sometimes']}),
-        composed_at: '2022-01-22T00:10:00.000Z',
-      };
-      const contentId = (await knex('content')
-        .insert(content)
-        .returning('id'))[0];
-
       const message = {
         id: uuid(),
         content_id: contentId,
-        sender_id: mobile_author_2_id,
-        recipient_id: admin_author_id,
+        sender_id: admin_author_id,
+        recipient_id: mobile_author_1_id,
       };
       await knex('message').insert(message).returning('id');
     }
   }
+
+
+
+
 
 
   // another survey
@@ -262,7 +389,7 @@ const seed = async function (knex) {
         recipient_region_id: regionId
       }
       await knex('bulk_message')
-      .insert(bulkMessage);
+        .insert(bulkMessage);
 
       {
         const message = {
