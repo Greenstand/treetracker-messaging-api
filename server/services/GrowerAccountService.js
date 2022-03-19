@@ -7,8 +7,20 @@ const TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL =
 
 const growerAccountUrl = `${TREETRACKER_GROWER_ACCOUNT_QUERY_API_URL}/grower_accounts`;
 
-const getGrowerAccountWalletsForOrganization = async (organization_id) => {
-  const url = `${growerAccountUrl}?organization_id=${organization_id}`;
+const getGrowerAccountWalletsForOrganizationAndRegion = async (organization_id, region_id) => {
+  let url = `${growerAccountUrl}?`;
+  if(organization_id){
+    url = `${url}organization_id=${organization_id}`
+  }
+
+  if(organization_id && region_id){
+    url = `${url}&`;
+  }
+
+  if(region_id){
+    url = `${url}region_id=${region_id}`;
+  }
+
   log.info(url);
   const response = await axios.get(
     url
@@ -20,15 +32,7 @@ const getGrowerAccountWalletsForOrganization = async (organization_id) => {
     : [];
 };
 
-const getGrowerAccountWalletsForRegion = async (region_id) => {
-  const response = await axios.get(
-    `${growerAccountUrl}?region_id=${region_id}`,
-  );
-  const { grower_accounts } = response.data;
-  return grower_accounts.filter((row) => row.wallet).map((row) => row.wallet);
-};
 
 module.exports = {
-  getGrowerAccountWalletsForOrganization,
-  getGrowerAccountWalletsForRegion,
+  getGrowerAccountWalletsForOrganizationAndRegion
 };

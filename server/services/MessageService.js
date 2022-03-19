@@ -64,39 +64,32 @@ const createBulkMessage = async (body) => {
   const session = new Session();
   try {
     await session.beginTransaction();
-    let orgRecipientHandles = [];
-    if (body.organization_id) {
-      orgRecipientHandles =
-        await GrowerAccountService.getGrowerAccountWalletsForOrganization(
+    let recipientHandles = [];
+    if (body.organization_id || body.region_id) {
+      recipientHandles =
+        await GrowerAccountService.getGrowerAccountWalletsForOrganizationAndRegion(
           body.organization_id,
+          body.region
         );
 
-      if (orgRecipientHandles.length < 1) {
+      if (recipientHandles.length < 1) {
+        let errorMessage = 'Error';
+        if (body.organization_id && body.region_id){
+          errorMessage = 'No author handle found in the specified organization and region';
+        } else if (body.organization_id){
+          errorMessage = 'No author handle found in the specified organization';
+        } else if (body.region_id){
+          errorMessage = 'No author handle found in the specified region';
+        }
         throw new HttpError(
           422,
-          'No author handle found in the specified organization',
-        );
-      }
-    }
-
-    let regionRecipientHandles = [];
-    if (body.region_id) {
-      regionRecipientHandles =
-        await GrowerAccountService.getGrowerAccountWalletsForRegion(
-          body.region_id,
-        );
-
-      if (regionRecipientHandles.length < 1) {
-        throw new HttpError(
-          422,
-          'No author handle found in the specified region',
+          errorMessage,
         );
       }
     }
 
     await Message.createBulkMessage(session, body, [
-      ...orgRecipientHandles,
-      ...regionRecipientHandles,
+      ...recipientHandles
     ]);
     await session.commitTransaction();
   } catch (e) {
