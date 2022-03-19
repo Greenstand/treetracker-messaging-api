@@ -1,3 +1,10 @@
+## [1.14.2](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.1...v1.14.2) (2022-03-19)
+
+
+### Bug Fixes
+
+* logic for bulk_message_recipients regionName ([dbfd485](https://github.com/Greenstand/treetracker-messaging-api/commit/dbfd485e7da5b3005ebe2b344a0d35755e596856))
+
 ## [1.14.1](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.0...v1.14.1) (2022-03-19)
 
 
