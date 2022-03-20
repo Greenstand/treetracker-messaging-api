@@ -1,3 +1,10 @@
+## [1.14.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.3...v1.14.4) (2022-03-20)
+
+
+### Bug Fixes
+
+* cors for beta-admin ([045c36b](https://github.com/Greenstand/treetracker-messaging-api/commit/045c36bdce98760e55f39117cd2fc3c46c420123))
+
 ## [1.14.3](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.2...v1.14.3) (2022-03-19)
 
 
