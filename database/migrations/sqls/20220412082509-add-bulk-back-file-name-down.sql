@@ -1,0 +1,1 @@
+ALTER TABLE message DROP bulk_pack_file_name;

@@ -47,6 +47,7 @@ const messagePostSchema = Joi.object({
   survey_response: Joi.array().items(Joi.string().allow(null)).allow(null),
   video_link: Joi.string().allow(null, '').uri(),
   composed_at: Joi.date().iso().allow(null),
+  bulk_pack_file_name: Joi.string(),
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({

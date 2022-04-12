@@ -27,6 +27,7 @@ const Message = async ({
   survey_id,
   survey_title,
   questions,
+  bulk_pack_file_name,
 }) => {
   let survey;
   if (!survey_id) {
@@ -36,7 +37,7 @@ const Message = async ({
       id: survey_id,
       title: survey_title,
       questions,
-      response: !!survey_response
+      response: !!survey_response,
     };
   }
 
@@ -53,8 +54,12 @@ const Message = async ({
     body,
     composed_at,
     video_link,
-    survey_response: survey_response?.survey_response.length > 0 ? survey_response.survey_response : null,
+    survey_response:
+      survey_response?.survey_response?.length > 0
+        ? survey_response.survey_response
+        : null,
     survey,
+    bulk_pack_file_name,
   };
 
   return Object.freeze(rval);
@@ -105,6 +110,7 @@ const MessageObject = ({
   content_id,
   sender_id,
   recipient_id,
+  bulk_pack_file_name = null,
 }) =>
   Object.freeze({
     id,
@@ -113,6 +119,7 @@ const MessageObject = ({
     parent_message_id,
     sender_id,
     recipient_id,
+    bulk_pack_file_name,
   });
 
 const createMessage = async (session, body) => {

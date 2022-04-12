@@ -1,0 +1,1 @@
+ALTER TABLE message ADD bulk_pack_file_name varchar;

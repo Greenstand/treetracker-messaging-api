@@ -68,6 +68,7 @@ class MessageRepository extends BaseRepository {
         'bulk_message.id as bulk_message_id',
         'message.id',
         'message.parent_message_id',
+        'message.bulk_pack_file_name',
         'author_sender.handle as author_handle',
         'author_recipient.handle as recipient_handle',
         'bulk_message.recipient_organization_id',
