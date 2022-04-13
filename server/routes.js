@@ -7,7 +7,7 @@ const {
   messageSingleGet,
   bulkMessagePost,
 } = require('./handlers/messageHandler');
-const { get } = require('./handlers/surveyHandler');
+const { surveyGet } = require('./handlers/surveyHandler');
 const { authorGet } = require('./handlers/authorHandler');
 const { handlerWrapper } = require('./utils/utils');
 
@@ -18,6 +18,6 @@ router.get('/message', handlerWrapper(messageGet));
 router.get('/message/:message_id', handlerWrapper(messageSingleGet));
 router.post('/bulk_message', handlerWrapper(bulkMessagePost));
 
-router.get('/survey/:uuid', handlerWrapper(get));
+router.get('/survey/:uuid', handlerWrapper(surveyGet));
 
 module.exports = router;

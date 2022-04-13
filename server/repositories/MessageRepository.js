@@ -62,28 +62,32 @@ class MessageRepository extends BaseRepository {
     return baseQuery;
   }
 
-  async getMessages(filter, { limit, offset }) {
-    const promise = this.getMessagesBaseQuery(filter)
-      .select(
-        'bulk_message.id as bulk_message_id',
-        'message.id',
-        'message.parent_message_id',
-        'message.bulk_pack_file_name',
-        'author_sender.handle as author_handle',
-        'author_recipient.handle as recipient_handle',
-        'bulk_message.recipient_organization_id',
-        'bulk_message.recipient_region_id',
-        'content.type',
-        'content.subject',
-        'content.body',
-        'content.video_link',
-        'content.composed_at',
-        'content.survey_response',
-        'content.survey_id',
-        'survey.title as survey_title',
-      )
-      .limit(limit)
-      .offset(offset);
+  async getMessages(filter, limitOptions) {
+    const promise = this.getMessagesBaseQuery(filter).select(
+      'bulk_message.id as bulk_message_id',
+      'message.id',
+      'message.parent_message_id',
+      'message.bulk_pack_file_name',
+      'author_sender.handle as author_handle',
+      'author_recipient.handle as recipient_handle',
+      'bulk_message.recipient_organization_id',
+      'bulk_message.recipient_region_id',
+      'content.type',
+      'content.subject',
+      'content.body',
+      'content.video_link',
+      'content.composed_at',
+      'content.survey_response',
+      'content.survey_id',
+      'survey.title as survey_title',
+    );
+
+    if (limitOptions?.limit) {
+      promise.limit(limitOptions?.limit);
+    }
+    if (limitOptions?.offset) {
+      promise.offset(limitOptions?.offset);
+    }
 
     if (filter.sort_by) {
       promise.orderBy(filter.sort_by, filter.order);
