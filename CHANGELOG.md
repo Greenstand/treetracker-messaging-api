@@ -1,3 +1,11 @@
+## [1.14.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.4...v1.14.5) (2022-05-03)
+
+
+### Bug Fixes
+
+* add bulk pack file names ([bde8a3e](https://github.com/Greenstand/treetracker-messaging-api/commit/bde8a3ebff593d801a39f56a2996b3ed45707423))
+* change models and services to use classes ([a4dce3e](https://github.com/Greenstand/treetracker-messaging-api/commit/a4dce3e665737b4133a4761af0006fe34f3fb0e7))
+
 ## [1.14.4](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.3...v1.14.4) (2022-03-20)
 
 
