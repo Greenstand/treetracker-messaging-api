@@ -1,14 +1,12 @@
 const log = require('loglevel');
 const Joi = require('joi');
 
-const {
-  getMessages,
-  createMessage,
-  createBulkMessage,
-  getMessagesCount,
-} = require('../services/MessageService');
-
+const MessageService = require('../services/MessageService');
 const HttpError = require('../utils/HttpError');
+const {
+  getFilterAndLimitOptions,
+  generatePrevAndNext,
+} = require('../utils/helper');
 
 const bulkMessagePostSchema = Joi.object({
   parent_message_id: Joi.string().uuid(),
@@ -47,6 +45,7 @@ const messagePostSchema = Joi.object({
   survey_response: Joi.array().items(Joi.string().allow(null)).allow(null),
   video_link: Joi.string().allow(null, '').uri(),
   composed_at: Joi.date().iso().allow(null),
+  bulk_pack_file_name: Joi.string(),
 }).unknown(false);
 
 const messageGetQuerySchema = Joi.object({
@@ -64,51 +63,28 @@ const messageSingleGetQuerySchema = Joi.object({
 
 const messageGet = async (req, res, next) => {
   try {
-    const filter = req.query;
-    await messageGetQuerySchema.validateAsync(filter, { abortEarly: false });
+    await messageGetQuerySchema.validateAsync(req.query, { abortEarly: false });
 
-    const defaultRange = { limit: '100', offset: '0' };
-    filter.limit = filter.limit ?? defaultRange.limit;
-    filter.offset = filter.offset ?? defaultRange.offset;
-    log.debug(filter);
+    const { filter, limitOptions } = getFilterAndLimitOptions(req.query);
+    const messageService = new MessageService();
 
-    const messages = await getMessages(filter);
-    const messagesCount = await getMessagesCount(filter);
+    const messages = await messageService.getMessages(filter, limitOptions);
+    const messagesCount = await messageService.getMessagesCount(filter);
 
-    // offset starts from 0, hence the -1
-    const noOfIterations = messagesCount / filter.limit - 1;
-    const currentIteration = filter.offset / filter.limit;
+    const url = 'message';
 
-    const url = `message?handle=${filter.handle}`;
-    const urlWithLimitAndOffset = `${url}${
-      filter.since ? `&since=${filter.since}` : ''
-    }&limit=${filter.limit}&offset=`;
-
-    const nextUrl =
-      currentIteration < noOfIterations
-        ? `${urlWithLimitAndOffset}${+filter.offset + +filter.limit}`
-        : null;
-    let prev = null;
-    if (filter.offset - +filter.limit >= 0) {
-      prev = `${urlWithLimitAndOffset}${+filter.offset - +filter.limit}`;
-    }
-
-    const query = {
-      total: messagesCount,
-      ...filter,
-    };
-    query.limit = parseInt(query.limit);
-    query.offset = parseInt(query.offset);
+    const links = generatePrevAndNext({
+      url,
+      count: messagesCount,
+      limitOptions,
+      queryObject: { ...filter, ...limitOptions },
+    });
 
     res.send({
       messages,
-      links: {
-        prev,
-        next: nextUrl,
-      },
-      query,
+      links,
+      query: { total: messagesCount, ...limitOptions, ...filter },
     });
-    res.end();
   } catch (e) {
     log.error(e);
     next(e);
@@ -120,7 +96,9 @@ const messageSingleGet = async (req, res, next) => {
     await messageSingleGetQuerySchema.validateAsync(req.params, {
       abortEarly: false,
     });
-    const [message] = await getMessages({
+
+    const messageService = new MessageService();
+    const [message] = await messageService.getMessages({
       messageId: req.params.message_id,
     });
     if (!message) {
@@ -140,16 +118,15 @@ const messageSingleGet = async (req, res, next) => {
 // Create a new message resource
 const messagePost = async (req, res, next) => {
   try {
-    log.warn(req.body);
     if (!req.body.body && !req.body.survey_id) {
       throw new HttpError(422, 'Body is required');
     }
     await messagePostSchema.validateAsync(req.body, { abortEarly: false });
-    await createMessage(req.body);
+    const messageService = new MessageService();
+    await messageService.createMessage(req.body);
     res.status(204).send();
     res.end();
   } catch (e) {
-    log.info(e);
     next(e);
   }
 };
@@ -166,7 +143,8 @@ const bulkMessagePost = async (req, res, next) => {
       );
     }
 
-    await createBulkMessage(req.body);
+    const messageService = new MessageService();
+    await messageService.createBulkMessage(req.body);
 
     res.status(204).send();
     res.end();

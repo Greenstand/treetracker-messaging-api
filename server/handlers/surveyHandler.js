@@ -1,15 +1,18 @@
 const Joi = require('joi');
 
 const log = require('loglevel');
-const { getSurveyReport } = require('../services/SurveyService');
+const SurveyService = require('../services/SurveyService');
 
-const get = async (req, res) => {
-  await Joi.object({
-    uuid: Joi.string().required(),
-  }).unknown(false).validateAsync(req.params, { abortEarly: false });
+const surveyIdParamSchema = Joi.object({
+  uuid: Joi.string().required(),
+}).unknown(false);
+
+const surveyGet = async (req, res) => {
+  await surveyIdParamSchema.validateAsync(req.params, { abortEarly: false });
 
   try {
-    const result = await getSurveyReport(req.params.uuid);
+    const surveyService = new SurveyService();
+    const result = await surveyService.getSurveyReport(req.params.uuid);
     res.status(200).send(result);
   } catch (e) {
     log.log(e);
@@ -18,5 +21,5 @@ const get = async (req, res) => {
 };
 
 module.exports = {
-  get,
+  surveyGet,
 };

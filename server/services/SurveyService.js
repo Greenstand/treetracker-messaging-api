@@ -1,23 +1,19 @@
 const log = require('loglevel');
 const Session = require('../models/Session');
 const Survey = require('../models/Survey');
-const SurveyRepository = require('../repositories/SurveyRepository');
-const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
 
-const getSurveyReport = async (surveyId) => {
-  log.debug("getSurveyReport");
-  const session = new Session();
-  const surveyRepository = new SurveyRepository(session);
-  const surveyQuestionRepository = new SurveyQuestionRepository(session);
+class SurveyService {
+  constructor() {
+    this._session = new Session();
+    this._survey = new Survey(this._session);
+  }
 
-  const result = await Survey.getSurveyReport(
-    surveyRepository,
-    surveyQuestionRepository,
-    surveyId,
-  );
-  return result;
-};
+  async getSurveyReport(surveyId) {
+    log.debug('getSurveyReport');
 
-module.exports = {
-  getSurveyReport,
-};
+    const result = await this._survey.getSurveyReport(surveyId);
+    return result;
+  }
+}
+
+module.exports = SurveyService;
