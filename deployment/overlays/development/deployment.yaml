@@ -13,5 +13,3 @@ spec:
           env:
             - name: NODE_LOG_LEVEL
               value: debug
-
-  
