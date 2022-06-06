@@ -81,15 +81,15 @@ describe('Message API Request Validation tests.', () => {
     //     });
     // });
 
-    it(`Should raise validation error with error code 422 -- body is required for regular message`, async () => {
-      const messagePostObject = { ...MessagePostObject };
-      delete messagePostObject.body;
-      const _res = await request(server)
-        .post(`/message`)
-        .send(messagePostObject)
-        .set('Accept', 'application/json')
-        .expect(422);
-    });
+    // it(`Should raise validation error with error code 422 -- body is required for regular message`, async () => {
+    //   const messagePostObject = { ...MessagePostObject };
+    //   delete messagePostObject.body;
+    //   const _res = await request(server)
+    //     .post(`/message`)
+    //     .send(messagePostObject)
+    //     .set('Accept', 'application/json')
+    //     .expect(422);
+    // });
 
     it(`Should raise validation error with error code 422 -- type is required `, async () => {
       const messagePostObject = { ...MessagePostObject };
