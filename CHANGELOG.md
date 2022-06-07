@@ -1,3 +1,12 @@
+## [1.14.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.5...v1.14.6) (2022-06-07)
+
+
+### Bug Fixes
+
+* db url check ([bceb7cd](https://github.com/Greenstand/treetracker-messaging-api/commit/bceb7cdbb21394e1e2990b5d52eb62f34e1d0098))
+* remove empty body error and redundant try/catch/log.errors ([7850e25](https://github.com/Greenstand/treetracker-messaging-api/commit/7850e2555264ce5685b8cd74e309977418217017))
+* test ([b4a3a2a](https://github.com/Greenstand/treetracker-messaging-api/commit/b4a3a2ab3041ca29a48b11c52eaac65d139a747e))
+
 ## [1.14.5](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.4...v1.14.5) (2022-05-03)
 
 
