@@ -36,5 +36,3 @@ spec:
                   key: db
             - name: DATABASE_SCHEMA
               value: messaging
-      imagePullSecrets:
-        - name: greenstand-docker-secret
