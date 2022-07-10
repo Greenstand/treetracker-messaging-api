@@ -1,3 +1,10 @@
+## [1.14.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.6...v1.14.7) (2022-07-10)
+
+
+### Bug Fixes
+
+* reduce max pool ([122159d](https://github.com/Greenstand/treetracker-messaging-api/commit/122159dfce9d9bde58c68458e09b4f766e12bec4))
+
 ## [1.14.6](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.5...v1.14.6) (2022-06-07)
 
 
