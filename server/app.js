@@ -1,4 +1,5 @@
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
 
 const log = require('loglevel');
@@ -6,6 +7,10 @@ const HttpError = require('./utils/HttpError');
 const { errorHandler } = require('./utils/utils');
 const { handlerWrapper } = require('./utils/utils');
 const router = require('./routes');
+const {
+  swaggerConfig,
+  swaggerOptions
+} = require('./swagger/swagger');
 
 const app = express();
 
@@ -41,6 +46,7 @@ app.use(express.json()); // parse application/json
 
 // routers
 app.use('/', router);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig, swaggerOptions));
 
 // Global error handler
 app.use(errorHandler);
