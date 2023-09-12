@@ -1,6 +1,7 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
+const { join } = require('path');
 
 const log = require('loglevel');
 const HttpError = require('./utils/HttpError');
@@ -46,6 +47,7 @@ app.use(express.json()); // parse application/json
 
 // routers
 app.use('/', router);
+app.use('/assets', express.static(join(__dirname, '..', '/assets')));
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig, swaggerOptions));
 
 // Global error handler

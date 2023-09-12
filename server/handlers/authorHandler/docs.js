@@ -5,15 +5,15 @@ const {
 
 const { swagger: swaggerAuthorGetQuerySchema } = j2s(authorGetQuerySchema);
 
-const singleAuthorResponse = {
-  content: {
-    'application/json': {
-      schema: {
-        $ref: '#/components/schemas/Author',
-      },
-    },
-  },
-};
+// const singleAuthorResponse = {
+//   content: {
+//     'application/json': {
+//       schema: {
+//         $ref: '#/components/schemas/Author',
+//       },
+//     },
+//   },
+// };
 
 const authorSwagger = {
   '/author': {
