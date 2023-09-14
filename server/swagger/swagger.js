@@ -5,6 +5,7 @@ const {
 } = require('./../handlers/authorHandler/docs');
 const {
   messageSwagger,
+  messageComponent,
 } = require('./../handlers/messageHandler/docs');
 
 const paths = {
@@ -21,7 +22,8 @@ const swaggerConfig = {
   paths,
   components: {
     schemas: {
-      Tag: { ...authorComponent },
+      Author: { ...authorComponent },
+      Message: { ...messageComponent }
     },
   },
 };

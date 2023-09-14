@@ -6,10 +6,18 @@ const {
   messageSingleGetQuerySchema,
 } = require('./schemas');
 
-const { swagger: swaggerBulkMessagePostSchema } = j2s(bulkMessagePostSchema);
 const { swagger: swaggerMessagePostSchema } = j2s(messagePostSchema);
-const { swagger: swaggerMessageGetQuerySchema } = j2s(messageGetQuerySchema);
 const { swagger: swaggerMessageSingleGetQuerySchema } = j2s(messageSingleGetQuerySchema);
+
+const singleCaptureMessageResponse = {
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/Message',
+      },
+    },
+  },
+};
 
 const messageSwagger = {
   '/message': {
@@ -66,8 +74,41 @@ const messageSwagger = {
       responses: { 200: {} },
     },
   },
+  '/message{message_id}': {
+    get: {
+      tags: ['message'],
+      parameters: [
+        {
+          schema: {
+            ...swaggerMessageSingleGetQuerySchema,
+          },
+          in: 'query',
+          name: 'query',
+          required: true,
+          description: 'Message ID',
+        },
+      ],
+      responses: {
+        200: singleCaptureMessageResponse,
+      }
+    },
+  },
+  '/bulk_message': {
+
+  },
 };
+
+const messageComponent = {
+  type: 'object',
+    properties: {
+      id: { type: 'string', format: 'uuid' },
+      content_id: { type: 'string', format: 'string' },
+      sender_id: { type: 'string', format: 'string' },
+      recipient_id: { type: 'string', format: 'string' },
+  }
+}
 
 module.exports = {
   messageSwagger,
+  messageComponent,
 };
