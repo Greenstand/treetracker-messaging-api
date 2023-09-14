@@ -5,10 +5,20 @@ const {
 
 const { swagger: swaggerAuthorGetQuerySchema } = j2s(authorGetQuerySchema);
 
+const authorCaptureResponse = {
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/Author',
+      },
+    },
+  },
+};
+
 const authorSwagger = {
   '/author': {
     get: {
-      tags: ['author'],
+      tags: ['Author'],
       summary: 'Returns a list of all authors that an admin panel operator is allowed to message',
       parameters: [
         {
@@ -18,29 +28,11 @@ const authorSwagger = {
           in: 'query',
           required: true,
           name: 'query',
-          description: 'Author\'s id',
+          description: 'Author ID',
         },
       ],
       responses: {
-        200: {
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  id: {
-                    type: 'string',
-                    format: 'string',
-                  },
-                  handle: {
-                    type: 'string',
-                    format: 'email',
-                  }
-                },
-              },
-            },
-          },
-        },
+        200: authorCaptureResponse,
       },
     },
   },

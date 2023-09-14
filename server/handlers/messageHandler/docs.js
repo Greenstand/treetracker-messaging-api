@@ -2,12 +2,12 @@ const j2s = require('joi-to-swagger');
 const {
   bulkMessagePostSchema,
   messagePostSchema,
-  messageGetQuerySchema,
   messageSingleGetQuerySchema,
 } = require('./schemas');
 
 const { swagger: swaggerMessagePostSchema } = j2s(messagePostSchema);
 const { swagger: swaggerMessageSingleGetQuerySchema } = j2s(messageSingleGetQuerySchema);
+const { swagger: swaggerBulkMessagePostSchema } = j2s(bulkMessagePostSchema);
 
 const singleCaptureMessageResponse = {
   content: {
@@ -22,7 +22,7 @@ const singleCaptureMessageResponse = {
 const messageSwagger = {
   '/message': {
     post: {
-      tags: ['message'],
+      tags: ['Message'],
       summary: 'Create a message resource',
       requestBody: {
         content: {
@@ -34,7 +34,7 @@ const messageSwagger = {
       responses: { 204: {} },
     },
     get: {
-      tags: ['message'],
+      tags: ['Message'],
       summary: 'Retrieve messages for a handle since a specified date, with pagination. Includes both messages from and to the handle',
       parameters: [
         {
@@ -76,7 +76,7 @@ const messageSwagger = {
   },
   '/message{message_id}': {
     get: {
-      tags: ['message'],
+      tags: ['Message'],
       parameters: [
         {
           schema: {
@@ -94,7 +94,18 @@ const messageSwagger = {
     },
   },
   '/bulk_message': {
-
+    post: {
+      tags: ['Message'],
+      summary: 'Create a group message. Only one of recipient_handle or (organization_id and/or region_id) can be specified to direct a message to users. This is a special API path to be used by the admin panel tool to queue messages for delivery',
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: { ...swaggerBulkMessagePostSchema },
+          },
+        },
+      },
+      responses: { 204: {} },
+    },
   },
 };
 

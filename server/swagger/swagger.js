@@ -7,10 +7,15 @@ const {
   messageSwagger,
   messageComponent,
 } = require('./../handlers/messageHandler/docs');
+const {
+  surveySwagger,
+  surveyComponent,
+} = require('./../handlers/surveyHandler/docs');
 
 const paths = {
   ...authorSwagger,
   ...messageSwagger,
+  ...surveySwagger,
 };
 
 const swaggerConfig = {
@@ -23,7 +28,8 @@ const swaggerConfig = {
   components: {
     schemas: {
       Author: { ...authorComponent },
-      Message: { ...messageComponent }
+      Message: { ...messageComponent },
+      Survey: { ...surveyComponent },
     },
   },
 };
