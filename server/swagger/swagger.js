@@ -21,7 +21,7 @@ const paths = {
 const swaggerConfig = {
   openapi: '3.0.0',
   info: {
-    title: 'Treetracker API',
+    title: 'Treetracker Messaging API',
     version,
   },
   paths,

@@ -3,11 +3,13 @@ const {
   bulkMessagePostSchema,
   messagePostSchema,
   messageSingleGetQuerySchema,
+  messageGetQuerySchema,
 } = require('./schemas');
 
 const { swagger: swaggerMessagePostSchema } = j2s(messagePostSchema);
 const { swagger: swaggerMessageSingleGetQuerySchema } = j2s(messageSingleGetQuerySchema);
 const { swagger: swaggerBulkMessagePostSchema } = j2s(bulkMessagePostSchema);
+const { swagger: swaggerMessageGetQuerySchema } = j2s(messageGetQuerySchema);
 
 const singleCaptureMessageResponse = {
   content: {
@@ -38,37 +40,12 @@ const messageSwagger = {
       summary: 'Retrieve messages for a handle since a specified date, with pagination. Includes both messages from and to the handle',
       parameters: [
         {
-          schema: { type: 'string' },
-          in: 'path',
-          required: true,
-          name: 'handle',
-        },
-        {
-          schema: { type: 'integer' },
-          in: 'path',
-          name: 'offset',
-        },
-        {
-          schema: { type: 'integer' },
-          in: 'path',
-          name: 'limit',
-          description: 'Default value: 100',
-        },
-        {
-          schema: { type: 'string' },
-          in: 'path',
-          name: 'since',
-          description: 'Standard: IS0 8601',
-        },
-        {
-          schema: { type: 'string', enum: ['composed_at'], default: 'composed_at' },
-          in: 'path',
-          name: 'sort_by',
-        },
-        {
-          schema: { type: 'string', enum: ['desc', 'asc'], default: 'desc' },
-          in: 'path',
-          name: 'order',
+          schema: {
+            ...swaggerMessageGetQuerySchema,
+          },
+          in: 'query',
+          name: 'query',
+          description: 'Get Message',
         },
       ],
       responses: { 200: {} },

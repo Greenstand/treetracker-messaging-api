@@ -68,7 +68,7 @@ const messagePost = async (req, res) => {
   res.end();
 };
 
-// Author a new messageHandler or group messageHandler
+// Author a new message or group message
 const bulkMessagePost = async (req, res) => {
   await bulkMessagePostSchema.validateAsync(req.body, { abortEarly: false });
   const { region_id, organization_id } = req.body;
