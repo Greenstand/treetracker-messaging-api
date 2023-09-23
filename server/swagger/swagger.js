@@ -6,6 +6,7 @@ const {
 const {
   messageSwagger,
   messageComponent,
+  messageGetComponent,
 } = require('./../handlers/messageHandler/docs');
 const {
   surveySwagger,
@@ -29,6 +30,7 @@ const swaggerConfig = {
     schemas: {
       Author: { ...authorComponent },
       Message: { ...messageComponent },
+      MessageGet: { ...messageGetComponent },
       Survey: { ...surveyComponent },
     },
   },

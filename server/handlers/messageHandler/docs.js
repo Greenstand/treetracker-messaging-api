@@ -5,6 +5,8 @@ const {
   messageSingleGetQuerySchema,
   messageGetQuerySchema,
 } = require('./schemas');
+const { number } = require("joi");
+const announceSeed = require("../../../database/seeds/11_story_announce");
 
 const { swagger: swaggerMessagePostSchema } = j2s(messagePostSchema);
 const { swagger: swaggerMessageSingleGetQuerySchema } = j2s(messageSingleGetQuerySchema);
@@ -16,6 +18,16 @@ const singleCaptureMessageResponse = {
     'application/json': {
       schema: {
         $ref: '#/components/schemas/Message',
+      },
+    },
+  },
+};
+
+const singleCaptureMessageGetResponse = {
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/MessageGet',
       },
     },
   },
@@ -48,7 +60,9 @@ const messageSwagger = {
           description: 'Get Message',
         },
       ],
-      responses: { 200: {} },
+      responses: {
+        200: singleCaptureMessageGetResponse
+      },
     },
   },
   '/message{message_id}': {
@@ -88,15 +102,65 @@ const messageSwagger = {
 
 const messageComponent = {
   type: 'object',
-    properties: {
-      id: { type: 'string', format: 'uuid' },
-      content_id: { type: 'string', format: 'string' },
-      sender_id: { type: 'string', format: 'string' },
-      recipient_id: { type: 'string', format: 'string' },
+  properties: {
+    id: { type: 'string', format: 'uuid' },
+    content_id: { type: 'string', format: 'string' },
+    sender_id: { type: 'string', format: 'string' },
+    recipient_id: { type: 'string', format: 'string' },
   }
-}
+};
+
+const messageGetComponent = {
+  type: 'object',
+  properties: {
+    links: {
+      type: 'object',
+      properties: {
+        next: { type: 'string' },
+        prev: { type: 'string' },
+      },
+    },
+    query: {
+      type: 'object',
+      properties: {
+        handle: { type: 'string' },
+        limit: { type: 'number' },
+        offset: { type: 'number' },
+        since: { type: 'date' },
+        sort_by: { type: 'string' },
+        order: { type: 'string', enum: ['asc', 'desc'] },
+      },
+      required: ['handle'],
+    },
+    messages: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          parent_message_id: { type: 'string', format: 'uuid' },
+          content_id: { type: 'string', format: 'uuid' },
+          sender_id: { type: 'string', format: 'uuid' },
+          recipient_id: { type: 'string', format: 'uuid' },
+          created_at: { type: 'string', format: 'timestamptz' },
+          bulk_message_recipients: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                organization: { type: 'string' },
+                region: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
+  }
+};
 
 module.exports = {
   messageSwagger,
   messageComponent,
+  messageGetComponent,
 };
