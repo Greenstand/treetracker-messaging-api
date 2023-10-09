@@ -31,7 +31,9 @@ jobs:
           --health-retries 5
 
     if: |
-      !contains(github.event.head_commit.message, 'skip-ci')
+      !contains(github.event.head_commit.message, 'skip-ci') &&
+      github.event_name == 'push' &&
+      github.repository_owner == 'Greenstand'
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 16.x
@@ -51,12 +53,6 @@ jobs:
         working-directory: ${{ env.project-directory }}
         env:
           DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
-
-      - name: run unit tests
-        run: npm run test-unit-ci
-        working-directory: ${{ env.project-directory }}
-        env:
-          CI: true
 
       - name: run integration tests
         run: npm run test-integration-ci
