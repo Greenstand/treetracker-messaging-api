@@ -1,4 +1,3 @@
-const log = require('loglevel');
 const BaseRepository = require('./BaseRepository');
 
 class SurveyRepository extends BaseRepository {
@@ -12,6 +11,7 @@ class SurveyRepository extends BaseRepository {
     const result = await this._session.getDB().raw(
       `
         SELECT
+          subject,
           survey_id,
           survey_response
         FROM
@@ -22,7 +22,6 @@ class SurveyRepository extends BaseRepository {
           `,
       [surveyId],
     );
-    log.warn('result:', result.rows);
     return result.rows;
   }
 }

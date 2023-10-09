@@ -1,17 +1,11 @@
 const { version } = require('../../package.json');
-const {
-  authorSwagger,
-  authorComponent,
-} = require('./../handlers/authorHandler/docs');
+const { authorSwagger, authorComponent } = require('./authorHandler/docs');
 const {
   messageSwagger,
   messageComponent,
   messageGetComponent,
-} = require('./../handlers/messageHandler/docs');
-const {
-  surveySwagger,
-  surveyComponent,
-} = require('./../handlers/surveyHandler/docs');
+} = require('./messageHandler/docs');
+const { surveySwagger, surveyComponent } = require('./surveyHandler/docs');
 
 const paths = {
   ...authorSwagger,
@@ -45,9 +39,9 @@ const swaggerOptions = {
     }
   `,
   explorer: true,
-}
+};
 
 module.exports = {
   swaggerConfig,
-  swaggerOptions
-}
+  swaggerOptions,
+};

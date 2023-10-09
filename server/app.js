@@ -8,18 +8,14 @@ const HttpError = require('./utils/HttpError');
 const { errorHandler } = require('./utils/utils');
 const { handlerWrapper } = require('./utils/utils');
 const router = require('./routes');
-const {
-  swaggerConfig,
-  swaggerOptions
-} = require('./swagger/swagger');
+const { swaggerConfig, swaggerOptions } = require('./handlers/swaggerDoc');
 
 const app = express();
 
-if ( ['development', 'local'].includes(process.env.NODE_ENV) ) {
+if (['development', 'local'].includes(process.env.NODE_ENV)) {
   log.info('disable cors');
   app.use(cors());
 }
-
 
 /*
  * Check request
@@ -48,7 +44,11 @@ app.use(express.json()); // parse application/json
 // routers
 app.use('/', router);
 app.use('/assets', express.static(join(__dirname, '..', '/assets')));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig, swaggerOptions));
+app.use(
+  '/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerConfig, swaggerOptions),
+);
 
 // Global error handler
 app.use(errorHandler);

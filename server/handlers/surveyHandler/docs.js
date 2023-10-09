@@ -1,7 +1,5 @@
 const j2s = require('joi-to-swagger');
-const {
-  surveyIdParamSchema,
-} = require('./schemas');
+const { surveyIdParamSchema } = require('./schemas');
 
 const { swagger: swaggerSurveyIdParamSchema } = j2s(surveyIdParamSchema);
 
@@ -31,7 +29,7 @@ const surveySwagger = {
         },
       ],
       responses: {
-        200: singleCaptureSurveyResponse
+        200: singleCaptureSurveyResponse,
       },
     },
   },
@@ -40,10 +38,36 @@ const surveySwagger = {
 const surveyComponent = {
   type: 'object',
   properties: {
-    id: { type: 'string' },
+    id: { type: 'string', format: 'uuid' },
     title: { type: 'string' },
+    created_at: { type: 'string', format: 'date-time' },
+    active: { type: 'boolean' },
+    questions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          survey_id: { type: 'string', format: 'uuid' },
+          prompt: { type: 'string' },
+          rank: { type: 'string' },
+          choices: { type: 'array', items: { type: 'string' } },
+          created_at: { type: 'string', format: 'date-time' },
+        },
+      },
+    },
+    responses: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          labels: { type: 'array' },
+          dataset: { type: 'array' },
+        },
+      },
+    },
   },
-}
+};
 
 module.exports = {
   surveySwagger,

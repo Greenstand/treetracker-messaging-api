@@ -1,5 +1,4 @@
 const log = require('loglevel');
-const { v4: uuid } = require('uuid');
 
 const Author = require('./Author');
 
@@ -85,9 +84,7 @@ class Message {
     active = true,
   }) {
     return Object.freeze({
-      id: uuid(),
       type,
-      created_at: new Date().toISOString(),
       subject,
       body,
       composed_at,
@@ -106,7 +103,6 @@ class Message {
     organization_id = null,
   }) {
     return Object.freeze({
-      id: uuid(),
       author_handle,
       content_id,
       recipient_region_id: region_id,
@@ -125,7 +121,6 @@ class Message {
     return Object.freeze({
       id,
       content_id,
-      created_at: new Date().toISOString(),
       parent_message_id,
       sender_id,
       recipient_id,
@@ -289,8 +284,6 @@ class Message {
   }
 
   async getMessagesCount(filterCriteria = undefined) {
-    log.info('getMessagesCount');
-
     let author_id;
 
     if (!filterCriteria.messageId) {
