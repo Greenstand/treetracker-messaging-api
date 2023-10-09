@@ -1,5 +1,3 @@
-const { v4: uuid } = require('uuid');
-
 const SurveyRepository = require('../repositories/SurveyRepository');
 const SurveyQuestionRepository = require('../repositories/SurveyQuestionRepository');
 
@@ -9,29 +7,17 @@ class Survey {
     this._surveyQuestionRepository = new SurveyQuestionRepository(session);
   }
 
-  static SurveyObject(survey) {
-    return Object.freeze({
-      id: uuid(),
-      title: survey.title,
-      created_at: new Date().toISOString(),
-      active: true,
-    });
-  }
-
   static SurveyQuestionObject({ rank, prompt, choices, survey_id }) {
     return Object.freeze({
-      id: uuid(),
       survey_id,
       rank,
       prompt,
       choices,
-      created_at: new Date().toISOString(),
     });
   }
 
   async createSurvey(body) {
-    const surveyObject = this.constructor.SurveyObject(body);
-    const survey = await this._surveyRepository.create(surveyObject);
+    const survey = await this._surveyRepository.create({ title: body.title });
 
     let rank = 1;
     await Promise.all(
@@ -60,6 +46,7 @@ class Survey {
     const responses = surveyResponses
       .reduce((a, c) => {
         const aa = a;
+
         for (let i = 0; i < c.survey_response.survey_response.length; i += 1) {
           const e = c.survey_response.survey_response[i];
           if (aa[i] === undefined) {

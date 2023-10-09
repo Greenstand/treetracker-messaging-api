@@ -6,9 +6,9 @@ const {
   messageGet,
   messageSingleGet,
   bulkMessagePost,
-} = require('./handlers/messageHandler');
-const { surveyGet } = require('./handlers/surveyHandler');
-const { authorGet } = require('./handlers/authorHandler');
+} = require('./handlers/messageHandler/messageHandler');
+const { surveyGet } = require('./handlers/surveyHandler/surveyHandler');
+const { authorGet } = require('./handlers/authorHandler/authorHandler');
 const { handlerWrapper } = require('./utils/utils');
 
 router.get('/author', handlerWrapper(authorGet));

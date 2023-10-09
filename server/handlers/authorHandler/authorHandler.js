@@ -1,10 +1,5 @@
-const Joi = require('joi');
-
-const AuthorService = require('../services/AuthorService');
-
-const authorGetQuerySchema = Joi.object({
-  id: Joi.string().uuid(),
-}).unknown(false);
+const AuthorService = require('../../services/AuthorService');
+const { authorGetQuerySchema } = require('./schemas');
 
 const authorGet = async (req, res) => {
   await authorGetQuerySchema.validateAsync(req.query, { abortEarly: false });

@@ -1,11 +1,6 @@
-const Joi = require('joi');
-
 const log = require('loglevel');
-const SurveyService = require('../services/SurveyService');
-
-const surveyIdParamSchema = Joi.object({
-  uuid: Joi.string().required(),
-}).unknown(false);
+const SurveyService = require('../../services/SurveyService');
+const { surveyIdParamSchema } = require('./schemas');
 
 const surveyGet = async (req, res) => {
   await surveyIdParamSchema.validateAsync(req.params, { abortEarly: false });
