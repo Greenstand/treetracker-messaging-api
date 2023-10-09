@@ -1,3 +1,23 @@
+# [1.15.0](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.7...v1.15.0) (2023-10-09)
+
+
+### Bug Fixes
+
+* swagger doc updates ([711188c](https://github.com/Greenstand/treetracker-messaging-api/commit/711188c0ef8411a2560b44e55de3b3f76a2ccf7f))
+* update  github workflow ([cce3762](https://github.com/Greenstand/treetracker-messaging-api/commit/cce376241e41ca92737e43d85917463bbf19731a))
+* update support for semantic release ([520f44b](https://github.com/Greenstand/treetracker-messaging-api/commit/520f44b4a314a4c4918ddb9f802702dc7a28fedc))
+
+
+### Features
+
+* author done ([63ecbc0](https://github.com/Greenstand/treetracker-messaging-api/commit/63ecbc0dc69292427f60c8ce38d8ceb647753346))
+* message ([b119641](https://github.com/Greenstand/treetracker-messaging-api/commit/b11964180967bd99d7a39500fa92e02674018800))
+* PR fix ([5284ae5](https://github.com/Greenstand/treetracker-messaging-api/commit/5284ae5417828d07f19ad2c69866eb7968ba5f24))
+* PR fix message ([22b7ccb](https://github.com/Greenstand/treetracker-messaging-api/commit/22b7ccbd242723b25e09609117b829d6274a334d))
+* swagger done ([38430e4](https://github.com/Greenstand/treetracker-messaging-api/commit/38430e46f914913697e0398cfadbee9d401d1820))
+* swagger init ([a5eb912](https://github.com/Greenstand/treetracker-messaging-api/commit/a5eb9127cda4804dd3a705ed38185456cd7a1e30))
+* swagger message ([e9403d1](https://github.com/Greenstand/treetracker-messaging-api/commit/e9403d1480532ff77c67871a59e16d692a8be1fc))
+
 ## [1.14.7](https://github.com/Greenstand/treetracker-messaging-api/compare/v1.14.6...v1.14.7) (2022-07-10)
 
 
