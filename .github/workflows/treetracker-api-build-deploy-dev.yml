@@ -14,16 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     container: node:10.18-jessie
 
-    # Service containers to run with `container-job`
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgis/postgis
-        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -36,10 +31,12 @@ jobs:
       github.repository_owner == 'Greenstand'
     steps:
       - uses: actions/checkout@v2
+
       - name: Use Node.js 16.x
         uses: actions/setup-node@v1
         with:
           node-version: '16.x'
+
       - name: npm clean install
         run: npm ci
         working-directory: ${{ env.project-directory }}
@@ -72,73 +69,88 @@ jobs:
     name: Release
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     if: |
       !contains(github.event.head_commit.message, 'skip-ci') &&
       github.event_name == 'push' &&
       github.repository_owner == 'Greenstand'
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
         with:
-          node-version: '18.x'
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
 
       - name: npm clean install
         run: npm ci
         working-directory: ${{ env.project-directory }}
 
-      - run: npm i -g semantic-release @semantic-release/{git,exec,changelog}
+      - name: Install release tools
+        run: npm i -g semantic-release @semantic-release/git @semantic-release/exec @semantic-release/changelog
 
-      - run: semantic-release
+      - name: Run semantic-release
+        id: semantic-release
+        run: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@master
-
       - name: Set up QEMU
+        if: steps.semantic-release.outputs.new-release-published == 'true'
         uses: docker/setup-qemu-action@v1
 
       - name: Set up Docker Buildx
+        if: steps.semantic-release.outputs.new-release-published == 'true'
         uses: docker/setup-buildx-action@v1
 
       - name: Login to DockerHub
+        if: steps.semantic-release.outputs.new-release-published == 'true'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build snapshot and push on merge
-        id: docker_build_release
+      - name: Build and push release image
+        if: steps.semantic-release.outputs.new-release-published == 'true'
         uses: docker/build-push-action@v2
         with:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: greenstand/${{ github.event.repository.name }}:${{ steps.package-version.outputs.current-version }}
-
-      - id: export_bumped_version
-        run: |
-          export BUMPED_VERSION="${{ steps.package-version.outputs.current-version }}"
-          echo "::set-output name=bumped_version::${BUMPED_VERSION}"
+          tags: greenstand/${{ github.event.repository.name }}:${{ steps.semantic-release.outputs.new-release-version }}
 
       - name: Install kustomize
-        run: curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+        if: steps.semantic-release.outputs.new-release-published == 'true'
+        run: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
 
-      - name: Run kustomize
-        run: (cd deployment/overlays/development && ../../../kustomize edit set image greenstand/${{ github.event.repository.name }}:${{ steps.export_bumped_version.outputs.bumped_version }} )
+      - name: Update development image tag
+        if: steps.semantic-release.outputs.new-release-published == 'true'
+        env:
+          IMAGE_NAME: greenstand/${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ steps.semantic-release.outputs.new-release-version }}
+        run: |
+          cd deployment/overlays/development
+          ../../../kustomize edit set image "${IMAGE_NAME}:${IMAGE_TAG}"
 
-      - name: Commit dev kustomization file with new app version
-        if: |
-          !contains(github.event.head_commit.message, 'chore')
+      - name: Commit development image tag
+        id: commit-image-tag
+        if: steps.semantic-release.outputs.new-release-published == 'true'
+        env:
+          IMAGE_TAG: ${{ steps.semantic-release.outputs.new-release-version }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -am "chore: bump docker image tag ${{ steps.export_bumped_version.outputs.bumped_version }} [skip ci]"
+          git add deployment/overlays/development
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bump docker image tag ${IMAGE_TAG} [skip ci]"
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.commit-image-tag.outputs.committed == 'true'
+        run: git push origin HEAD:main
